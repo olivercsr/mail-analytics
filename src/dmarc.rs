@@ -31,3 +31,10 @@ struct Result {
     dkim_pass: bool,
     spf_pass: bool
 }
+
+struct Report {
+    id: String,
+    start: Time,
+    end: Time,
+    sender: String
+}
