@@ -22,19 +22,39 @@ struct Policy {
     action: Action
 }
 
-struct Sender {
+struct Mailer {
     host: String
 }
 
+struct DkimResult {
+    domain: String,
+    selector: String,
+    result: bool
+}
+
+struct SpfResult {
+    domain: String,
+    result: bool
+}
+
 struct Result {
-    sender: Sender,
-    dkim_pass: bool,
-    spf_pass: bool
+    mailer: Mailer,
+    header_from: String,
+    dkim: DkimResult,
+    spf: SpfResult,
+    count: usize
+}
+
+struct Reporter {
+    name: String,
+    email: String,
+    info: String
 }
 
 struct Report {
+    reporter: Reporter,
     id: String,
     start: Time,
     end: Time,
-    sender: String
+    policy: Policy
 }
