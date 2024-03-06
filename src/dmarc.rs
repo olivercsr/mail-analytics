@@ -1,60 +1,61 @@
-enum Adkim {
+pub enum Adkim {
     Relaxed,
     Strict
 }
 
-enum Aspf {
+pub enum Aspf {
     Relaxed,
     Strict
 }
 
-enum Action {
+pub enum Action {
     None,
     Quarantine,
     Reject
 }
 
-struct Policy {
-    domain: String,
-    adkim: Adkim,
-    aspf: Aspf,
-    percentage: u8,
-    action: Action
+pub struct Policy {
+    pub domain: String,
+    pub adkim: Adkim,
+    pub aspf: Aspf,
+    pub percentage: u8,
+    pub action: Action
 }
 
-struct Mailer {
-    host: String
+pub struct Mailer {
+    pub host: String
 }
 
-struct DkimResult {
-    domain: String,
-    selector: String,
-    result: bool
+pub struct DkimResult {
+    pub domain: String,
+    pub selector: String,
+    pub result: bool
 }
 
-struct SpfResult {
-    domain: String,
-    result: bool
+pub struct SpfResult {
+    pub domain: String,
+    pub result: bool
 }
 
-struct Result {
-    mailer: Mailer,
-    header_from: String,
-    dkim: DkimResult,
-    spf: SpfResult,
-    count: usize
+pub struct Result {
+    pub mailer: Mailer,
+    pub header_from: String,
+    pub dkim: DkimResult,
+    pub spf: SpfResult,
+    pub count: usize
 }
 
-struct Reporter {
-    name: String,
-    email: String,
-    info: String
+pub struct Reporter {
+    pub name: String,
+    pub email: String,
+    pub info: String
 }
 
-struct Report {
-    reporter: Reporter,
-    id: String,
-    start: Time,
-    end: Time,
-    policy: Policy
+#[derive(Debug)]
+pub struct Report {
+    //reporter: Reporter,
+    pub id: String,
+    pub start: usize,
+    pub end: usize,
+    //policy: Policy
 }

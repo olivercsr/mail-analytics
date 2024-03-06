@@ -1,6 +1,8 @@
 use std::fs::File;
 use std::io::{BufReader/*, Result*/};
+
 mod xmlreader;
+mod dmarc;
 
 pub fn do_xml(file: File) /*-> Result<()>*/ {
     //let file = File::open(path)?;

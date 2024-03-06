@@ -1,22 +1,36 @@
 use std::collections::HashMap;
 use std::io::Read;
 use xml::reader::{EventReader, XmlEvent};
+use crate::dmarc::{Report};
 
 pub fn read_xml<R: Read>(buf: R) {
     let parser = EventReader::new(buf);
 
     let mut tags: HashMap<String, usize> = HashMap::new();
+    //let mut reports: HashMap<String, Report> = HashMap::new();
+    let mut reports: Vec<Report> = Vec::new();
 
     let mut depth = 0;
     for e in parser {
         match e {
-            Ok(XmlEvent::StartElement { name, .. }) => {
+            Ok(XmlEvent::StartElement { name, attributes, .. }) => {
                 let tagname = name.to_string();
                 let count = tags.get(&tagname);
                 if count.is_some() {
                     tags.insert(String::from(&tagname), *count.unwrap()+1);
                 } else {
                     tags.insert(String::from(&tagname), 1);
+                }
+
+                if tagname.eq("record") {
+                    let report = Report {
+                        //reporter: "",
+                        id: String::from(name.to_string()),
+                        start: 0,
+                        end: 0,
+                        //policy: null()
+                    };
+                    reports.push(report);
                 }
 
                 println!("{:spaces$}+{name} ({})", "", tags.get(&tagname).unwrap(), spaces = depth * 2);
@@ -41,6 +55,8 @@ pub fn read_xml<R: Read>(buf: R) {
             _ => {}
         }
     }
+
+    println!("reports: {:?}", reports);
 
     //Ok({});
 }
