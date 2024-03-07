@@ -1,3 +1,5 @@
+use chrono::{DateTime, Utc};
+
 pub enum Adkim {
     Relaxed,
     Strict
@@ -55,7 +57,7 @@ pub struct Reporter {
 pub struct Report {
     //reporter: Reporter,
     pub id: String,
-    pub start: usize,
-    pub end: usize,
+    pub start: DateTime<Utc>,
+    pub end: DateTime<Utc>,
     //policy: Policy
 }

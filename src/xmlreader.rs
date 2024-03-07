@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::io::Read;
+use chrono::{DateTime};
 use xml::reader::{EventReader, XmlEvent};
 use crate::dmarc::{Report};
 
@@ -26,8 +27,8 @@ pub fn read_xml<R: Read>(buf: R) {
                     let report = Report {
                         //reporter: "",
                         id: String::from(name.to_string()),
-                        start: 0,
-                        end: 0,
+                        start: DateTime::from_timestamp(1000, 0).unwrap(),
+                        end: DateTime::from_timestamp(2000, 0).unwrap(),
                         //policy: null()
                     };
                     reports.push(report);
