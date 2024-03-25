@@ -1,14 +1,15 @@
 use std::fs::File;
 use std::io::{BufReader/*, Result*/};
+use std::path::Path;
 
 mod xmlreader;
 mod dmarc;
 
-pub fn do_xml(file: File) /*-> Result<()>*/ {
+pub fn do_xml<R: AsRef<Path>>(path: R) /*-> Result<()>*/ {
     //let file = File::open(path)?;
-    let buffer = BufReader::new(file);
+    //let buffer = BufReader::new(file);
 
-    xmlreader::read_xml(buffer);
+    xmlreader::read_xml(path);
 
     //Ok({})
 }
