@@ -26,6 +26,9 @@ pub fn main() !void {
 
     // ------------------
     echo.echo(std.io.getStdIn(), std.io.getStdOut());
+
+    // ------------------
+    deserializer_json.JsonDeserializer(u8, u8);
 }
 
 test "simple test" {
