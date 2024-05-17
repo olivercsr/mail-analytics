@@ -5,6 +5,7 @@ extern fn foo() void;
 pub fn main() !void {
     // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
     std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    try std.io.getStdErr().writer().print("and then some {s}\n", .{"dings"});
 
     // stdout is for the actual output of your application, for example if you
     // are implementing gzip, then only the compressed bytes should be sent to
@@ -15,9 +16,9 @@ pub fn main() !void {
 
     try stdout.print("Run `zig build test` to run the tests.\n", .{});
 
-    foo();
-
     try bw.flush(); // don't forget to flush!
+
+    foo();
 }
 
 test "simple test" {
