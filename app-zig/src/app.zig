@@ -1,7 +1,7 @@
 const std = @import("std");
 const echo = @import("echo.zig");
-const formats = @import("formats.zig");
-const formats_json = @import("formats/json.zig");
+const deserializer = @import("deserializer.zig");
+const deserializer_json = @import("deserializers/json.zig");
 
 pub fn main() !void {
     // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
