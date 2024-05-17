@@ -1,6 +1,5 @@
 const std = @import("std");
-
-extern fn foo() void;
+const echo = @import("echo.zig");
 
 pub fn main() !void {
     // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
@@ -18,7 +17,13 @@ pub fn main() !void {
 
     try bw.flush(); // don't forget to flush!
 
-    foo();
+    // ------------------
+    const a = [_]u8{ 'a', 'b', 'c', 'd', 'e' };
+    const a1 = a[0..3];
+    std.debug.print("a1: {s}\n", .{a1});
+
+    // ------------------
+    echo.echo(std.io.getStdIn(), std.io.getStdOut());
 }
 
 test "simple test" {

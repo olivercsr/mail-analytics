@@ -15,6 +15,18 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
+    const zig_xml = b.dependency("zig_xml", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
+    // NOTE: see https://ziggit.dev/t/how-to-package-a-zig-source-module-and-how-to-use-it/3457
+    //_ = b.addModule("lib", .{
+    //    .root_source_file = b.path("src/lib.zig"),
+    //    .target = target,
+    //    .optimize = optimize,
+    //});
+
     const lib = b.addStaticLibrary(.{
         .name = "dmarc-parser",
         // In this case the main source file is merely a path, however, in more
@@ -23,13 +35,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-
-    const zig_xml = b.dependency("zig_xml", .{
-        .target = target,
-        .optimize = optimize,
-    });
     lib.root_module.addImport("zig_xml", zig_xml.module("xml"));
-
     lib.linkLibC();
 
     // This declares intent for the library to be installed into the standard
@@ -43,8 +49,8 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-
-    exe.linkLibrary(lib);
+    exe.root_module.addImport("zig_xml", zig_xml.module("xml"));
+    //exe.linkLibrary(lib);
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default

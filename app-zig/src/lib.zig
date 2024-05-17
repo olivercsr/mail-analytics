@@ -1,4 +1,5 @@
 const std = @import("std");
+const echo = @import("echo.zig");
 const testing = std.testing;
 
 const c = @cImport({
@@ -16,6 +17,8 @@ export fn foo() void {
 
     //const reader = xml.reader();
     //std.debug.print("well {n}", .{xml.ReaderOptions});
+
+    echo.echo(std.io.getStdIn(), std.io.getStdOut());
 }
 
 test "basic add functionality" {
