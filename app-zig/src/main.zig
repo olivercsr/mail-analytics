@@ -1,18 +1,10 @@
 const std = @import("std");
-const c = @cImport({
-    @cDefine("_NO_CRT_STDIO_INLINE", "1");
-    @cInclude("stdio.h");
-});
-const xml = @import("zig_xml");
+
+extern fn foo() void;
 
 pub fn main() !void {
     // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
     std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
-
-    _ = c.printf("hello from c\n");
-
-    //const reader = xml.reader();
-    //std.debug.print("well {n}", .{xml.ReaderOptions});
 
     // stdout is for the actual output of your application, for example if you
     // are implementing gzip, then only the compressed bytes should be sent to
@@ -22,6 +14,8 @@ pub fn main() !void {
     const stdout = bw.writer();
 
     try stdout.print("Run `zig build test` to run the tests.\n", .{});
+
+    foo();
 
     try bw.flush(); // don't forget to flush!
 }

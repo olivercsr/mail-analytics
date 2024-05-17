@@ -24,6 +24,14 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    const zig_xml = b.dependency("zig_xml", .{
+        .target = target,
+        .optimize = optimize,
+    });
+    lib.root_module.addImport("zig_xml", zig_xml.module("xml"));
+
+    lib.linkLibC();
+
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
     // running `zig build`).
@@ -36,13 +44,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    const zig_xml = b.dependency("zig_xml", .{
-        .target = target,
-        .optimize = optimize,
-    });
-    exe.root_module.addImport("zig_xml", zig_xml.module("xml"));
-
-    exe.linkLibC();
+    exe.linkLibrary(lib);
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
