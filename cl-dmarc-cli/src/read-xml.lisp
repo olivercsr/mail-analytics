@@ -3,15 +3,12 @@
 (defun find-node (node-p node-value node-children node value)
   (format t "find-node ~a ~a~%" node value)
   (when (funcall node-p node)
-    (if (equal (funcall node-value node) value)
-        (progn
-          (format t "hit ~a~%" node)
-          node)
-        (let ((res (mapcan #'(lambda (node)
-                               (find-node node-p node-value node-children node value))
-                           (funcall node-children node))))
-          (format t "res ~a~%" res)
-          res))))
+    (mapcan
+     (when (equal (funcall node-value node) value)
+       (list node))
+     (mapcar #'(lambda (node)
+                 (find-node node-p node-value node-children node value))
+             (funcall node-children node)))))
 
 (defun access-node (node name)
   (find-node #'x:node-p #'x:node-name #'x:node-children node name))
