@@ -18,6 +18,7 @@
   :components ((:module "src"
                         :serial t
                         :components ((:file "packages")
+                                     (:file "read-xml")
                                      (:file "cl-dmarc-cli"))))
 
   ;; Build a binary:
