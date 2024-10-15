@@ -11,7 +11,10 @@
 
   ;; Dependencies.
   :depends-on ("alexandria"
-               "xmls")
+               "serapeum"
+               "xmls"
+               ;;"cl-transit"
+               )
 
   ;; Project stucture.
   :serial t
