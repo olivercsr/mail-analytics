@@ -2,7 +2,11 @@
 
 ;;(declaim (optimize (speed 0) (space 0) (debug 3)))
 
-(defun find-nodes (nodes &key (node-p #'identity) (wanted-p #'identity) (children #'cdr) (results nil))
+(defun find-nodes (nodes
+                   &key (node-p #'identity)
+                     (wanted-p #'identity)
+                     (children #'cdr)
+                     (results nil))
   (let ((node       (car nodes))
         (rest-nodes (cdr nodes)))
     (if (funcall node-p node)
