@@ -21,6 +21,11 @@
   :components ((:module "src"
                         :serial t
                         :components ((:file "packages")
+                                     (:file "storage")
+                                     (:module "storages"
+                                              :serial t
+                                              :components ((:file "memory")
+                                                           (:file "postgres")))
                                      (:file "read-xml")
                                      (:file "cl-dmarc-cli"))))
 
