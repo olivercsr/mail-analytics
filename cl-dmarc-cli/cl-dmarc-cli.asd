@@ -14,6 +14,7 @@
                "serapeum"
                "xmls"
                ;;"cl-transit"
+               "postmodern"
                )
 
   ;; Project stucture.
