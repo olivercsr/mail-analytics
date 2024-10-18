@@ -22,6 +22,7 @@
   :components ((:module "src"
                         :serial t
                         :components ((:file "packages")
+                                     (:file "types")
                                      (:file "storage")
                                      (:module "storages"
                                               :serial t
