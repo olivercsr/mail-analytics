@@ -7,18 +7,21 @@
                          (action #'(lambda (&rest args)
                                      (declare (ignore args))))
                          (children #'cdr)
-                         (parents '()))
+                         (parents '())
+                         (results '()))
   (let ((node       (car nodes))
         (rest-nodes (cdr nodes)))
-    (when (funcall node-p node)
-      (funcall action node parents)
-      (traverse-nodes (concatenate 'list
-                                   rest-nodes
-                                   (funcall children node))
-                      :action   action
-                      :node-p   node-p
-                      :children children
-                      :parents  (cons node parents)))))
+    (if (funcall node-p node)
+        (let ((result (funcall action node parents)))
+          (traverse-nodes (concatenate 'list
+                                       rest-nodes
+                                       (funcall children node))
+                          :action   action
+                          :node-p   node-p
+                          :children children
+                          :parents  (cons node parents)
+                          :results  (cons result results)))
+        results)))
 
 (defun report-metadata-node (xml)
   (car (traverse-nodes (list xml)
@@ -33,15 +36,17 @@
 
 
 
-;;(let ((policies-evaluated '()))
-;;  (traverse-nodes '((11 ((22) (33) (44 ((55) (99) (33 ((44) (33))))) (33 ((11))))))
-;;                  :action #'(lambda (node parents)
-;;                              ;;(format t "node: ~a parents: ~a~%" node parents)
-;;                              (when (equal (car node) 33)
-;;                                (setf policies-evaluated
-;;                                      (cons (car node)
-;;                                            policies-evaluated)))))
-;;  policies-evaluated)
+;;(let* ((policies-evaluated '())
+;;       (results (traverse-nodes '((11 ((22) (33) (44 ((55) (99) (33 ((44) (33))))) (33 ((11))))))
+;;                                :action #'(lambda (node parents)
+;;                                            ;;(format t "node: ~a parents: ~a~%" node parents)
+;;                                            (when (equal (car node) 33)
+;;                                              (setf policies-evaluated
+;;                                                    (cons (car node)
+;;                                                          policies-evaluated))
+;;                                              (car node))))))
+;;       `((:pe ,policies-evaluated)
+;;         (:rs ,results)))
 
 ;;(let ((al nil))
 ;;  (setf al (acons :x 11 al))
