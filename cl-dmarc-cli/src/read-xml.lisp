@@ -24,12 +24,17 @@
         results)))
 
 (defun report-metadata-node (xml)
-  (car (traverse-nodes (list xml)
-                       :node-p   #'x:node-p
-                       :wanted-p #'(lambda (node)
-                                     (equal (x:node-name node)
-                                            "report_metadata"))
-                       :children #'x:node-children)))
+  (car
+   (remove-if
+    #'null
+    (traverse-nodes (list xml)
+                    :node-p #'x:node-p
+                    :action #'(lambda (node parents)
+                                (declare (ignore parents))
+                                (when (equal (x:node-name node)
+                                             "report_metadata")
+                                  node))
+                    :children #'x:node-children))))
 
 (defun parse-xml (stream)
   (x:parse stream))
