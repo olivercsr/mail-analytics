@@ -11,8 +11,8 @@
   domain
   adkim
   aspf
-  p
-  sp
+  p?
+  sp?
   pct
   np)
 
