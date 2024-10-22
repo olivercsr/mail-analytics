@@ -12,7 +12,10 @@
   ;; Dependencies.
   :depends-on ("alexandria"
                "serapeum"
-               "xmls"
+               ;;"xmls"
+               "cxml"
+               "cxml-dom"
+               "xpath"
                ;;"cl-transit"
                "postmodern"
                )

@@ -43,9 +43,17 @@
 ;;(greet)
 
 ;;(with-open-file (stream "../../dmarc-data/amazonses.com\!csr-informatik.de\!1711065600\!1711152000.xml")
-;;  (let* ((xml-data (parse-xml stream))
+;;  (let* (;;(xml-data (parse-xml stream))
 ;;         ;;(metadata (report-metadata-node xml-data))
+;;         (cxml-data (cxml:parse-stream stream (cxml-dom:make-dom-builder)))
+;;         ;;context (xpath:make-context cxml-data)
 ;;         )
-;;    ;;(format t "data: ~a~%" (x:node-name metadata))
-;;    (process-report xml-data)
+;;    (format t "data: ~a~%" cxml-data)
+;;    ;;(process-report xml-data)
+;;    ;;(xpath:evaluate "//child" context)
 ;;    ))
+
+;;(let* ((dom (x:parse-file "../../dmarc-data/amazonses.com!csr-informatik.de!1711065600!1711152000.xml"
+;;                          (xd:make-dom-builder)))
+;;       (result (xp:evaluate "//report_metadata" dom)))
+;;  (format t "hhhhhhhhhhhhhhhhhhhh ~a ~a~%" dom (dom:child-nodes (car (xp:all-nodes result)))))

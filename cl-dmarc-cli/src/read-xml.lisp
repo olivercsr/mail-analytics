@@ -23,34 +23,45 @@
                           :results  (cons result results)))
         results)))
 
-(defun report-metadata-node (xml)
-  (car
-   (remove-if
-    #'null
-    (traverse-nodes (list xml)
-                    :node-p #'x:node-p
-                    :children #'x:node-children
-                    :action #'(lambda (node parents)
-                                (declare (ignore parents))
-                                (when (equal (x:node-name node)
-                                             "report_metadata")
-                                  node))))))
+;;(defun report-metadata-node (xml)
+;;  (car
+;;   (remove-if
+;;    #'null
+;;    (traverse-nodes (list xml)
+;;                    :node-p #'x:node-p
+;;                    :children #'x:node-children
+;;                    :action #'(lambda (node parents)
+;;                                (declare (ignore parents))
+;;                                (when (equal (x:node-name node)
+;;                                             "report_metadata")
+;;                                  node))))))
 
-(defun process-report (xml)
-  (let ((report-metadata nil)
-        (policy-published nil))
-    (traverse-nodes (list xml)
-                    :node-p #'x:node-p
-                    :children #'x:node-children
-                    :action #'(lambda (node parents)
-                                (cond ((equal (x:node-name node) "report_metadata")
-                                       (setf report-metadata node))
-                                      ((equal (x:node-name node) "policy_published")
-                                       (setf policy-published node)))))
-    (format t "oooooooooooooooo ~a~%~a~%" report-metadata policy-published)))
+;;(defun process-report (xml)
+;;  (let ((report-metadata nil)
+;;        (policy-published nil))
+;;    (traverse-nodes (list xml)
+;;                    :node-p #'x:node-p
+;;                    :children #'x:node-children
+;;                    :action #'(lambda (node parents)
+;;                                (declare (ignore parents))
+;;                                (cond ((equal (x:node-name node) "report_metadata")
+;;                                       (setf report-metadata node))
+;;                                      ((equal (x:node-name node) "policy_published")
+;;                                       (setf policy-published node)))))
+;;    (traverse-nodes (list xml)
+;;                    :node-p #'x:node-p
+;;                    :children #'x:node-children
+;;                    :action #'(lambda (node parents)
+;;                                (declare (ignore parents))
+;;                                (when (equal (x:node-name node) "record")
+;;                                  (let ((row nil))
+;;                                    (format t "NNNNNNNNNNN ~a ~a ~a~%"
+;;                                            (x:node-name report-metadata)
+;;                                            (x:node-name policy-published)
+;;                                            (x:node-name node))))))))
 
-(defun parse-xml (stream)
-  (x:parse stream))
+;;(defun parse-xml (stream)
+;;  (x:parse stream))
 
 
 
