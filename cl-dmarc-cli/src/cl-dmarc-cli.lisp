@@ -44,5 +44,8 @@
 
 ;;(with-open-file (stream "../../dmarc-data/amazonses.com\!csr-informatik.de\!1711065600\!1711152000.xml")
 ;;  (let* ((xml-data (parse-xml stream))
-;;         (metadata (report-metadata-node xml-data)))
-;;    (format t "data: ~a~%" (x:node-name metadata))))
+;;         ;;(metadata (report-metadata-node xml-data))
+;;         )
+;;    ;;(format t "data: ~a~%" (x:node-name metadata))
+;;    (process-report xml-data)
+;;    ))

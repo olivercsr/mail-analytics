@@ -29,12 +29,25 @@
     #'null
     (traverse-nodes (list xml)
                     :node-p #'x:node-p
+                    :children #'x:node-children
                     :action #'(lambda (node parents)
                                 (declare (ignore parents))
                                 (when (equal (x:node-name node)
                                              "report_metadata")
-                                  node))
-                    :children #'x:node-children))))
+                                  node))))))
+
+(defun process-report (xml)
+  (let ((report-metadata nil)
+        (policy-published nil))
+    (traverse-nodes (list xml)
+                    :node-p #'x:node-p
+                    :children #'x:node-children
+                    :action #'(lambda (node parents)
+                                (cond ((equal (x:node-name node) "report_metadata")
+                                       (setf report-metadata node))
+                                      ((equal (x:node-name node) "policy_published")
+                                       (setf policy-published node)))))
+    (format t "oooooooooooooooo ~a~%~a~%" report-metadata policy-published)))
 
 (defun parse-xml (stream)
   (x:parse stream))
