@@ -28,8 +28,9 @@
     (uiop:quit))
   ;;(greet (or (first argv)
   ;;           "dear lisp user"))
-  (let ((dmarc-data (parse-xml *standard-input*)))
-    (format t "~a - ~a~%" (report-metadata-node dmarc-data) dmarc-data)))
+  ;;(let ((dmarc-data (parse-xml *standard-input*)))
+  ;;  (format t "~a - ~a~%" (report-metadata-node dmarc-data) dmarc-data))
+  )
 
 (defun main ()
   "Entry point for the executable.
