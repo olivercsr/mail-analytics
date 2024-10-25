@@ -63,6 +63,13 @@
 ;;(defun parse-xml (stream)
 ;;  (x:parse stream))
 
+(defun read-nodes (dom)
+  (let* ((metadata (xp:evaluate "/feedback/report_metadata" dom))
+         (policy   (xp:evaluate "/feedback/policy_published" dom))
+         (records  (xp:evaluate "/feedback/record" dom)))
+    (xp:do-node-set (record records)
+      (format t "hhhhhhhhhhhhhhhhhhhh ~a~%" record))))
+
 
 
 ;;(let* ((policies-evaluated '())

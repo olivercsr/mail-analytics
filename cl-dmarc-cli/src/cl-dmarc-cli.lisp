@@ -54,7 +54,9 @@
 ;;    ;;(xpath:evaluate "//child" context)
 ;;    ))
 
-;;(let* ((dom (x:parse-file "../../dmarc-data/amazonses.com!csr-informatik.de!1711065600!1711152000.xml"
+;;(let* ((dom (x:parse-file "../dmarc-data/enterprise.protection.outlook.com!csr-informatik.de!1715299200!1715385600.xml"
 ;;                          (xd:make-dom-builder)))
-;;       (result (xp:evaluate "//report_metadata" dom)))
-;;  (format t "hhhhhhhhhhhhhhhhhhhh ~a ~a~%" dom (dom:child-nodes (car (xp:all-nodes result)))))
+;;       ;;(result (xp:evaluate "//report_metadata" dom))
+;;       )
+;;  ;;(format t "hhhhhhhhhhhhhhhhhhhh ~a ~a~%" dom (dom:child-nodes (car (xp:all-nodes result))))
+;;  (read-nodes dom))
