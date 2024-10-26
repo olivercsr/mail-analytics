@@ -16,6 +16,12 @@ create table report (
   "identifier" text,
   "starttime" timestamptz,
   "endtime" timestamptz,
+  "policy_adkim" text,
+  "policy_aspf" text,
+  "policy_p" text,
+  "policy_sp" text,
+  "policy_pct" int,
+  "policy_fo" int,
 
   primary key ("id"),
   foreign key ("reporter_id") references reporter ("id") on update cascade on delete cascade
@@ -35,16 +41,15 @@ create table policy (
 )
 */
 
-create table report_record (
+create table report_auth_result (
   "starttime" timestamptz not null,
   "endtime" timestamptz not null,
   "report_id" int,
-  "policy_adkim" text,
-  "policy_aspf" text,
-  "policy_p" text,
-  "policy_sp" text,
-  "policy_pct" int,
-  "policy_fo" int,
+  "source_ip" text,
+  "count" int,
+  "evaluation_disposition" text,
+  "evaluation_dkim" boolean,
+  "evaluation_spf" boolean,
 
   /* TODO */
 

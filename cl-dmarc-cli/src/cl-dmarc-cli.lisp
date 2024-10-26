@@ -59,4 +59,4 @@
 ;;       ;;(result (xp:evaluate "//report_metadata" dom))
 ;;       )
 ;;  ;;(format t "hhhhhhhhhhhhhhhhhhhh ~a ~a~%" dom (dom:child-nodes (car (xp:all-nodes result))))
-;;  (read-nodes dom))
+;;  (read-records dom))

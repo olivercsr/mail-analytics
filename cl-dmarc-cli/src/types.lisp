@@ -8,6 +8,7 @@
   end-date)
 
 (defstruct policy
+  id
   domain
   adkim
   aspf
@@ -16,10 +17,10 @@
   pct
   np)
 
-(defstruct policy-evaluation
-  disposition
-  dkim
-  spf)
+(defstruct identifier
+  envelope-from
+  envelope-to
+  header-from)
 
 (defstruct auth-result-dkim
   domain
@@ -30,10 +31,15 @@
   domain
   result)
 
+(defstruct policy-evaluation
+  disposition
+  dkim
+  spf)
+
 (defstruct record-row
   source-ip
   policy-evaluation
   header-from
-  auth-result-dkim
-  auth-result-spf
+  auth-results-dkim
+  auth-results-spf
   count)
