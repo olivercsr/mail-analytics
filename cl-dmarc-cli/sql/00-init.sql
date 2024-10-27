@@ -41,15 +41,26 @@ create table policy (
 )
 */
 
-create table report_auth_result (
+create table report_auth_evaluation (
   "starttime" timestamptz not null,
   "endtime" timestamptz not null,
   "report_id" int,
+
+  /* record.row */
   "source_ip" text,
   "count" int,
-  "evaluation_disposition" text,
-  "evaluation_dkim" boolean,
-  "evaluation_spf" boolean,
+
+  /* record.row.policy_evaluated */
+  "disposition" text,
+  "dkim" boolean,
+  "spf" boolean,
+
+  /* record.identifiers */
+  "envelope_from" text,
+  "envelope_to" text,
+  "header_from" text,
+
+  /* record.auth_results */
 
   /* TODO */
 
@@ -57,3 +68,23 @@ create table report_auth_result (
 );
 select create_hypertable('report_record', 'starttime');
 create index report_record_end_idx on report_record ("endtime");
+
+create table report_dkim_evaluation (
+  "starttime" timestamptz not null,
+  "endtime" timestamptz not null,
+
+  "domain" text,
+  "selector" text,
+  "result" text
+);
+select create hypertable('report_dkim_evaluation', 'startime');
+
+create table report_spf_evaluation (
+  "startime" timestamptz not null,
+  "endtime" timestamptz not null,
+
+  "domain" text,
+  "scope" text,
+  "result" text
+);
+select create hypertable('report_spf_evaluation', 'startime');
