@@ -1,6 +1,14 @@
-drop table if exists report_record;
+/*drop table if exists report_record;*/
 drop table if exists report;
 drop table if exists reporter;
+
+create type alignment as enum ('strict', 'relaxed');
+create type disposition as enum ('none', 'quarantine', 'reject');
+create type dmarc_result as enum ('pass', 'fail');
+create type policy_override as enum ('forwarded', 'sampled_out', 'trusted_forwarder', 'mailing_list', 'local_policy', 'other');
+create type dkim_result as enum ('none', 'pass', 'fail', 'policy', 'neutral', 'temperror', 'permerror');
+create type spf_domain_scope as enum ('helo', 'mfrom');
+create type spf_result as enum ('none', 'neutral', 'pass', 'fail', 'softfail', 'temperror', 'permerror');
 
 create table reporter (
   "id" serial not null,
