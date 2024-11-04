@@ -37,12 +37,11 @@ create table reporter (
 
 create table report (
   "report_id" text not null,
-  "reporter_id" int,
-
   "begin" timestamptz not null,
   "end" timestamptz not null,
-  "error" text,
+  "reporter_id" int,
 
+  "error" text,
   "policy_domain" text,
   "policy_adkim" alignment,
   "policy_aspf" alignment,
@@ -51,19 +50,17 @@ create table report (
   "policy_pct" int,
   "policy_fo" text,
 
-  primary key ("report_id"),
+  primary key ("report_id", "begin"),
   foreign key ("reporter_id") references reporter ("id") on update cascade on delete cascade
 );
-/*
 select create_hypertable('report', 'begin');
 create index report_end_idx on report ("end");
-*/
-create index report_begin_end_idx on report ("begin", "end");
 
 
 create table evaluation (
   "id" serial not null,
   "report_id" text,
+  "begin" timestamptz,
 
   /* record.row */
   "source_ip" inet,
@@ -80,7 +77,7 @@ create table evaluation (
   "header_from" text,
 
   primary key ("id"),
-  foreign key ("report_id") references report ("report_id") on update cascade on delete cascade
+  foreign key ("report_id", "begin") references report ("report_id", "begin") on update cascade on delete cascade
 );
 
 
