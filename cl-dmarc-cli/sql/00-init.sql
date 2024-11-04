@@ -12,56 +12,49 @@ create type spf_result as enum ('none', 'neutral', 'pass', 'fail', 'softfail', '
 
 create table reporter (
   "id" serial not null,
-  "name" text,
+
+  "org_name" text,
   "email" text,
+  "extra_contact_info" text,
 
   primary key ("id")
 );
 
 create table report (
-  "id" serial not null,
+  "report_id" text not null,
   "reporter_id" int,
-  "identifier" text,
-  "starttime" timestamptz,
-  "endtime" timestamptz,
-  "policy_adkim" text,
-  "policy_aspf" text,
-  "policy_p" text,
-  "policy_sp" text,
-  "policy_pct" int,
-  "policy_fo" int,
 
-  primary key ("id"),
+  "begin" timestamptz,
+  "end" timestamptz,
+  "error" text,
+
+  "policy_domain" text,
+  "policy_adkim" alignment,
+  "policy_aspf" alignment,
+  "policy_p" disposition,
+  "policy_sp" disposition,
+  "policy_pct" int,
+  "policy_fo" text,
+
+  primary key ("report_id"),
   foreign key ("reporter_id") references reporter ("id") on update cascade on delete cascade
 );
+select create_hypertable('report', 'begin');
+create index report_end_idx on report ("end");
 
-/*
-create table policy (
-  "id" serial not null,
-  "adkim" text,
-  "aspf" text,
-  "p" text,
-  "sp" text,
-  "pct" int,
-  "fo" int,
-
-  primary key ("id")
-)
-*/
-
-create table report_auth_evaluation (
-  "starttime" timestamptz not null,
-  "endtime" timestamptz not null,
-  "report_id" int,
+create table policy_evaluated (
+  "begin" timestamptz not null,
+  "end" timestamptz not null,
+  "report_id" text,
 
   /* record.row */
   "source_ip" text,
   "count" int,
 
   /* record.row.policy_evaluated */
-  "disposition" text,
-  "dkim" boolean,
-  "spf" boolean,
+  "disposition" disposition,
+  "dkim" dmarc_result,
+  "spf" dmarc_result,
 
   /* record.identifiers */
   "envelope_from" text,
@@ -72,10 +65,10 @@ create table report_auth_evaluation (
 
   /* TODO */
 
-  foreign key ("report_id") references report ("id") on update cascade on delete cascade
+  foreign key ("report_id") references report ("report_id") on update cascade on delete cascade
 );
-select create_hypertable('report_record', 'starttime');
-create index report_record_end_idx on report_record ("endtime");
+select create_hypertable('policy_evaluated', 'begin');
+create index policy_evaluated_end_idx on policy_evaluated ("end");
 
 create table report_dkim_evaluation (
   "starttime" timestamptz not null,

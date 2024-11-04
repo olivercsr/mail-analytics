@@ -57,6 +57,7 @@
        <xs:element name="fo" type="xs:string"/>
      </xs:all>
    </xs:complexType>
+
    <!-- The DMARC-aligned authentication result. -->
    <xs:simpleType name="DMARCResultType">
      <xs:restriction base="xs:string">
