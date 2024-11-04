@@ -1,8 +1,18 @@
-drop table if exists spf_evaulation;
-drop table if exists dkim_evaulation;
-drop table if exists evaulation;
-drop table if exists report;
-drop table if exists reporter;
+/*drop index if exists report_end_idx;*/
+
+drop table if exists spf_evaluation cascade;
+drop table if exists dkim_evaluation cascade;
+drop table if exists evaluation cascade;
+drop table if exists report cascade;
+drop table if exists reporter cascade;
+
+drop type if exists spf_result cascade;
+drop type if exists spf_domain_scope cascade;
+drop type if exists dkim_result cascade;
+drop type if exists policy_override cascade;
+drop type if exists dmarc_result cascade;
+drop type if exists disposition cascade;
+drop type if exists alignment cascade;
 
 
 create type alignment as enum ('strict', 'relaxed');
@@ -29,8 +39,8 @@ create table report (
   "report_id" text not null,
   "reporter_id" int,
 
-  "begin" timestamptz,
-  "end" timestamptz,
+  "begin" timestamptz not null,
+  "end" timestamptz not null,
   "error" text,
 
   "policy_domain" text,
@@ -44,8 +54,11 @@ create table report (
   primary key ("report_id"),
   foreign key ("reporter_id") references reporter ("id") on update cascade on delete cascade
 );
+/*
 select create_hypertable('report', 'begin');
 create index report_end_idx on report ("end");
+*/
+create index report_begin_end_idx on report ("begin", "end");
 
 
 create table evaluation (
@@ -77,7 +90,8 @@ create table dkim_evaluation (
 
   "domain" text,
   "selector" text,
-  "result" text,
+  "result" dkim_result,
+  "human_result" text,
 
   primary key ("id"),
   foreign key ("evaluation_id") references evaluation ("id") on update cascade on delete cascade
@@ -89,8 +103,8 @@ create table spf_evaluation (
   "evaluation_id" int,
 
   "domain" text,
-  "scope" text,
-  "result" text,
+  "scope" spf_domain_scope,
+  "result" spf_result,
 
   primary key ("id"),
   foreign key ("evaluation_id") references evaluation ("id") on update cascade on delete cascade
