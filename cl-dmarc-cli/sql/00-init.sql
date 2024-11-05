@@ -59,8 +59,8 @@ create index report_end_idx on report ("end");
 
 create table evaluation (
   "id" serial not null,
+  "begin" timestamptz not null,
   "report_id" text,
-  "begin" timestamptz,
 
   /* record.row */
   "source_ip" inet,
@@ -76,13 +76,15 @@ create table evaluation (
   "envelope_to" text,
   "header_from" text,
 
-  primary key ("id"),
+  primary key ("id", "begin"),
   foreign key ("report_id", "begin") references report ("report_id", "begin") on update cascade on delete cascade
 );
+select create_hypertable('evaluation', 'begin');
 
 
 create table dkim_evaluation (
   "id" serial not null,
+  "begin" timestamptz not null,
   "evaluation_id" int,
 
   "domain" text,
@@ -90,19 +92,22 @@ create table dkim_evaluation (
   "result" dkim_result,
   "human_result" text,
 
-  primary key ("id"),
-  foreign key ("evaluation_id") references evaluation ("id") on update cascade on delete cascade
+  primary key ("id", "begin"),
+  foreign key ("evaluation_id", "begin") references evaluation ("id", "begin") on update cascade on delete cascade
 );
+select create_hypertable('dkim_evaluation', 'begin');
 
 
 create table spf_evaluation (
   "id" serial not null,
+  "begin" timestamptz not null,
   "evaluation_id" int,
 
   "domain" text,
   "scope" spf_domain_scope,
   "result" spf_result,
 
-  primary key ("id"),
-  foreign key ("evaluation_id") references evaluation ("id") on update cascade on delete cascade
+  primary key ("id", "begin"),
+  foreign key ("evaluation_id", "begin") references evaluation ("id", "begin") on update cascade on delete cascade
 );
+select create_hypertable('spf_evaluation', 'begin');
