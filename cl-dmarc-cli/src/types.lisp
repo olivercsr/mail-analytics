@@ -1,45 +1,49 @@
 (in-package :cl-dmarc-cli)
 
-(defstruct report
+(defstruct reporter
   id
   org-name
   email
-  start-date
-  end-date)
+  extra-contact-info)
 
-(defstruct policy
+(defstruct report
+  report-id
+  begin
+  end
+  reporter-id
+  error
+  policy-domain
+  policy-adkim
+  policy-aspf
+  policy-p
+  policy-sp
+  policy-pct
+  policy-fo)
+
+(defstruct evaluation
   id
-  domain
-  adkim
-  aspf
-  p?
-  sp?
-  pct
-  np)
-
-(defstruct identifier
+  report-id
+  begin
+  source-ip
+  count
+  disposition
+  dkim
+  spf
   envelope-from
   envelope-to
   header-from)
 
-(defstruct auth-result-dkim
+(defstruct dkim-evaluation
+  id
+  evaluation-id
   domain
   selector
-  result)
+  result
+  human-result)
 
-(defstruct auth-result-spf
+(defstruct spf-evaluation
+  id
+  evaluation-id
   domain
+  scope
   result)
-
-(defstruct policy-evaluation
-  disposition
-  dkim
-  spf)
-
-(defstruct record-row
-  source-ip
-  policy-evaluation
-  header-from
-  auth-results-dkim
-  auth-results-spf
-  count)
