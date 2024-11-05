@@ -59,4 +59,5 @@
 ;;       ;;(result (xp:evaluate "//report_metadata" dom))
 ;;       )
 ;;  ;;(format t "hhhhhhhhhhhhhhhhhhhh ~a ~a~%" dom (dom:child-nodes (car (xp:all-nodes result))))
-;;  (read-records dom))
+;;  (read-records dom #'(lambda (metadata policy evaluation)
+;;                        (format t "EVALUATION ~a~%" evaluation))))

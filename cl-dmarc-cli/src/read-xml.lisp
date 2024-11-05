@@ -64,11 +64,23 @@
 ;;  (x:parse stream))
 
 (defun read-records (dom record-fn)
-  (let* ((metadata (xp:evaluate "/feedback/report_metadata" dom))
-         (policy   (xp:evaluate "/feedback/policy_published" dom))
-         (records  (xp:evaluate "/feedback/record" dom)))
-    (xp:do-node-set (record records)
-      (funcall record-fn metadata policy records))))
+  (let* ((metadata-set (xp:evaluate "/feedback/report_metadata" dom))
+         (metadata     (car (xp:all-nodes metadata-set)))
+         (policy-set   (xp:evaluate "/feedback/policy_published" dom))
+         (policy       (car (xp:all-nodes policy-set)))
+         (records-set  (xp:evaluate "/feedback/record" dom)))
+    (xp:do-node-set (record records-set)
+      (let ((evaluation (make-evaluation :report-id (xp:string-value (xp:evaluate "report_id" metadata))
+                                         :begin (xp:string-value (xp:evaluate "date_range/begin" metadata))
+                                         :source-ip (xp:string-value (xp:evaluate "row/source_ip" record))
+                                         :count (xp:number-value (xp:evaluate "row/count" record))
+                                         :disposition nil
+                                         :dkim nil
+                                         :spf nil
+                                         :envelope-from nil
+                                         :envelope-to nil
+                                         :header-from nil)))
+        (funcall record-fn metadata policy evaluation)))))
 
 
 
