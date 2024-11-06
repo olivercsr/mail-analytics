@@ -57,7 +57,8 @@
 ;;(let* ((dom (x:parse-file "../dmarc-data/enterprise.protection.outlook.com!csr-informatik.de!1715299200!1715385600.xml"
 ;;                          (xd:make-dom-builder)))
 ;;       ;;(result (xp:evaluate "//report_metadata" dom))
-;;       )
+;;       (report-fn #'(lambda (&rest args)
+;;                      (format t "====== ~a~%" args)
+;;                      123)))
 ;;  ;;(format t "hhhhhhhhhhhhhhhhhhhh ~a ~a~%" dom (dom:child-nodes (car (xp:all-nodes result))))
-;;  (read-records dom #'(lambda (metadata policy evaluation)
-;;                        (format t "EVALUATION ~a~%" evaluation))))
+;;  (read-records dom report-fn report-fn report-fn report-fn report-fn))
