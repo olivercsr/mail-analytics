@@ -54,11 +54,21 @@
 ;;    ;;(xpath:evaluate "//child" context)
 ;;    ))
 
-;;(let* ((dom (x:parse-file "../dmarc-data/enterprise.protection.outlook.com!csr-informatik.de!1715299200!1715385600.xml"
+;;(let* ((db (pg:with-connection '("dmarc" "dmarc" "dmarc" "localhost"
+;;                                 :port 5432
+;;                                 :pooled-p nil
+;;                                 :use-binary t
+;;                                 ;;:use-ssl :try
+;;                                 :application-name "dmarc-tool")
+;;             (make-instance 'postgres-storage
+;;                            :connection pg:*database*)))
+;;       (dom (x:parse-file "../dmarc-data/enterprise.protection.outlook.com!csr-informatik.de!1715299200!1715385600.xml"
 ;;                          (xd:make-dom-builder)))
 ;;       ;;(result (xp:evaluate "//report_metadata" dom))
+;;       (reporter-fn #'(lambda (reporter)
+;;                        (upsert-reporter db reporter)))
 ;;       (report-fn #'(lambda (&rest args)
 ;;                      (format t "====== ~a~%" args)
 ;;                      123)))
 ;;  ;;(format t "hhhhhhhhhhhhhhhhhhhh ~a ~a~%" dom (dom:child-nodes (car (xp:all-nodes result))))
-;;  (read-records dom report-fn report-fn report-fn report-fn report-fn))
+;;  (read-records dom reporter-fn report-fn report-fn report-fn report-fn))
