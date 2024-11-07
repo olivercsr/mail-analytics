@@ -70,7 +70,8 @@
          (policy       (car (xp:all-nodes policy-set)))
          (records-set  (xp:evaluate "/feedback/record" dom)))
     (xp:do-node-set (record records-set)
-      (let* ((reporter (make-reporter :org-name (xp:string-value (xp:evaluate "org_name" metadata))
+      (let* ((reporter (make-reporter :id nil
+                                      :org-name (xp:string-value (xp:evaluate "org_name" metadata))
                                       :email (xp:string-value (xp:evaluate "email" metadata))
                                       :extra-contact-info (xp:string-value (xp:evaluate "extra_contact_info" metadata))))
              (reporter-result (funcall reporter-fn reporter))

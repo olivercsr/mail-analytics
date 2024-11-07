@@ -1,12 +1,18 @@
 (in-package :cl-dmarc-cli)
 
-(defclass postgres-storage () ((pg-connection :initarg :connection)))
+(defclass postgres-storage () ())
 
 (defmethod upsert-reporter ((db postgres-storage) reporter)
   (pg:execute (:insert-into 'reporter :set
-                            'org-name (reporter-org-name reporter)
-                            'email (reporter-email reporter)
-                            'extra_contact_info (reporter-extra-contact-info reporter))))
+               ;;'id 123
+               'org-name (reporter-org-name reporter)
+               'email (reporter-email reporter)
+               'extra_contact_info (reporter-extra-contact-info reporter)
+               :on-conflict-update 'id
+               :update-set
+               'org-name (reporter-org-name reporter)
+               'email (reporter-email reporter)
+               'extra_contact_info (reporter-extra-contact-info reporter))))
 
 (defmethod store-report ((db postgres-storage) id report)
   (format t "postgres-storage ~a ~a~%" id report))
