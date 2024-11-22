@@ -1,2 +1,3 @@
 (defpackage :shared
-  (:use :cl))
+  (:use :cl)
+  (:export :traverse-nodes))
