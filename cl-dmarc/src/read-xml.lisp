@@ -1,4 +1,4 @@
-(in-package :cl-dmarc-cli)
+(in-package :dmarc-reading)
 
 ;;(declaim (optimize (speed 0) (space 0) (debug 3)))
 

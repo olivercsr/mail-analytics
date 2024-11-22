@@ -1,4 +1,4 @@
-# cl-dmarc-cli
+# dmarc-importer
 
 
 
@@ -17,8 +17,8 @@ or build and run the binary:
 
 ```
 $ make build
-$ ./cl-dmarc-cli [name]
-Hello [name] from cl-dmarc-cli
+$ ./dmarc-importer [name]
+Hello [name] from dmarc-importer
 ```
 
 ## Roswell integration
@@ -27,7 +27,7 @@ Roswell is an implementation manager and [script launcher](https://github.com/ro
 
 A POC script is in the roswell/ directory.
 
-Your users can install the script with `owegner/cl-dmarc-cli`.
+Your users can install the script with `owegner/dmarc-importer`.
 
 # Dev
 

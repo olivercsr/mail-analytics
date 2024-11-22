@@ -20,7 +20,7 @@ install:
     - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
 
 script:
-    # Run the cl-dmarc-cli tests using lisp-unit
-    cl -e '(ql:quickload :cl-dmarc-cli-tests)
-           (unless (cl-dmarc-cli-tests:run)
+    # Run the dmarc-importer tests using lisp-unit
+    cl -e '(ql:quickload :dmarc-importer-tests)
+           (unless (dmarc-importer-tests:run)
              (uiop:quit 1))'

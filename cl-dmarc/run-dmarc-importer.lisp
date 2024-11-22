@@ -13,11 +13,12 @@ If you don't want to land in the REPL, you can (quit) below or call lisp with th
 Another solution to run the app is to build and run a binary (see README).
 "
 
-(load "cl-dmarc-cli.asd")
+(load "dmarc-importer.asd")
 
-(ql:quickload "cl-dmarc-cli")
+(ql:quickload "dmarc-importer")
 
-(in-package :cl-dmarc-cli)
+(in-package :dmarc-importer)
+
 (handler-case
     (main)
   (error (c)

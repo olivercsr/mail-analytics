@@ -9,15 +9,15 @@ exec ros -Q -- $0 "$@"
 (defun help ()
   (format t "~&Usage:
 
-  cl-dmarc-cli [name]
+  dmarc-importer [name]
 "))
 
 ;; XXX: this load does not load from everywhere
 ;; It doesn't work when run as a script.
-(load (truename "cl-dmarc-cli.asd"))
-(ql:quickload "cl-dmarc-cli")
+(load (truename "dmarc-importer.asd"))
+(ql:quickload "dmarc-importer")
 
 (defun main (&rest argv)
   "Optional name parameter."
   ;; CLI args parsing is done in %main.
-  (cl-dmarc-cli::%main argv))
+  (dmarc-importer::%main argv))

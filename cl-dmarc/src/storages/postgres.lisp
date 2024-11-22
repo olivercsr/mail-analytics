@@ -1,4 +1,4 @@
-(in-package :cl-dmarc-cli)
+(in-package :storage)
 
 (defclass postgres-storage () ())
 

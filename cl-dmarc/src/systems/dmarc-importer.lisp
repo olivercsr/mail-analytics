@@ -1,4 +1,4 @@
-(in-package :cl-dmarc-cli)
+(in-package :dmarc-importer)
 
 ;; Define your project functionality here...
 
@@ -12,12 +12,12 @@
 ;;</book>")
 
 ;;(defun greet (&optional (name "Oliver Wegner"))
-;;  (format t "Hello ~a from ~a!~&" name "cl-dmarc-cli"))
+;;  (format t "Hello ~a from ~a!~&" name "dmarc-importer"))
 
 (defun help ()
   (format t "~&Usage:
 
-  cl-dmarc-cli [name]~&"))
+  dmarc-importer [name]~&"))
 
 (defun %main (argv)
   "Parse CLI args."

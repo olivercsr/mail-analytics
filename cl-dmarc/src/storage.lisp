@@ -1,4 +1,4 @@
-(in-package :cl-dmarc-cli)
+(in-package :storage)
 
 (defgeneric store-report (storage id report))
 (defgeneric get-report (storage id))

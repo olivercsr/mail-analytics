@@ -1,4 +1,4 @@
-(defpackage :cl-dmarc-cli
+(defpackage :dmarc-importer
   (:use :cl)
   (:local-nicknames
    ;;(:x :xmls)

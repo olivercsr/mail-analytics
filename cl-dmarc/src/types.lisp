@@ -1,4 +1,4 @@
-(in-package :cl-dmarc-cli)
+(in-package :shared)
 
 (defstruct reporter
   id

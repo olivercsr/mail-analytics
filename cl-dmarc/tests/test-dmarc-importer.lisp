@@ -1,4 +1,4 @@
-(in-package :cl-dmarc-cli-tests)
+(in-package :dmarc-importer-tests)
 
 ;; Define your project tests here...
 

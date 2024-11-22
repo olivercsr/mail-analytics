@@ -1,6 +1,6 @@
 (in-package :asdf-user)
 
-(defsystem "cl-dmarc-cli"
+(defsystem "dmarc-importer"
   :author "Oliver Wegner <oliver.wegner@csr-informatik.de>"
   :version "0.0.1"
   :license "unlicensed"
@@ -24,7 +24,10 @@
   :serial t
   :components ((:module "src"
                         :serial t
-                        :components ((:file "packages")
+                        :components ((:module "packages"
+                                              :serial t
+                                              :components ((:file "shared")
+                                                           (:file "dmarc-importer")))
                                      (:file "types")
                                      (:file "storage")
                                      (:module "storages"
@@ -32,12 +35,14 @@
                                               :components ((:file "memory")
                                                            (:file "postgres")))
                                      (:file "read-xml")
-                                     (:file "cl-dmarc-cli"))))
+                                     (:module "systems"
+                                              :serial t
+                                              :components ((:file "dmarc-importer"))))))
 
   ;; Build a binary:
   ;; don't change this line.
   :build-operation "program-op"
   ;; binary name: adapt.
-  :build-pathname "cl-dmarc-cli"
+  :build-pathname "bin/dmarc-importer"
   ;; entry point: here "main" is an exported symbol. Otherwise, use a double ::
-  :entry-point "cl-dmarc-cli:main")
+  :entry-point "dmarc-importer:main")

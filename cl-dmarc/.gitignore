@@ -37,3 +37,7 @@ tramp
 
 # cask packages
 .cask/
+
+# output files
+/bin/
+!/bin/.gitkeep
