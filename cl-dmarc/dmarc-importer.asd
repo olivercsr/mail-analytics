@@ -32,6 +32,7 @@
                                                            (:file "storage")
                                                            (:file "dmarc-importer")))
                                      (:file "types")
+                                     (:file "trees")
                                      (:file "dmarc-finder")
                                      (:module "dmarc-finders"
                                               :serial t
