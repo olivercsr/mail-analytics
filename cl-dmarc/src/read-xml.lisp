@@ -2,26 +2,26 @@
 
 ;;(declaim (optimize (speed 0) (space 0) (debug 3)))
 
-(defun traverse-nodes (nodes
-                       &key (node-p #'identity)
-                         (action #'(lambda (&rest args)
-                                     (declare (ignore args))))
-                         (children #'cdr)
-                         (parents '())
-                         (results '()))
-  (let ((node       (car nodes))
-        (rest-nodes (cdr nodes)))
-    (if (funcall node-p node)
-        (let ((result (funcall action node parents)))
-          (traverse-nodes (concatenate 'list
-                                       rest-nodes
-                                       (funcall children node))
-                          :action   action
-                          :node-p   node-p
-                          :children children
-                          :parents  (cons node parents)
-                          :results  (cons result results)))
-        results)))
+;;(defun traverse-nodes (nodes
+;;                       &key (node-p #'identity)
+;;                         (action #'(lambda (&rest args)
+;;                                     (declare (ignore args))))
+;;                         (children #'cdr)
+;;                         (parents '())
+;;                         (results '()))
+;;  (let ((node       (car nodes))
+;;        (rest-nodes (cdr nodes)))
+;;    (if (funcall node-p node)
+;;        (let ((result (funcall action node parents)))
+;;          (traverse-nodes (concatenate 'list
+;;                                       rest-nodes
+;;                                       (funcall children node))
+;;                          :action   action
+;;                          :node-p   node-p
+;;                          :children children
+;;                          :parents  (cons node parents)
+;;                          :results  (cons result results)))
+;;        results)))
 
 ;;(defun report-metadata-node (xml)
 ;;  (car
