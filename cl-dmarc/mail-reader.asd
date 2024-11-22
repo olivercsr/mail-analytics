@@ -27,6 +27,7 @@
                         :components ((:module "packages"
                                               :serial t
                                               :components ((:file "shared")
+                                                           (:file "dmarc-finder")
                                                            (:file "mail-reader")))
                                      ;;(:file "types")
                                      ;;(:file "storage")
@@ -35,6 +36,10 @@
                                      ;;         :components ((:file "memory")
                                      ;;                      (:file "postgres")))
                                      ;;(:file "read-xml")
+                                     (:file "dmarc-finder")
+                                     (:module "dmarc-finders"
+                                              :serial t
+                                              :components ((:file "noop")))
                                      (:module "systems"
                                               :serial t
                                               :components ((:file "mail-reader"))))))
