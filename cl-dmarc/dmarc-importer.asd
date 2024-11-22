@@ -27,6 +27,8 @@
                         :components ((:module "packages"
                                               :serial t
                                               :components ((:file "shared")
+                                                           (:file "dmarc-reading")
+                                                           (:file "storage")
                                                            (:file "dmarc-importer")))
                                      (:file "types")
                                      (:file "storage")
