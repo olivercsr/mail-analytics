@@ -1,11 +1,11 @@
-(in-package :dmarc-finder)
+(in-package :file-processor)
 
-(defclass filesystem-dmarc-finder ()
+(defclass filesystem-file-processor ()
   ((base-path :initform #p"."
               :initarg :base-path)))
 
-(defmethod find-dmarc-reports ((dmarc-finder filesystem-dmarc-finder))
-  (shared:traverse-nodes (list (slot-value dmarc-finder 'base-path))
+(defmethod lock-next-file ((file-processor filesystem-file-processor))
+  (shared:traverse-nodes (list (slot-value file-processor 'base-path))
                          :action #'(lambda (path &rest args)
                                      (declare (ignore args))
                                      (uiop:directory-files (truename path)
@@ -18,6 +18,6 @@
                                                          results))))
 
 
-(let ((f (make-instance 'filesystem-dmarc-finder
-                        :base-path #p".")))
-  (find-dmarc-reports f))
+;;(let ((ffp (make-instance 'filesystem-file-processor
+;;                          :base-path #p".")))
+;;  (lock-next-file ffp))

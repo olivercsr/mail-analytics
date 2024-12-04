@@ -27,16 +27,17 @@
                         :components ((:module "packages"
                                               :serial t
                                               :components ((:file "shared")
-                                                           (:file "dmarc-finder")
+                                                           (:file "file-processor")
                                                            (:file "dmarc-reading")
                                                            (:file "storage")
                                                            (:file "dmarc-importer")))
                                      (:file "types")
                                      (:file "trees")
-                                     (:file "dmarc-finder")
-                                     (:module "dmarc-finders"
+                                     (:file "file-processor")
+                                     (:module "file-processors"
                                               :serial t
-                                              :components ((:file "noop")))
+                                              :components ((:file "noop")
+                                                           (:file "filesystem")))
                                      (:file "read-xml")
                                      (:file "storage")
                                      (:module "storages"
