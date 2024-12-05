@@ -45,10 +45,10 @@
   (format t "reset-stuck-files~%"))
 
 
-(let ((ffp (make-instance 'filesystem-file-processor
-                          :source-path #p"../../../dmarc-data/source/"
-                          :processing-path #p"../../../dmarc-data/processing/")))
-  (lock-next-file ffp))
+;;(let ((ffp (make-instance 'filesystem-file-processor
+;;                          :source-path #p"../../../dmarc-data/source/"
+;;                          :processing-path #p"../../../dmarc-data/processing/")))
+;;  (lock-next-file ffp))
 
 ;;(->> "/foo/bar.md"
 ;;  file-namestring
