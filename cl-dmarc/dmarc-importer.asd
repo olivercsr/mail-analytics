@@ -12,6 +12,7 @@
   ;; Dependencies.
   :depends-on ("alexandria"
                "serapeum"
+               "arrow-macros"
                ;;"xmls"
                "cxml"
                "cxml-dom"

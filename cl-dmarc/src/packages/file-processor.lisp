@@ -1,2 +1,3 @@
 (defpackage :file-processor
-  (:use :cl))
+  (:use :cl)
+  (:use :arrow-macros))
