@@ -23,8 +23,17 @@
                                        (concatenate 'list
                                                     new-results
                                                     results)))
-                   car)))
-    ))
+                   car))
+         (processing-path (-> (slot-value file-processor 'processing-path)
+                              truename
+                              namestring)))
+    (format t "lock-next-file ~a~%" file)
+    (when file
+      (rename-file (pathname file)
+                   (->> file
+                     file-namestring
+                     (concatenate 'string processing-path)
+                     pathname)))))
 
 (defmethod file-done ((file-processor filesystem-file-processor) file)
   (format t "file-done ~a~%" file))
@@ -36,6 +45,14 @@
   (format t "reset-stuck-files~%"))
 
 
-;;(let ((ffp (make-instance 'filesystem-file-processor
-;;                          :base-path #p".")))
-;;  (lock-next-file ffp))
+(let ((ffp (make-instance 'filesystem-file-processor
+                          :source-path #p"../../../dmarc-data/source/"
+                          :processing-path #p"../../../dmarc-data/processing/")))
+  (lock-next-file ffp))
+
+;;(->> "/foo/bar.md"
+;;  file-namestring
+;;  (concatenate 'string "/doo/")
+;;  pathname)
+
+(rename-file)
