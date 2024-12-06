@@ -29,17 +29,22 @@
                               namestring)))
     (format t "lock-next-file ~a~%" file)
     (when file
-      (rename-file (pathname file)
-                   (->> file
-                     file-namestring
-                     (concatenate 'string processing-path)
-                     pathname)))))
+      (-> (rename-file (pathname file)
+                       (->> file
+                            file-namestring
+                            (concatenate 'string processing-path)
+                            pathname))
+          car))))
 
 (defmethod file-done ((file-processor filesystem-file-processor) file)
-  (format t "file-done ~a~%" file))
-
-(defmethod archive-done-files ((file-processor filesystem-file-processor))
-  (format t "archive-done-files~%"))
+  (let ((done-path (-> (slot-value file-processor 'done-path)
+                       truename
+                       namestring)))
+    (rename-file (pathname file)
+                 (->> file
+                      file-namestring
+                      (concatenate 'string done-path)
+                      pathname))))
 
 (defmethod reset-stuck-files ((file-processor filesystem-file-processor))
   (format t "reset-stuck-files~%"))
@@ -55,4 +60,5 @@
 ;;  (concatenate 'string "/doo/")
 ;;  pathname)
 
-(rename-file)
+;;(uiop:getcwd)
+;;(rename-file (truename #p"./cl-dmarc/foo") #p"bar")
