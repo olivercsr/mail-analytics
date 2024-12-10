@@ -1,4 +1,4 @@
 (defpackage :storage
-  (:use :cl)
+  (:use :cl :shared)
   (:local-nicknames
    (:pg :postmodern)))
