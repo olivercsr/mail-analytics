@@ -29,12 +29,13 @@
                               namestring)))
     (format t "lock-next-file ~a~%" file)
     (when file
-      (-> (rename-file (pathname file)
-                       (->> file
-                            file-namestring
-                            (concatenate 'string processing-path)
-                            pathname))
-          car))))
+      (multiple-value-bind
+            (destpath) (rename-file (pathname file)
+                                    (->> file
+                                      file-namestring
+                                      (concatenate 'string processing-path)
+                                      pathname))
+        destpath))))
 
 (defmethod file-done ((file-processor filesystem-file-processor) file)
   (let ((done-path (-> (slot-value file-processor 'done-path)
@@ -55,7 +56,7 @@
 ;;                          :processing-path #p"../../../dmarc-data/processing/")))
 ;;  (lock-next-file ffp))
 
-;;(->> "/foo/bar.md"
+;;(->> (concatenate 'string "/foo/" "bar.md")
 ;;  file-namestring
 ;;  (concatenate 'string "/doo/")
 ;;  pathname)
