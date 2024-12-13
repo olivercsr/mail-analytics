@@ -1,5 +1,5 @@
 (defpackage :dmarc-reading
-  (:use :cl)
+  (:use :cl :shared)
   (:local-nicknames
    ;;(:x :xmls)
    (:x :cxml)
