@@ -30,12 +30,17 @@
                         :components ((:module "packages"
                                               :serial t
                                               :components ((:file "shared")
+                                                           (:file "event-listener")
                                                            (:file "file-processor")
                                                            (:file "dmarc-reading")
                                                            (:file "storage")
                                                            (:file "dmarc-importer")))
                                      (:file "types")
                                      (:file "trees")
+                                     (:file "event-listener")
+                                     (:module "event-listeners"
+                                              :serial t
+                                              :components ((:file "kafka")))
                                      (:file "file-processor")
                                      (:module "file-processors"
                                               :serial t
