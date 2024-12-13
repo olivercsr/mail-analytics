@@ -41,4 +41,3 @@ tramp
 # output files
 /bin/*
 !/bin/.gitkeep
-!/bin/start-kafka.sh
