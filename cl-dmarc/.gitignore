@@ -39,5 +39,6 @@ tramp
 .cask/
 
 # output files
-/bin/
+/bin/*
 !/bin/.gitkeep
+!/bin/start-kafka.sh
