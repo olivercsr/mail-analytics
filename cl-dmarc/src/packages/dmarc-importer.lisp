@@ -1,5 +1,5 @@
 (defpackage :dmarc-importer
-  (:use :cl)
+  (:use :cl :shared)
   (:local-nicknames
    ;;(:x :xmls)
    (:x :cxml)
