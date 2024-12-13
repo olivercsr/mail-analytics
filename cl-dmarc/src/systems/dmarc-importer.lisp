@@ -26,6 +26,9 @@
     ;; clingon, unix-opts, defmain, adopt… when needed.
     (help)
     (uiop:quit))
+  (let ((event-listener (-> (make-instance 'el:kafka-event-listener)
+                            (el:connect))))
+    (format t "EVENT-LISTENER: ~a~%" event-listener))
   ;;(greet (or (first argv)
   ;;           "dear lisp user"))
   ;;(let ((dmarc-data (parse-xml *standard-input*)))
@@ -71,3 +74,5 @@
 ;;                        123)))
 ;;    ;;(format t "hhhhhhhhhhhhhhhhhhhh ~a ~a~%" dom (dom:child-nodes (car (xp:all-nodes result))))
 ;;    (read-records dom reporter-fn report-fn report-fn report-fn report-fn)))
+
+;;(main)
