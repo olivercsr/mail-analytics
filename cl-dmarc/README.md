@@ -92,3 +92,5 @@ podman run -it --rm --name mykafka --hostname mykafka -m 256m \
     -p 9093:9093 \
     docker.io/bitnami/kafka
 ```
+
+In this repository, you will find a script `./bin/start-kafka.sh` that will do just that.
