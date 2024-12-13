@@ -2,7 +2,10 @@
 
 (defclass kafka-event-listener ()
   ((address :initform "localhost:9092"
-            :initarg  :address)))
+            :initarg  :address)
+   (handler :initform #'(lambda (arg)
+                          (format t "HANDLER: ~a~%" arg))
+            :initarg  :handler)))
 
 (defmethod connect ((event-listener kafka-event-listener))
   (format t "CONNECT~%"))
