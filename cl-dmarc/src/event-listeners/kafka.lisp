@@ -5,11 +5,20 @@
             :initarg  :address)
    (handler :initform #'(lambda (arg)
                           (format t "HANDLER: ~a~%" arg))
-            :initarg  :handler)))
+            :initarg  :handler)
+   (consumer)))
 
 (defmethod connect ((event-listener kafka-event-listener))
-  (format t "CONNECT~%")
-  event-listener)
+  (let ((consumer (make-instance 'kf:consumer
+                                 :conf '("bootstrap.servers" "127.0.0.1:9092"
+                                         "group.id" "dmarc-importer"
+                                         "enable.auto.commit" "false"
+                                         "auto.offset.reset" "earliest"))))
+    (format t "CONNECT~%")
+    (kf:subscribe consumer "dmarc-file-received")
+    (setf (slot-value event-listener 'consumer)
+          consumer)
+    event-listener))
 
 (defmethod disconnect ((event-listener kafka-event-listener))
   (format t "DISCONNECT~%")
