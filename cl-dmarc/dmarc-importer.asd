@@ -13,12 +13,14 @@
   :depends-on ("alexandria"
                "serapeum"
                "arrow-macros"
+
                ;;"xmls"
-               "cxml"
-               "cxml-dom"
-               "xpath"
+               "cxml"          ;; xml processing
+               "cxml-dom"      ;; xml processing
+               "xpath"         ;; xml-xpath processing
                ;;"cl-transit"
-               "postmodern"
+               "postmodern"    ;; postgres client
+               "cl-rdkafka"    ;; kafka client
                )
 
   ;; Project stucture.
