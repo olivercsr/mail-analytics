@@ -13,7 +13,11 @@
                                  :conf '("bootstrap.servers" "127.0.0.1:9092"
                                          "group.id" "dmarc-importer"
                                          "enable.auto.commit" "false"
-                                         "auto.offset.reset" "earliest"))))
+                                         "auto.offset.reset" "earliest"
+                                         "allow.auto.create.topics" "true")
+                                 :serde #'babel:octets-to-string
+                                 :key-serde 123
+                                 :value-serde 234)))
     (format t "CONNECT~%")
     (kf:subscribe consumer "dmarc-file-received")
     (setf (slot-value event-listener 'consumer)
