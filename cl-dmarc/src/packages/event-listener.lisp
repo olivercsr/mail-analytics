@@ -3,6 +3,6 @@
   (:export :connect
    :disconnect
 
-           :make-kafka-event-listener
+   :kafka-event-listener
            :kafka-event-listener-address
            :kafka-event-listener-handler))

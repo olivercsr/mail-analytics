@@ -8,7 +8,9 @@
             :initarg  :handler)))
 
 (defmethod connect ((event-listener kafka-event-listener))
-  (format t "CONNECT~%"))
+  (format t "CONNECT~%")
+  event-listener)
 
 (defmethod disconnect ((event-listener kafka-event-listener))
-  (format t "DISCONNECT~%"))
+  (format t "DISCONNECT~%")
+  event-listener)
