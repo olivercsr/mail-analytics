@@ -1,3 +1,2 @@
 (defpackage :file-processor
-  (:use :cl :shared)
-  (:use :arrow-macros))
+  (:use :cl :arrow-macros :shared))

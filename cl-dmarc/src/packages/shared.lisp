@@ -1,5 +1,5 @@
 (defpackage :shared
-  (:use :cl)
+  (:use :cl :arrow-macros)
   (:export :traverse-nodes
 
    :make-reporter

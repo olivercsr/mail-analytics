@@ -1,3 +1,2 @@
 (defpackage :event-listener
-  (:use :cl :shared)
-  (:use :arrow-macros))
+  (:use :cl :arrow-macros :shared))
