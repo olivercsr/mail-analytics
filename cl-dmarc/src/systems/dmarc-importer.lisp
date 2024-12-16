@@ -1,4 +1,6 @@
+;;(declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3)))
 (in-package :dmarc-importer)
+;;(declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3)))
 
 ;; Define your project functionality here...
 
@@ -76,3 +78,16 @@
 ;;    (read-records dom reporter-fn report-fn report-fn report-fn report-fn)))
 
 ;;(main)
+
+;;(defun myffi ()
+;;  (let* ((conf (cl-rdkafka/ll:rd-kafka-conf-new))
+;;         (errstrlen 200)
+;;         (consumer (cffi:with-foreign-object (errstr :char errstrlen)
+;;                     (cl-rdkafka/ll:rd-kafka-new cl-rdkafka/ll:rd-kafka-consumer
+;;                                                 conf
+;;                                                 ;;(cffi:null-pointer)
+;;                                                 errstr
+;;                                                 errstrlen
+;;                                                 ))))
+;;    (format t "===================== ~a ~a ~a~%" conf errstr consumer)
+;;    consumer))
