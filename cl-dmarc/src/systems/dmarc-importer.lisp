@@ -83,11 +83,20 @@
 ;;  (let* ((conf (cl-rdkafka/ll:rd-kafka-conf-new))
 ;;         (errstrlen 200)
 ;;         (consumer (cffi:with-foreign-object (errstr :char errstrlen)
+;;                     (cl-rdkafka/ll:rd-kafka-conf-set conf "bootstrap.servers" "localhost" errstr errstrlen)
+;;                     (cl-rdkafka/ll:rd-kafka-conf-set conf "group.id" "mygroup" errstr errstrlen)
+;;                     (cl-rdkafka/ll:rd-kafka-conf-set conf "auto.offset.reset" "earliest" errstr errstrlen)
+;;                     (cl-rdkafka/ll:rd-kafka-conf-set conf "allow.auto.create.topics" "true" errstr errstrlen)
 ;;                     (cl-rdkafka/ll:rd-kafka-new cl-rdkafka/ll:rd-kafka-consumer
 ;;                                                 conf
 ;;                                                 ;;(cffi:null-pointer)
 ;;                                                 errstr
 ;;                                                 errstrlen
 ;;                                                 ))))
-;;    (format t "===================== ~a ~a ~a~%" conf errstr consumer)
+;;    (format t "===================== ~a~%" consumer)
 ;;    consumer))
+
+;;#+sbcl
+;;(sb-int:with-float-traps-masked
+;;    (:divide-by-zero :invalid)
+;;  (myffi))
