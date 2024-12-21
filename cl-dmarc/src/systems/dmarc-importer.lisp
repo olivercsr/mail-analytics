@@ -42,7 +42,19 @@
   Reads command line arguments."
   ;; uiop:command-line-arguments returns a list of arguments (sans the script name).
   ;; We defer the work of parsing to %main because we call it also from the Roswell script.
-  (%main (uiop:command-line-arguments)))
+  #+sbcl
+  (sb-int:with-float-traps-masked
+      ;; NOTE: otherwise, librdkafka will cause division-by-zero error:
+      ;;   librdkafka will call libm. libm will use a double to represent infinity (by doing a
+      ;;   division by zero), which is valid for floating point numbers in libc. however,
+      ;;   sbcl seems to treat that as a fatal event and signal a division-by-zero error instead
+      ;;   of continuing running the code with the inf double value.
+      ;;
+      ;;   also refer to:
+      ;;   - https://bugs.launchpad.net/sbcl/+bug/1519630
+      ;;   - https://github.com/sbcl/sbcl/blob/master/src/code/float-trap.lisp
+      (:divide-by-zero :invalid)
+    (%main (uiop:command-line-arguments))))
 
 
 
