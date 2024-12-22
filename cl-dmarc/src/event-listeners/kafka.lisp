@@ -18,7 +18,7 @@
                                           "enable.auto.commit" "false"
                                           "auto.offset.reset" "earliest"
                                           "allow.auto.create.topics" "true")
-                                  :serde #'babel:octets-to-string
+                                  :serde #'babel:octets-to-string  ;; TODO: implement JSON deserialization? maybe even transit+JSON?
                                   ;;:key-serde 123
                                   ;;:value-serde 234
                                   ))
