@@ -14,14 +14,15 @@
                "serapeum"
                "arrow-macros"
 
+               "bordeaux-threads"  ;; threading library
                ;;"xmls"
-               "cxml"          ;; xml processing
-               "cxml-dom"      ;; xml processing
-               "xpath"         ;; xml-xpath processing
+               "cxml"              ;; xml processing
+               "cxml-dom"          ;; xml processing
+               "xpath"             ;; xml-xpath processing
                ;;"cl-transit"
-               "postmodern"    ;; postgres client
-               "cl-rdkafka"    ;; kafka client
-               "babel"         ;; data conversion
+               "postmodern"        ;; postgres client
+               "cl-rdkafka"        ;; kafka client
+               "babel"             ;; data conversion
                )
 
   ;; Project stucture.
