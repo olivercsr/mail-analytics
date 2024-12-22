@@ -8,7 +8,8 @@
    (handler :initform #'(lambda (arg)
                           (format t "HANDLER: ~a~%" arg))
             :initarg  :handler)
-   (consumer)))
+   (consumer)
+   (handler-thread)))
 
 (defmethod connect ((event-listener kafka-event-listener))
   (let* ((consumer (make-instance 'kf:consumer
@@ -29,21 +30,38 @@
          ;;                                        conf
          ;;                                        errstr
          ;;                                        errstrlen)))
-         )
+         (top-level *standard-output*))
     ;;(break)
     ;;(format t "=========================== ~a ~a~%" conf consumer)
     (format t "CONNECT ~a~%" consumer)
     (kf:subscribe consumer "dmarc-file-received")
     (setf (slot-value event-listener 'consumer)
           consumer)
-    (a:when-let ((msg (kf:poll consumer 30000)))
-      (format t "MESSAGE RECEIVED: ~a => ~a~%" (kf:key msg) (kf:value msg))
-      (kf:commit consumer))
+    (setf (slot-value event-listener 'handler-thread)
+          (bt2:make-thread #'(lambda ()
+                               (format top-level "HANDLER-THREAD START~%")
+                               (loop for msg = (progn
+                                                 (format top-level "POLLING...~%")
+                                                 (kf:poll consumer 10000))
+                                     while msg
+                                     for key = (kf:key msg)
+                                     for value = (kf:value msg)
+                                     do (progn
+                                          (format top-level "MESSAGE RECEIVED ~a: ~a~%" key value)
+                                          (kf:commit consumer)))
+                               (format top-level "HANDLER-THREAD END~%"))))
+    ;;(a:when-let ((msg (kf:poll consumer 30000)))
+    ;;  (format t "MESSAGE RECEIVED: ~a => ~a~%" (kf:key msg) (kf:value msg))
+    ;;  (kf:commit consumer))
     event-listener))
 
 (defmethod disconnect ((event-listener kafka-event-listener))
-  (format t "DISCONNECT~%")
+  (format t "DISCONNECTING...~%")
+  (bt2:join-thread (slot-value event-listener 'handler-thread))
+  (setf (slot-value event-listener 'handler-thread)
+        nil)
   (kf:close (slot-value event-listener 'consumer))
   (setf (slot-value event-listener 'consumer)
         nil)
+  (format t "DISCONNECTED~%")
   event-listener)
