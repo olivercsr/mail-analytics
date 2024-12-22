@@ -36,8 +36,15 @@
     (kf:subscribe consumer "dmarc-file-received")
     (setf (slot-value event-listener 'consumer)
           consumer)
+    (let ((msg (kf:poll consumer 30000)))
+      (when msg
+        (format t "MESSAGE RECEIVED: ~a => ~a~%" (kf:key msg) (kf:value msg)))
+      (kf:commit consumer))
     event-listener))
 
 (defmethod disconnect ((event-listener kafka-event-listener))
   (format t "DISCONNECT~%")
+  (kf:close (slot-value event-listener 'consumer))
+  (setf (slot-value event-listener 'consumer)
+        nil)
   event-listener)

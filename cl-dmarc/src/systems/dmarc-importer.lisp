@@ -30,7 +30,9 @@
     (uiop:quit))
   (let ((event-listener (-> (make-instance 'el:kafka-event-listener)
                             (el:connect))))
-    (format t "EVENT-LISTENER: ~a~%" event-listener))
+    (format t "EVENT-LISTENER: ~a~%" event-listener)
+    (sleep 2)
+    (el:disconnect event-listener))
   ;;(greet (or (first argv)
   ;;           "dear lisp user"))
   ;;(let ((dmarc-data (parse-xml *standard-input*)))
@@ -90,8 +92,6 @@
 ;;    ;;(format t "hhhhhhhhhhhhhhhhhhhh ~a ~a~%" dom (dom:child-nodes (car (xp:all-nodes result))))
 ;;    (read-records dom reporter-fn report-fn report-fn report-fn report-fn)))
 
-;;(main)
-
 ;;(defun myffi ()
 ;;  (let* ((conf (cl-rdkafka/ll:rd-kafka-conf-new))
 ;;         (errstrlen 200)
@@ -113,3 +113,5 @@
 ;;(sb-int:with-float-traps-masked
 ;;    (:divide-by-zero :invalid)
 ;;  (myffi))
+
+;;(main)
