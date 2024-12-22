@@ -53,6 +53,7 @@
       ;;   also refer to:
       ;;   - https://bugs.launchpad.net/sbcl/+bug/1519630
       ;;   - https://github.com/sbcl/sbcl/blob/master/src/code/float-trap.lisp
+      ;;   - https://www.gnu.org/software/libc/manual/html_node/FP-Exceptions.html
       (:divide-by-zero :invalid)
     (%main (uiop:command-line-arguments))))
 
