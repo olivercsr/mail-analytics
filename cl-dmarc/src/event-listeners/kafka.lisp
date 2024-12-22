@@ -36,9 +36,8 @@
     (kf:subscribe consumer "dmarc-file-received")
     (setf (slot-value event-listener 'consumer)
           consumer)
-    (let ((msg (kf:poll consumer 30000)))
-      (when msg
-        (format t "MESSAGE RECEIVED: ~a => ~a~%" (kf:key msg) (kf:value msg)))
+    (a:when-let ((msg (kf:poll consumer 30000)))
+      (format t "MESSAGE RECEIVED: ~a => ~a~%" (kf:key msg) (kf:value msg))
       (kf:commit consumer))
     event-listener))
 
