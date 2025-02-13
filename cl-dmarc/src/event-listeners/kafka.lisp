@@ -65,7 +65,7 @@
     (handler-case
         (bt2:join-thread thread)
       (bt2:abnormal-exit (c)
-        (format t "ABNORMAL-EXIT!~%"))))
+        (format t "ABNORMAL-EXIT ~a~%" c))))
   (setf (slot-value event-listener 'handler-thread)
         nil)
   (kf:close (slot-value event-listener 'consumer))
