@@ -23,6 +23,7 @@
 
 (defun %main (argv)
   "Parse CLI args."
+  (format t "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA~%")
   (when (member "-h" argv :test #'equal)
     ;; To properly parse command line arguments, use a third-party library such as
     ;; clingon, unix-opts, defmain, adopt… when needed.
@@ -31,7 +32,7 @@
   (let ((event-listener (-> (make-instance 'el:kafka-event-listener)
                             (el:connect))))
     (format t "EVENT-LISTENER: ~a~%" event-listener)
-    (sleep 10)
+    (sleep 60)
     (el:disconnect event-listener))
   ;;(greet (or (first argv)
   ;;           "dear lisp user"))
