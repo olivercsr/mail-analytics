@@ -42,13 +42,15 @@
                                (format top-level "HANDLER-THREAD START~%")
                                (loop for msg = (progn
                                                  (format top-level "POLLING...~%")
-                                                 (kf:poll consumer 10000))
-                                     while msg
-                                     for key = (kf:key msg)
-                                     for value = (kf:value msg)
-                                     do (progn
-                                          (format top-level "MESSAGE RECEIVED ~a: ~a~%" key value)
-                                          (kf:commit consumer)))
+                                                 (kf:poll consumer 5000))
+                                     ;;while msg
+                                     ;;for key = (kf:key msg)
+                                     ;;for value = (kf:value msg)
+                                     do (when msg
+                                          (let ((key (kf:key msg))
+                                                (value (kf:value msg)))
+                                            (format top-level "MESSAGE RECEIVED ~a: ~a~%" key value)
+                                            (kf:commit consumer))))
                                (format top-level "HANDLER-THREAD END~%"))))
     ;;(a:when-let ((msg (kf:poll consumer 30000)))
     ;;  (format t "MESSAGE RECEIVED: ~a => ~a~%" (kf:key msg) (kf:value msg))
@@ -57,7 +59,13 @@
 
 (defmethod disconnect ((event-listener kafka-event-listener))
   (format t "DISCONNECTING...~%")
-  (bt2:join-thread (slot-value event-listener 'handler-thread))
+  (let ((thread (slot-value event-listener 'handler-thread)))
+    (when (bt2:thread-alive-p thread)
+      (bt2:destroy-thread thread))
+    (handler-case
+        (bt2:join-thread thread)
+      (bt2:abnormal-exit (c)
+        (format t "ABNORMAL-EXIT!~%"))))
   (setf (slot-value event-listener 'handler-thread)
         nil)
   (kf:close (slot-value event-listener 'consumer))

@@ -31,7 +31,7 @@
   (let ((event-listener (-> (make-instance 'el:kafka-event-listener)
                             (el:connect))))
     (format t "EVENT-LISTENER: ~a~%" event-listener)
-    (sleep 2)
+    (sleep 10)
     (el:disconnect event-listener))
   ;;(greet (or (first argv)
   ;;           "dear lisp user"))
