@@ -28,7 +28,10 @@
     ;; clingon, unix-opts, defmain, adopt… when needed.
     (help)
     (uiop:quit))
-  (let ((event-listener (-> (make-instance 'el:kafka-event-listener)
+  (let ((event-listener (-> (make-instance 'el:kafka-event-listener
+                                           :address "localhost:9092"
+                                           :group   "database-importer"
+                                           :topics  '("dmarc-file-received"))
                             (el:connect))))
     (format t "EVENT-LISTENER: ~a~%" event-listener)
     (sleep 60)

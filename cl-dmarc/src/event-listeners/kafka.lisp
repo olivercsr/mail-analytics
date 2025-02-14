@@ -8,16 +8,21 @@
    (handler :initform #'(lambda (arg)
                           (format t "HANDLER: ~a~%" arg))
             :initarg  :handler)
+   (topics :initform  '()
+           :initarg   :topics)
+   (group :initform   "mygroup"
+          :initarg    :group)
    (consumer)
    (handler-thread)))
 
 (defmethod connect ((event-listener kafka-event-listener))
+  (format t "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ~a~%" event-listener)
   (let* ((consumer (make-instance 'kf:consumer
-                                  :conf '("bootstrap.servers" "127.0.0.1:9092"
-                                          "group.id" "dmarc-importer"
-                                          "enable.auto.commit" "false"
-                                          "auto.offset.reset" "earliest"
-                                          "allow.auto.create.topics" "true")
+                                  :conf (list "bootstrap.servers"        (slot-value event-listener 'address)
+                                              "group.id"                 (slot-value event-listener 'group)
+                                              "enable.auto.commit"       "false"
+                                              ;;"auto.offset.reset"        "earliest"
+                                              "allow.auto.create.topics" "true")
                                   :serde #'babel:octets-to-string  ;; TODO: implement JSON deserialization? maybe even transit+JSON?
                                   ;;:key-serde 123
                                   ;;:value-serde 234
@@ -34,7 +39,7 @@
     ;;(break)
     ;;(format t "=========================== ~a ~a~%" conf consumer)
     (format t "CONNECT ~a~%" consumer)
-    (kf:subscribe consumer '("dmarc-file-received"))
+    (kf:subscribe consumer (slot-value event-listener 'topics))
     (setf (slot-value event-listener 'consumer)
           consumer)
     (setf (slot-value event-listener 'handler-thread)
