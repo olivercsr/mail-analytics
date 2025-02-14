@@ -23,7 +23,6 @@
 
 (defun %main (argv)
   "Parse CLI args."
-  (format t "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA~%")
   (when (member "-h" argv :test #'equal)
     ;; To properly parse command line arguments, use a third-party library such as
     ;; clingon, unix-opts, defmain, adopt… when needed.
