@@ -3,9 +3,10 @@
 (defclass postgres-storage () ())
 
 (defmethod upsert-reporter ((db postgres-storage) reporter)
-  (pg:execute (:insert-into 'reporter :set
+  (pg:execute (:insert-into 'reporter
+               :set
                ;;'id 123
-               'org-name (reporter-org-name reporter)
+               'org_name (reporter-org-name reporter)
                'email (reporter-email reporter)
                'extra_contact_info (reporter-extra-contact-info reporter)
                :on-conflict-update 'id
@@ -15,7 +16,33 @@
                'extra_contact_info (reporter-extra-contact-info reporter))))
 
 (defmethod store-report ((db postgres-storage) id report)
-  (format t "postgres-storage ~a ~a~%" id report))
+  (format t "postgres-storage ~a ~a~%" id report)
+  (pg:execute (:insert-into 'reporter
+               :set
+               'report_id id
+               'begin (s:report-begin report)
+               'end (s:report-end report)
+               'reporter_id (s:report-reporter_id report)
+               'error (s:report-error report)
+               'policy_domain (s:report-policy_domain report)
+               'policy_adkim (s:report-policy_adkim report)
+               'policy_aspf (s:report-policy_aspf report)
+               'policy_p (s:report-policy_p report)
+               'policy_sp (s:report-policy_sp report)
+               'policy_pct (s:report-policy_pct report)
+               'policy_fo (s:report-policy_fo report)
+               :on-conflict-update '(report_id begin)
+               :update-set
+               'end (s:report-end report)
+               'reporter_id (s:report-reporter_id report)
+               'error (s:report-error report)
+               'policy_domain (s:report-policy_domain report)
+               'policy_adkim (s:report-policy_adkim report)
+               'policy_aspf (s:report-policy_aspf report)
+               'policy_p (s:report-policy_p report)
+               'policy_sp (s:report-policy_sp report)
+               'policy_pct (s:report-policy_pct report)
+               'policy_fo (s:report-policy_fo report))))
 
 (defmethod get-report ((db postgres-storage) id)
   (format t "aaaaaaaaaaaaa"))

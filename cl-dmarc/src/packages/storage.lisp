@@ -1,4 +1,5 @@
 (defpackage :storage
   (:use :cl :arrow-macros :shared)
   (:local-nicknames
-   (:pg :postmodern)))
+   (:pg :postmodern)
+   (:s :shared)))

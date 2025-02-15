@@ -28,14 +28,22 @@
     ;; clingon, unix-opts, defmain, adopt… when needed.
     (help)
     (uiop:quit))
-  (let ((event-listener (-> (make-instance 'el:kafka-event-listener
-                                           :address "localhost:9092"
-                                           :group   "database-importer"
-                                           :topics  '("dmarc-file-received"))
-                            (el:connect))))
-    (format t "EVENT-LISTENER: ~a~%" event-listener)
-    (sleep 60)
-    (el:disconnect event-listener))
+  ;;(let ((event-listener (-> (make-instance 'el:kafka-event-listener
+  ;;                                         :address "localhost:9092"
+  ;;                                         :group   "database-importer"
+  ;;                                         :topics  '("dmarc-file-received"))
+  ;;                          (el:connect))))
+  ;;  (format t "EVENT-LISTENER: ~a~%" event-listener)
+  ;;  (sleep 60)
+  ;;  (el:disconnect event-listener))
+  (pg:with-connection '("dmarc" "dmarc" "dmarc" "localhost"
+                        :port 5432
+                        :pooled-p nil
+                        :use-binary t
+                        ;;:use-ssl :try
+                        :application-name "dmarc-tool")
+    (let ((db (make-instance 'st:postgres-storage)))
+      (st:upsert-reporter )))
   ;;(greet (or (first argv)
   ;;           "dear lisp user"))
   ;;(let ((dmarc-data (parse-xml *standard-input*)))

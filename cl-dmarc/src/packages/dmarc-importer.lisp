@@ -6,5 +6,6 @@
    (:xd :cxml-dom)
    (:xp :xpath)
    (:pg :postmodern)
-   (:el :event-listener))
+   (:el :event-listener)
+   (:st :storage))
   (:export :main))
