@@ -79,7 +79,7 @@ create table evaluation (
   primary key ("id", "begin"),
   foreign key ("report_id", "begin") references report ("report_id", "begin") on update cascade on delete cascade
 );
-select create_hypertable('evaluation', 'begin');
+/*select create_hypertable('evaluation', 'begin');*/
 
 
 create table dkim_evaluation (
@@ -95,7 +95,7 @@ create table dkim_evaluation (
   primary key ("id", "begin"),
   foreign key ("evaluation_id", "begin") references evaluation ("id", "begin") on update cascade on delete cascade
 );
-select create_hypertable('dkim_evaluation', 'begin');
+/*select create_hypertable('dkim_evaluation', 'begin');*/
 
 
 create table spf_evaluation (
@@ -110,4 +110,4 @@ create table spf_evaluation (
   primary key ("id", "begin"),
   foreign key ("evaluation_id", "begin") references evaluation ("id", "begin") on update cascade on delete cascade
 );
-select create_hypertable('spf_evaluation', 'begin');
+/*select create_hypertable('spf_evaluation', 'begin');*/
