@@ -43,7 +43,7 @@
                         ;;:use-ssl :try
                         :application-name "dmarc-tool")
     (let ((db (make-instance 'st:postgres-storage)))
-      (st:upsert-reporter )))
+      (st:upsert-reporter db nil))) ;; TODO: implement
   ;;(greet (or (first argv)
   ;;           "dear lisp user"))
   ;;(let ((dmarc-data (parse-xml *standard-input*)))

@@ -2,4 +2,6 @@
   (:use :cl :arrow-macros :shared)
   (:local-nicknames
    (:pg :postmodern)
-   (:s :shared)))
+   (:s :shared))
+  (:export :postgres-storage
+           :upsert-reporter))
