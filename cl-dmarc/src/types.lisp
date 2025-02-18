@@ -1,49 +1,49 @@
 (in-package :shared)
 
-(defstruct reporter
-  id
-  org-name
-  email
-  extra-contact-info)
+(sp:defconstructor reporter
+  (id string)
+  (org-name string)
+  (email string)
+  (extra-contact-info string))
 
-(defstruct report
-  report-id
-  begin
-  end
-  reporter-id
-  error
-  policy-domain
-  policy-adkim
-  policy-aspf
-  policy-p
-  policy-sp
-  policy-pct
-  policy-fo)
+(sp:defconstructor report
+  (report-id string)
+  (begin integer)
+  (end integer)
+  (reporter-id string)
+  (error string)
+  (policy-domain string)
+  (policy-adkim string)
+  (policy-aspf string)
+  (policy-p integer)
+  (policy-sp string)
+  (policy-pct string)
+  (policy-fo string))
 
-(defstruct evaluation
-  id
-  report-id
-  begin
-  source-ip
-  count
-  disposition
-  dkim
-  spf
-  envelope-from
-  envelope-to
-  header-from)
+(sp:defconstructor evaluation
+  (id string)
+  (report-id string)
+  (begin integer)
+  (source-ip string)
+  (count integer)
+  (disposition string)
+  (dkim string)
+  (spf string)
+  (envelope-from string)
+  (envelope-to string)
+  (header-from string))
 
-(defstruct dkim-evaluation
-  id
-  evaluation-id
-  domain
-  selector
-  result
-  human-result)
+(sp:defconstructor dkim-evaluation
+  (id string)
+  (evaluation-id string)
+  (domain string)
+  (selector string)
+  (result string)
+  (human-result string))
 
-(defstruct spf-evaluation
-  id
-  evaluation-id
-  domain
-  scope
-  result)
+(sp:defconstructor spf-evaluation
+  (id string)
+  (evaluation-id string)
+  (domain string)
+  (scope string)
+  (result string))

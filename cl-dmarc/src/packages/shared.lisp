@@ -1,27 +1,31 @@
 (defpackage :shared
-  (:use :cl :arrow-macros)
+  (:use :cl)
+  (:local-nicknames
+   (:sp :serapeum)
+   (:am :arrow-macros))
   (:export :traverse-nodes
 
-   :reporter
-   :report
-   :evaluation
-   :dkim-evaluation
-   :spf-evaluation
+   ;;:reporter
+   ;;:report
+   ;;:evaluation
+   ;;:dkim-evaluation
+   ;;:spf-evaluation
 
-           :reporter-id
-           :reporter-org-name
-           :reporter-email
-           :reporter-extra-contact-info
+           ;;:reporter-id
+           ;;:reporter-org-name
+           ;;:reporter-email
+           ;;:reporter-extra-contact-info
 
-           :report-report-id
-           :report-begin
-           :report-end
-           :report-reporter-id
-           :report-error
-           :report-policy-domain
-           :report-policy-adkim
-           :report-policy-aspf
-           :report-policy-p
-           :report-policy-sp
-           :report-policy-pct
-           :report-policy-fo))
+           ;;:report-report-id
+           ;;:report-begin
+           ;;:report-end
+           ;;:report-reporter-id
+           ;;:report-error
+           ;;:report-policy-domain
+           ;;:report-policy-adkim
+           ;;:report-policy-aspf
+           ;;:report-policy-p
+           ;;:report-policy-sp
+           ;;:report-policy-pct
+           ;;:report-policy-fo
+           ))
