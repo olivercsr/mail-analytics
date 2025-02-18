@@ -13,15 +13,15 @@
            :reporter-email
            :reporter-extra-contact-info
 
-           :report-report_id
+           :report-report-id
            :report-begin
            :report-end
-           :report-reporter_id
+           :report-reporter-id
            :report-error
-           :report-policy_domain
-           :report-policy_adkim
-           :report-policy_aspf
-           :report-policy_p
-           :report-policy_sp
-           :report-policy_pct
-           :report-policy_fo))
+           :report-policy-domain
+           :report-policy-adkim
+           :report-policy-aspf
+           :report-policy-p
+           :report-policy-sp
+           :report-policy-pct
+           :report-policy-fo))
