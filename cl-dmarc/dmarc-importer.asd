@@ -10,19 +10,32 @@
   :source-control (:git "")
 
   ;; Dependencies.
-  :depends-on ("alexandria"
+  :depends-on (;; language features
+               "alexandria"
                "serapeum"
                "arrow-macros"
 
+               ;; concurrency
                "bordeaux-threads"  ;; threading library
+
+               ;; data conversion
+               "babel"             ;; data conversion
+
+               ;; http
+               "drakma"
+
+               ;; xml processing
                ;;"xmls"
                "cxml"              ;; xml processing
                "cxml-dom"          ;; xml processing
                "xpath"             ;; xml-xpath processing
                ;;"cl-transit"
+
+               ;; database connectivity
                "postmodern"        ;; postgres client
+
+               ;; message broker connectivity
                "cl-rdkafka"        ;; kafka client
-               "babel"             ;; data conversion
                )
 
   ;; Project stucture.
