@@ -36,14 +36,19 @@
   ;;  (format t "EVENT-LISTENER: ~a~%" event-listener)
   ;;  (sleep 60)
   ;;  (el:disconnect event-listener))
-  (pg:with-connection '("dmarc" "dmarc" "dmarc" "localhost"
-                        :port 5432
-                        :pooled-p nil
-                        :use-binary t
-                        ;;:use-ssl :try
-                        :application-name "dmarc-tool")
-    (let ((db (make-instance 'st:postgres-storage)))
-      (st:upsert-reporter db nil))) ;; TODO: implement
+  ;;
+  ;;(pg:with-connection '("dmarc" "dmarc" "dmarc" "localhost"
+  ;;                      :port 5432
+  ;;                      :pooled-p nil
+  ;;                      :use-binary t
+  ;;                      ;;:use-ssl :try
+  ;;                      :application-name "dmarc-tool")
+  ;;  (let ((db (make-instance 'st:postgres-storage)))
+  ;;    (st:upsert-reporter db nil))) ;; TODO: implement
+
+  (let ((existdb (make-instance 'ste:existdb-storage)))
+    (format t "EXISTDB INSTANCE: ~a~%" existdb))
+
   ;;(greet (or (first argv)
   ;;           "dear lisp user"))
   ;;(let ((dmarc-data (parse-xml *standard-input*)))

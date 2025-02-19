@@ -49,6 +49,7 @@
                                                            (:file "file-processor")
                                                            (:file "dmarc-reading")
                                                            (:file "storage")
+                                                           (:file "storage.existdb")
                                                            (:file "dmarc-importer")))
                                      (:file "types")
                                      (:file "trees")
@@ -66,7 +67,8 @@
                                      (:module "storages"
                                               :serial t
                                               :components ((:file "memory")
-                                                           (:file "postgres")))
+                                                           (:file "postgres")
+                                                           (:file "existdb")))
                                      (:module "systems"
                                               :serial t
                                               :components ((:file "dmarc-importer"))))))

@@ -7,5 +7,6 @@
    (:xp :xpath)
    (:pg :postmodern)
    (:el :event-listener)
-   (:st :storage))
+   (:st :storage)
+   (:ste :storage.existdb))
   (:export :main))
