@@ -1,9 +1,9 @@
-(in-package #:file-extractor.zip)
+(in-package #:archiver.zip)
 
-(se:defclass zip-file-extractor () ())
+(se:defclass zip-archiver () ())
 
-(defmethod fp:extract ((extractor zip-file-extractor) stream)
-  (format t "extract ~a~%" stream)
+(defmethod arch:unarchive ((archiver zip-archiver) stream)
+  (format t "unarchive ~a~%" stream)
   (with-open-file (in #p"../../../dmarc-data/compressed/google.com!csr-informatik.de!1728864000!1728950399.zip"
                       :element-type '(unsigned-byte 8))
     (with-open-file (out #p"foobar"

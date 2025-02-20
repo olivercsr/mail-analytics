@@ -1,15 +1,15 @@
-(defpackage #:file-extractor
+(defpackage #:archiver
   (:use :cl :arrow-macros :shared)
   (:local-nicknames
    (:a :alexandria)
    (:s :serapeum)
    (:se :serapeum.exporting)))
 
-(defpackage #:file-extractor.zip
+(defpackage #:archiver.zip
   (:use :cl :arrow-macros :shared)
   (:local-nicknames
    (:a :alexandria)
    (:s :serapeum)
    (:se :serapeum.exporting)
-   (:fp :file-extractor)
+   (:arch :archiver)
    (:zip :org.shirakumo.zippy)))

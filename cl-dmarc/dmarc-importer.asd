@@ -52,7 +52,7 @@
                                               :serial t
                                               :components ((:file "shared")
                                                            (:file "event-listener")
-                                                           (:file "file-extractor")
+                                                           (:file "archiver")
                                                            (:file "file-processor")
                                                            (:file "dmarc-reading")
                                                            (:file "storage")
@@ -64,8 +64,8 @@
                                      (:module "event-listeners"
                                               :serial t
                                               :components ((:file "kafka")))
-                                     (:file "file-extractor")
-                                     (:module "file-extractors"
+                                     (:file "archiver")
+                                     (:module "archivers"
                                               :serial t
                                               :components ((:file "zip")))
                                      (:file "file-processor")
