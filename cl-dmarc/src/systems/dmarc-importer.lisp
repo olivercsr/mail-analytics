@@ -46,20 +46,22 @@
   ;;  (let ((db (make-instance 'st:postgres-storage)))
   ;;    (st:upsert-reporter db nil))) ;; TODO: implement
 
-  (let ((existdb (make-instance 'ste:existdb-storage
-                                :base-url   "http://localhost:8080"
-                                :username   "admin"
-                                :password   ""
-                                :collection "dmarc-importer")))
+  (let* ((existdb (make-instance 'ste:existdb-storage
+                                 :base-url   "http://localhost:8080"
+                                 :username   "admin"
+                                 :password   ""
+                                 :collection "dmarc-importer"))
+         (path #p"../../../dmarc-data/source/google.com!csr-informatik.de!1707782400!1707868799.xml")
+         (id (file-namestring path)))
     (format t "EXISTDB INSTANCE: ~a~%" existdb)
-    (with-open-file (content #p"../../../dmarc-data/source/google.com!csr-informatik.de!1707782400!1707868799.xml"
+    (with-open-file (content path
                              :element-type '(unsigned-byte 8))
       (format t "================== ~a ~a ~a ~a"
               (streamp content)
               (input-stream-p content)
               (open-stream-p content)
               (stream-element-type content))
-      (st:store-report existdb "123" content)))
+      (st:store-report existdb id content)))
 
   ;;(greet (or (first argv)
   ;;           "dear lisp user"))

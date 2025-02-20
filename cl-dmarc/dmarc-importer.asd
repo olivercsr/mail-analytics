@@ -18,6 +18,9 @@
                ;; concurrency
                "bordeaux-threads"  ;; threading library
 
+               ;; uuid
+               ;;"uuid"
+
                ;; data conversion
                "babel"             ;; data conversion
 
