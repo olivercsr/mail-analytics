@@ -6,7 +6,7 @@
                    :reader parameter-name))
   (:documentation "Signals that a mandatory parameter is missing"))
 
-(defgeneric upsert-reporter (storage reporter))
-(defgeneric store-report (storage id report))
-(defgeneric get-report (storage id))
-(defgeneric find-reports-by-daterange (storage start-date end-date))
+(se:defgeneric upsert-reporter (storage reporter))
+(se:defgeneric store-report (storage id report))
+(se:defgeneric get-report (storage id))
+(se:defgeneric find-reports-by-daterange (storage start-date end-date))
