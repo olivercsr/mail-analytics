@@ -5,4 +5,5 @@
    (:http :drakma))
   (:export :parameter-missing
    :postgres-storage
+   :store-report
            :upsert-reporter))
