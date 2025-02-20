@@ -3,5 +3,6 @@
   (:local-nicknames
    (:pg :postmodern)
    (:http :drakma))
-  (:export :postgres-storage
+  (:export :parameter-missing
+   :postgres-storage
            :upsert-reporter))
