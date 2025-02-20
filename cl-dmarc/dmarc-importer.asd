@@ -34,6 +34,9 @@
                "xpath"             ;; xml-xpath processing
                ;;"cl-transit"
 
+               ;; zip archives
+               "zippy"
+
                ;; database connectivity
                "postmodern"        ;; postgres client
 
@@ -49,6 +52,7 @@
                                               :serial t
                                               :components ((:file "shared")
                                                            (:file "event-listener")
+                                                           (:file "file-preparer")
                                                            (:file "file-processor")
                                                            (:file "dmarc-reading")
                                                            (:file "storage")
@@ -60,6 +64,10 @@
                                      (:module "event-listeners"
                                               :serial t
                                               :components ((:file "kafka")))
+                                     (:file "file-preparer")
+                                     (:module "file-preparers"
+                                              :serial t
+                                              :components ((:file "zip")))
                                      (:file "file-processor")
                                      (:module "file-processors"
                                               :serial t
