@@ -1,9 +1,9 @@
-(in-package #:file-preparer.zip)
+(in-package #:file-extractor.zip)
 
-(se:defclass zip-file-preparer () ())
+(se:defclass zip-file-extractor () ())
 
-(defmethod fp:prepare ((preparer zip-file-preparer) stream)
-  (format t "prepare ~a~%" stream)
+(defmethod fp:extract ((extractor zip-file-extractor) stream)
+  (format t "extract ~a~%" stream)
   (with-open-file (in #p"../../../dmarc-data/compressed/google.com!csr-informatik.de!1728864000!1728950399.zip"
                       :element-type '(unsigned-byte 8))
     (with-open-file (out #p"foobar"
