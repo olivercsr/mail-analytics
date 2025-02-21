@@ -2,8 +2,8 @@
 
 (se:defclass zip-archiver () ())
 
-(defmethod arch:unarchive ((archiver zip-archiver) stream)
-  (format t "unarchive ~a~%" stream)
+(defmethod arch:unarchive ((archiver zip-archiver) in-stream out-handler)
+  (format t "unarchive ~a~%" in-stream)
   (with-open-file (in #p"../../../dmarc-data/compressed/google.com!csr-informatik.de!1728864000!1728950399.zip"
                       :element-type '(unsigned-byte 8))
     (with-open-file (out #p"foobar"
@@ -11,5 +11,5 @@
                          :if-exists :supersede
                          :if-does-not-exist :create
                          :element-type '(unsigned-byte 8))
-      (org.shirakumo.zippy:with-zip-file (zip in)
-        (format t "~a~%" (org.shirakumo.zippy:entry-to-stream out (elt (org.shirakumo.zippy:entries zip) 0)))))))
+      (zip:with-zip-file (zip in)
+        (format t "~a~%" (zip:entry-to-stream out (elt (zip:entries zip) 0)))))))
