@@ -18,6 +18,9 @@
                ;; concurrency
                "bordeaux-threads"  ;; threading library
 
+               ;; streams
+               "flexi-streams"
+
                ;; uuid
                ;;"uuid"
 

@@ -7,6 +7,8 @@
    (:xp :xpath)
    (:pg :postmodern)
    (:el :event-listener)
+   (:ar :archiver)
+   (:arz :archiver.zip)
    (:st :storage)
    (:ste :storage.existdb))
   (:export :main))

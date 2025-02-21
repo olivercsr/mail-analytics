@@ -46,22 +46,36 @@
   ;;  (let ((db (make-instance 'st:postgres-storage)))
   ;;    (st:upsert-reporter db nil))) ;; TODO: implement
 
-  (let* ((existdb (make-instance 'ste:existdb-storage
-                                 :base-url   "http://localhost:8080"
-                                 :username   "admin"
-                                 :password   ""
-                                 :collection "dmarc-importer"))
-         (path #p"../../../dmarc-data/source/google.com!csr-informatik.de!1707782400!1707868799.xml")
-         (id (file-namestring path)))
-    (format t "EXISTDB INSTANCE: ~a~%" existdb)
-    (with-open-file (content path
-                             :element-type '(unsigned-byte 8))
-      (format t "================== ~a ~a ~a ~a"
-              (streamp content)
-              (input-stream-p content)
-              (open-stream-p content)
-              (stream-element-type content))
-      (st:store-report existdb id content)))
+  (let ((archiver (make-instance 'arz:zip-archiver)))
+    (with-open-file (in #p"../../../dmarc-data/compressed/google.com!csr-informatik.de!1728864000!1728950399.zip"
+                        :element-type '(unsigned-byte 8))
+      (ar:unarchive archiver in #'(lambda (entry)
+                                    ;;(format t "out-handler: ~a~%" entry)
+                                    (with-open-file (out #p"barbaz"
+                                                         :direction :output
+                                                         :if-exists :supersede
+                                                         :if-does-not-exist :create
+                                                         :element-type '(unsigned-byte 8))
+                                      ;;(write-sequence entry :stream out)
+                                      (uiop:copy-stream-to-stream entry out
+                                                                  :element-type '(unsigned-byte 8)))))))
+
+  ;;(let* ((existdb (make-instance 'ste:existdb-storage
+  ;;                               :base-url   "http://localhost:8080"
+  ;;                               :username   "admin"
+  ;;                               :password   ""
+  ;;                               :collection "dmarc-importer"))
+  ;;       (path #p"../../../dmarc-data/source/google.com!csr-informatik.de!1707782400!1707868799.xml")
+  ;;       (id (file-namestring path)))
+  ;;  (format t "EXISTDB INSTANCE: ~a~%" existdb)
+  ;;  (with-open-file (content path
+  ;;                           :element-type '(unsigned-byte 8))
+  ;;    (format t "================== ~a ~a ~a ~a"
+  ;;            (streamp content)
+  ;;            (input-stream-p content)
+  ;;            (open-stream-p content)
+  ;;            (stream-element-type content))
+  ;;    (st:store-report existdb id content)))
 
   ;;(greet (or (first argv)
   ;;           "dear lisp user"))

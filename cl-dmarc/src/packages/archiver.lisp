@@ -11,5 +11,6 @@
    (:a :alexandria)
    (:s :serapeum)
    (:se :serapeum.exporting)
+   (:flex :flexi-streams)
    (:arch :archiver)
    (:zip :org.shirakumo.zippy)))
