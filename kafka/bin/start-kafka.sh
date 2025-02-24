@@ -15,7 +15,7 @@ KAFKA_NAME=${KAFKA_NAME:-kafka-dev}
 ${DOCKER_CMD} run -it --rm \
   --name "${KAFKA_NAME}" \
   --hostname "${KAFKA_NAME}" \
-  -m 384m \
+  -m 512m \
   -e KAFKA_CFG_NODE_ID=0 \
   -e KAFKA_CFG_PROCESS_ROLES=controller,broker \
   -e KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093 \
