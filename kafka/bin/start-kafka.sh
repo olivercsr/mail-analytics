@@ -12,6 +12,9 @@ fi
 
 KAFKA_NAME=${KAFKA_NAME:-kafka-dev}
 
+# in order to run with camel, you need to download
+#  https://repo.maven.apache.org/maven2/org/apache/camel/kafkaconnector/camel-timer-source-kafka-connector/4.8.3/camel-timer-source-kafka-connector-4.8.3-package.tar.gz
+# and extract that archive into ./camel/ :
 ${DOCKER_CMD} run -it --rm \
   --name "${KAFKA_NAME}" \
   --hostname "${KAFKA_NAME}" \
@@ -23,6 +26,9 @@ ${DOCKER_CMD} run -it --rm \
   -e KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@"${KAFKA_NAME}":9093 \
   -e KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER \
   -e KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true \
+  -e KAFKA_CFG_PLUGIN_PATH=/plugins \
   -p 9092:9092 \
   -p 9093:9093 \
+  -v ./config/connect-standalone.properties:/opt/bitnami/kafka/config/connect-standalone.properties:ro \
+  -v ./camel:/kafka-plugins/:ro \
   docker.io/bitnami/kafka
