@@ -45,6 +45,7 @@
 
                ;; message broker connectivity
                "cl-rdkafka"        ;; kafka client
+               "cl-amqp"
                )
 
   ;; Project stucture.
