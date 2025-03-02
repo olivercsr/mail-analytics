@@ -7,6 +7,7 @@
    (:xp :xpath)
    (:pg :postmodern)
    (:el :event-listener)
+   (:elk :event-listener.kafka)
    (:ar :archiver)
    (:arz :archiver.zip)
    (:st :storage)

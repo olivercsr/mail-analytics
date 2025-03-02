@@ -1,6 +1,6 @@
 ;;(declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3)))
 
-(in-package :event-listener)
+(in-package :event-listener.kafka)
 
 (defclass kafka-event-listener ()
   ((address :initform "localhost:9092"
