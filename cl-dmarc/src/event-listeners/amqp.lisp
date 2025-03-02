@@ -11,3 +11,10 @@
 
 (defmethod el:disconnect ((event-listener amqp-event-listener))
   (format t "AMQP DISCONNECT"))
+
+
+;;(defun foo ()
+;;  (let ((conn (make-instance 'amqp:amqp-method-connection-start)))
+;;    (format t "foo: ~a~%" conn)))
+;;
+;;(foo)
