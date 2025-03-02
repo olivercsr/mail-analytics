@@ -67,7 +67,8 @@
                                      (:file "event-listener")
                                      (:module "event-listeners"
                                               :serial t
-                                              :components ((:file "kafka")))
+                                              :components ((:file "kafka")
+                                                           (:file "amqp")))
                                      (:file "archiver")
                                      (:module "archivers"
                                               :serial t
