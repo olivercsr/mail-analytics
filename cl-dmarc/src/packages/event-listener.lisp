@@ -21,13 +21,22 @@
    :kafka-event-listener-address
    :kafka-event-listener-handler))
 
-(defpackage :event-listener.amqp
+;;(defpackage :event-listener.amqp
+;;  (:use :cl :arrow-macros :shared)
+;;  (:local-nicknames
+;;   (:a :alexandria)
+;;   (:s :serapeum)
+;;   (:se :serapeum.exporting)
+;;   (:el :event-listener))
+;;  ;;(:export
+;;  ;; :amqp-event-listener)
+;;  )
+
+(defpackage :event-listener.rabbit
   (:use :cl :arrow-macros :shared)
   (:local-nicknames
    (:a :alexandria)
    (:s :serapeum)
    (:se :serapeum.exporting)
-   (:el :event-listener))
-  ;;(:export
-  ;; :amqp-event-listener)
-  )
+   (:el :event-listener)
+   (:rb :cl-rabbit)))

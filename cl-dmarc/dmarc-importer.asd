@@ -45,7 +45,8 @@
 
                ;; message broker connectivity
                "cl-rdkafka"        ;; kafka client
-               "cl-amqp"
+               ;;"cl-amqp"
+               "cl-rabbit"
                )
 
   ;; Project stucture.
@@ -68,7 +69,8 @@
                                      (:module "event-listeners"
                                               :serial t
                                               :components ((:file "kafka")
-                                                           (:file "amqp")))
+                                                           ;;(:file "amqp")
+                                                           (:file "rabbit")))
                                      (:file "archiver")
                                      (:module "archivers"
                                               :serial t
