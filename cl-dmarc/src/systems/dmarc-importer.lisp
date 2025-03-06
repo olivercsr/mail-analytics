@@ -28,6 +28,17 @@
     ;; clingon, unix-opts, defmain, adopt… when needed.
     (help)
     (uiop:quit))
+
+  (let ((event-listener (make-instance 'elr:rabbit-event-listener
+                                       :host "localhost"
+                                       :port 5672
+                                       ;;:handler #'(lambda (arg)
+                                       ;;             )
+                                       )))
+    (el:connect event-listener)
+    (sleep 30)
+    (el:disconnect event-listener))
+
   ;;(let ((event-listener (-> (make-instance 'elk:kafka-event-listener
   ;;                                         :address "localhost:9092"
   ;;                                         :group   "database-importer"
@@ -46,19 +57,19 @@
   ;;  (let ((db (make-instance 'st:postgres-storage)))
   ;;    (st:upsert-reporter db nil))) ;; TODO: implement
 
-  (let ((archiver (make-instance 'arz:zip-archiver)))
-    (with-open-file (in #p"../../../dmarc-data/compressed/google.com!csr-informatik.de!1728864000!1728950399.zip"
-                        :element-type '(unsigned-byte 8))
-      (ar:unarchive archiver in #'(lambda (entry)
-                                    ;;(format t "out-handler: ~a~%" entry)
-                                    (with-open-file (out #p"barbaz"
-                                                         :direction :output
-                                                         :if-exists :supersede
-                                                         :if-does-not-exist :create
-                                                         :element-type '(unsigned-byte 8))
-                                      ;;(write-sequence entry :stream out)
-                                      (uiop:copy-stream-to-stream entry out
-                                                                  :element-type '(unsigned-byte 8)))))))
+  ;;(let ((archiver (make-instance 'arz:zip-archiver)))
+  ;;  (with-open-file (in #p"../../../dmarc-data/compressed/google.com!csr-informatik.de!1728864000!1728950399.zip"
+  ;;                      :element-type '(unsigned-byte 8))
+  ;;    (ar:unarchive archiver in #'(lambda (entry)
+  ;;                                  ;;(format t "out-handler: ~a~%" entry)
+  ;;                                  (with-open-file (out #p"barbaz"
+  ;;                                                       :direction :output
+  ;;                                                       :if-exists :supersede
+  ;;                                                       :if-does-not-exist :create
+  ;;                                                       :element-type '(unsigned-byte 8))
+  ;;                                    ;;(write-sequence entry :stream out)
+  ;;                                    (uiop:copy-stream-to-stream entry out
+  ;;                                                                :element-type '(unsigned-byte 8)))))))
 
   ;;(let* ((existdb (make-instance 'ste:existdb-storage
   ;;                               :base-url   "http://localhost:8080"
