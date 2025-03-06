@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: existdb
+  labels:
+    app: existdb
+spec:
+  selector:
+    matchLabels:
+      run: existdb
+  serviceName: existdb
+  replicas: 1
+  revisionHistoryLimit: 2
+  minReadySeconds: 20
+  template:
+    metadata:
+      labels:
+        run: existdb
+    spec:
+      terminationGracePeriodSeconds: 20
+      containers:
+      - name: existdb
+        image: existdb/existdb:release
+        #imagePullPolicy: IfNotPresent
+#        env:
+#        - name: POSTGRES_DB
+#          valueFrom:
+#            configMapKeyRef:
+#              name: existdb-config
+#              key: POSTGRES_DB
+#        - name: PGDATA
+#          valueFrom:
+#            configMapKeyRef:
+#              name: existdb-config
+#              key: PGDATA
+#        - name: POSTGRES_USER
+#          valueFrom:
+#            secretKeyRef:
+#              name: existdb-secrets
+#              key: POSTGRES_USER
+#        - name: POSTGRES_PASSWORD
+#          valueFrom:
+#            secretKeyRef:
+#              name: existdb-secrets
+#              key: POSTGRES_PASSWORD
+        volumeMounts:
+        - name: existdb-data
+          mountPath: '/exist/data'
+          readOnly: false
+        resources:
+          requests:
+            memory: 64Mi
+          limits:
+            memory: 512Mi
+  volumeClaimTemplates:
+  - metadata:
+      name: existdb-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi

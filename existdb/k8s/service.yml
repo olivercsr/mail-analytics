@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: existdb
+  labels:
+    app: existdb
+spec:
+  #type: LoadBalancer
+  clusterIP: None  # headless service for statefulset
+  selector:
+    run: existdb
+  ports:
+  - name: existdb
+    protocol: TCP
+    port: 5672
+    targetPort: 5672
