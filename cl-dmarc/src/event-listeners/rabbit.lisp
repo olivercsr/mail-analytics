@@ -30,10 +30,13 @@
 ;;          (rb:queue-bind conn 1 :queue queue-name :exchange "dmarcEmailMessages" :routing-key "xx")
 ;;          (rb:basic-consume conn 1 queue-name)
 ;;          (let* ((result (rb:consume-message conn))
-;;                 (message (rb:envelope/message result)))
+;;                 (message (rb:envelope/message result))
+;;                 (body (babel:octets-to-string (rb:message/body message)
+;;                                               :encoding :utf-8))
+;;                 (props (rb:message/properties message)))
 ;;            (format t "Got message: ~s~%content: ~s~%props: ~s~%"
-;;                    result (babel:octets-to-string (rb:message/body message) :encoding :utf-8)
-;;                    (rb:message/properties message))
-;;            (rb:basic-ack conn 1 (rb:envelope/delivery-tag result))))))))
+;;                    result body props)
+;;            (rb:basic-ack conn 1 (rb:envelope/delivery-tag result))
+;;            body))))))
 ;;
 ;;(foo)
