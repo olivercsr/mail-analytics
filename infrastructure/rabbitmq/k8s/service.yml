@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  #type: LoadBalancer
+  clusterIP: None  # headless service for statefulset
+  selector:
+    run: rabbitmq
+  ports:
+  - name: rabbitmq
+    protocol: TCP
+    port: 5672
+    targetPort: 5672

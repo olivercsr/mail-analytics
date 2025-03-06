@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  selector:
+    matchLabels:
+      run: rabbitmq
+  serviceName: rabbitmq
+  replicas: 1
+  revisionHistoryLimit: 2
+  minReadySeconds: 20
+  template:
+    metadata:
+      labels:
+        run: rabbitmq
+    spec:
+      terminationGracePeriodSeconds: 20
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3-alpine
+        #imagePullPolicy: IfNotPresent
+#        env:
+#        - name: POSTGRES_DB
+#          valueFrom:
+#            configMapKeyRef:
+#              name: existdb-config
+#              key: POSTGRES_DB
+#        - name: PGDATA
+#          valueFrom:
+#            configMapKeyRef:
+#              name: existdb-config
+#              key: PGDATA
+#        - name: POSTGRES_USER
+#          valueFrom:
+#            secretKeyRef:
+#              name: existdb-secrets
+#              key: POSTGRES_USER
+#        - name: POSTGRES_PASSWORD
+#          valueFrom:
+#            secretKeyRef:
+#              name: existdb-secrets
+#              key: POSTGRES_PASSWORD
+        volumeMounts:
+        - name: rabbitmq-data
+          mountPath: '/var/lib/rabbitmq'
+          readOnly: false
+        resources:
+          requests:
+            memory: 64Mi
+          limits:
+            memory: 512Mi
+  volumeClaimTemplates:
+  - metadata:
+      name: rabbitmq-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi

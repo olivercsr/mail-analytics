@@ -12,5 +12,9 @@ spec:
   ports:
   - name: existdb
     protocol: TCP
-    port: 5672
-    targetPort: 5672
+    port: 8080
+    targetPort: 8080
+  - name: existdb-ssl
+    protocol: TCP
+    port: 8443
+    targetPort: 8443
