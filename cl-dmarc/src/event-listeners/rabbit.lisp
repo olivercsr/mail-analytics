@@ -20,10 +20,14 @@
 ;;      (rb:socket-open socket "localhost" 5672)
 ;;      (rb:login-sasl-plain conn "/" "guest" "guest")
 ;;      (rb:with-channel (conn 1)
-;;        (rb:exchange-declare conn 1 "test-ex" "topic")
-;;        (let ((queue-name "foo"))
-;;          (rb:queue-declare conn 1 :queue queue-name)
-;;          (rb:queue-bind conn 1 :queue queue-name :exchange "test-ex" :routing-key "xx")
+;;        (rb:exchange-declare conn 1 "dmarcEmailMessages" "direct"
+;;                             :durable t
+;;                             :auto-delete t)
+;;        (let ((queue-name "dmarcEmails"))
+;;          (rb:queue-declare conn 1 :queue queue-name
+;;                            :durable t
+;;                            :auto-delete nil)
+;;          (rb:queue-bind conn 1 :queue queue-name :exchange "dmarcEmailMessages" :routing-key "xx")
 ;;          (rb:basic-consume conn 1 queue-name)
 ;;          (let* ((result (rb:consume-message conn))
 ;;                 (message (rb:envelope/message result)))
