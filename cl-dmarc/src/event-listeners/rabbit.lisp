@@ -14,29 +14,29 @@
   (format t "RABBIT DISCONNECT"))
 
 
-;;(defun foo ()
-;;  (rb:with-connection (conn)
-;;    (let ((socket (rb:tcp-socket-new conn)))
-;;      (rb:socket-open socket "localhost" 5672)
-;;      (rb:login-sasl-plain conn "/" "guest" "guest")
-;;      (rb:with-channel (conn 1)
-;;        (rb:exchange-declare conn 1 "dmarcEmailMessages" "direct"
-;;                             :durable t
-;;                             :auto-delete t)
-;;        (let ((queue-name "dmarcEmails"))
-;;          (rb:queue-declare conn 1 :queue queue-name
-;;                            :durable t
-;;                            :auto-delete nil)
-;;          (rb:queue-bind conn 1 :queue queue-name :exchange "dmarcEmailMessages" :routing-key "xx")
-;;          (rb:basic-consume conn 1 queue-name)
-;;          (let* ((result (rb:consume-message conn))
-;;                 (message (rb:envelope/message result))
-;;                 (body (babel:octets-to-string (rb:message/body message)
-;;                                               :encoding :utf-8))
-;;                 (props (rb:message/properties message)))
-;;            (format t "Got message: ~s~%content: ~s~%props: ~s~%"
-;;                    result body props)
-;;            (rb:basic-ack conn 1 (rb:envelope/delivery-tag result))
-;;            body))))))
-;;
+(defun foo ()
+  (rb:with-connection (conn)
+    (let ((socket (rb:tcp-socket-new conn)))
+      (rb:socket-open socket "localhost" 5672)
+      (rb:login-sasl-plain conn "/" "guest" "guest")
+      (rb:with-channel (conn 1)
+        (rb:exchange-declare conn 1 "dmarcEmailMessages" "direct"
+                             :durable t
+                             :auto-delete t)
+        (let ((queue-name "dmarcEmails"))
+          (rb:queue-declare conn 1 :queue queue-name
+                            :durable t
+                            :auto-delete nil)
+          (rb:queue-bind conn 1 :queue queue-name :exchange "dmarcEmailMessages" :routing-key "xx")
+          (rb:basic-consume conn 1 queue-name)
+          (let* ((result (rb:consume-message conn))
+                 (message (rb:envelope/message result))
+                 (body (babel:octets-to-string (rb:message/body message)
+                                               :encoding :utf-8))
+                 (props (rb:message/properties message)))
+            (format t "Got message: ~s~%content: ~s~%props: ~s~%"
+                    result body props)
+            (rb:basic-ack conn 1 (rb:envelope/delivery-tag result))
+            body))))))
+
 ;;(foo)

@@ -44,7 +44,7 @@
                "postmodern"        ;; postgres client
 
                ;; message broker connectivity
-               "cl-rdkafka"        ;; kafka client
+               ;;"cl-rdkafka"        ;; kafka client
                ;;"cl-amqp"
                "cl-rabbit"
                )
@@ -57,8 +57,9 @@
                                               :serial t
                                               :components ((:file "shared")
                                                            (:file "event-listener")
+                                                           (:file "mail-processor")
                                                            (:file "archiver")
-                                                           (:file "file-processor")
+                                                           ;;(:file "file-processor")
                                                            (:file "dmarc-reading")
                                                            (:file "storage")
                                                            (:file "storage.existdb")
@@ -68,18 +69,19 @@
                                      (:file "event-listener")
                                      (:module "event-listeners"
                                               :serial t
-                                              :components ((:file "kafka")
+                                              :components (;;(:file "kafka")
                                                            ;;(:file "amqp")
                                                            (:file "rabbit")))
+                                     (:file "mail-processor")
                                      (:file "archiver")
                                      (:module "archivers"
                                               :serial t
                                               :components ((:file "zip")))
-                                     (:file "file-processor")
-                                     (:module "file-processors"
-                                              :serial t
-                                              :components ((:file "noop")
-                                                           (:file "filesystem")))
+                                     ;;(:file "file-processor")
+                                     ;;(:module "file-processors"
+                                     ;;         :serial t
+                                     ;;         :components ((:file "noop")
+                                     ;;                      (:file "filesystem")))
                                      (:file "read-xml")
                                      (:file "storage")
                                      (:module "storages"
