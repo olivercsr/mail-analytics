@@ -47,6 +47,9 @@
                ;;"cl-rdkafka"        ;; kafka client
                ;;"cl-amqp"
                "cl-rabbit"
+
+               ;; mime parsing
+               "cl-mime"
                )
 
   ;; Project stucture.

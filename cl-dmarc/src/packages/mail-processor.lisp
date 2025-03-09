@@ -3,4 +3,5 @@
   (:local-nicknames
    (:a :alexandria)
    (:s :serapeum)
-   (:se :serapeum.exporting)))
+   (:se :serapeum.exporting)
+   (:mi :cl-mime)))
