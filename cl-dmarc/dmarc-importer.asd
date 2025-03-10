@@ -26,6 +26,7 @@
 
                ;; data conversion
                "babel"             ;; data conversion
+               "cl-base64"
 
                ;; http
                "drakma"

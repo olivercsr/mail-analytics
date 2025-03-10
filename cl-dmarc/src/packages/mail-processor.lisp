@@ -4,4 +4,5 @@
    (:a :alexandria)
    (:s :serapeum)
    (:se :serapeum.exporting)
-   (:mi :cl-mime)))
+   (:mi :cl-mime)
+   (:b64 :cl-base64)))

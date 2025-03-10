@@ -1,15 +1,27 @@
 (in-package :mail-processor)
 
+(defun decode-part (mime out-stream)
+  (format t "decode (~a/~a) ~a~%"
+          (mi:content-type mime) (mi:content-subtype mime)
+          (mi:content-transfer-encoding mime))
+  (b64:base64-string-to-stream (mi:content mime)
+                               :stream out-stream))
+
 (defun process-part (mime)
-  (format t "process-part enter (~a/~a)~%"
+  (format t "process-part enter ~a ~a (~a/~a)~%"
+          (mi:content-disposition mime) (mi:content-disposition-parameters mime)
           (mi:content-type mime) (mi:content-subtype mime))
   (case (type-of mime)
     (mi:multipart-mime (dolist (part (mi:content mime))
                          (process-part part)))
-    (t (a:switch ((mi:content-type mime) :test #'equal)
-         ("application" (a:switch ((mi:content-subtype mime) :test #'equal)
-                          ("gzip" (format t "found gzip mime-part~%"))
-                          ("zip"  (format t "found zip mime-part~%")))))))
+    (t (a:switch ((mi:content-disposition mime) :test #'equal)
+         ("attachment" (format t "OUT: ~a~%"
+                               (length (with-output-to-string (out)
+                                         (decode-part mime out))))
+                       ;;(a:switch ((mi:content-subtype mime) :test #'equal)
+                       ;;  ("gzip" (format t "found gzip mime-part~%"))
+                       ;;  ("zip"  (format t "found zip mime-part~%")))
+                       ))))
   ;;(case (type-of mime)
   ;;  ;;(mi:text-mime (print (mi:content mime)))
   ;;  (mi:text-mime (format t "text-mime~%"))
