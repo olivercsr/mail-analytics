@@ -4,13 +4,17 @@
   (format t "decode (~a/~a) ~a~%"
           (mi:content-type mime) (mi:content-subtype mime)
           (mi:content-transfer-encoding mime))
-  (b64:base64-string-to-stream (mi:content mime)
-                               :stream out-stream))
+  (case (cl-mime:content-transfer-encoding mime)
+    (:base64 (b64:base64-string-to-stream (mi:content mime)
+                                          :stream out-stream))
+    (t (with-input-from-string (content (mi:content mime))
+         (uiop:copy-stream-to-stream content out-stream)))))
 
 (defun process-part (mime)
-  (format t "process-part enter ~a ~a (~a/~a)~%"
+  (format t "process-part enter ~a ~a (~a/~a) ~a ~a~%"
           (mi:content-disposition mime) (mi:content-disposition-parameters mime)
-          (mi:content-type mime) (mi:content-subtype mime))
+          (mi:content-type mime) (mi:content-subtype mime)
+          (mi:content-transfer-encoding mime) (type-of (mi:content mime)))
   (case (type-of mime)
     (mi:multipart-mime (dolist (part (mi:content mime))
                          (process-part part)))
