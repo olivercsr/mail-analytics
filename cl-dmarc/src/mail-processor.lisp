@@ -15,6 +15,7 @@
                  (funcall file-handler "file01" ;;(-> out
                           ;;  (flex:get-output-stream-sequence)
                           ;;  (flex:make-in-memory-input-stream))
+                          ;;(cl-base64:base64-string-to-string (mi:content mime))
                           (with-output-to-string (s) ;; TODO: how do we handle large files properly (i.e. stream-/chunk-wise instead of keeping the entire file in memory?)
                             (b64:base64-string-to-stream (mi:content mime)
                                                          :stream s)))))
@@ -56,4 +57,4 @@
                                                         :properties '((:app-id . "Application id")))))))))
   nil)
 
-(foo)
+;;(foo)
