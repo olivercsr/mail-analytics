@@ -4,19 +4,11 @@
   (format t "decode (~a/~a) ~a~%"
           (mi:content-type mime) (mi:content-subtype mime)
           (mi:content-transfer-encoding mime))
-  (let* ((out ;;(make-string-output-stream)
-              (flex:make-in-memory-output-stream
-               :element-type '(unsigned-byte 8))
-               ;;:element-type 'char
-              )
-         )
-    (case (cl-mime:content-transfer-encoding mime)
-      (:base64 (with-output-to-string (s)
-                 (b64:base64-string-to-stream (mi:content mime)
-                                              :stream s)
-                 (funcall file-handler "file01" s)))
-      (t (with-input-from-string (content (mi:content mime))
-           (funcall file-handler "file01" content))))))
+  (case (cl-mime:content-transfer-encoding mime)
+    (:base64 (with-input-from-string (content-stream (b64:base64-string-to-string (mi:content mime)))
+               (funcall file-handler "file01" content-stream)))
+    (t (with-input-from-string (content-stream (mi:content mime))
+         (funcall file-handler "file01" content-stream)))))
 
 (defun process-part (mime file-handler)
   (format t "process-part enter ~a ~a (~a/~a) ~a ~a~%"
@@ -49,9 +41,18 @@
                                                         ;;:exchange "dmarcFilesExchange"
                                                         :exchange ""
                                                         :routing-key "xx"
-                                                        :body content-stream
+                                                        :body (with-output-to-string (out)
+                                                                (loop for c = (read-char content-stream nil)
+                                                                      while c
+                                                                      do (write-char c out)))
                                                         :encoding :utf-8
                                                         :properties '((:app-id . "Application id")))))))))
   nil)
 
-;;(foo)
+(foo)
+
+;;(with-input-from-string (in "foobar")
+;;  (with-output-to-string (out)
+;;    (loop for c = (read-char in nil)
+;;          while c
+;;          do (write-char c out))))
