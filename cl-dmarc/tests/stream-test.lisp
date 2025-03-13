@@ -27,6 +27,9 @@
   (let* ((arr (make-array 3 :element-type 'octet
                             :initial-contents '(50 100 150)))
          (stream (make-instance 'octet-input-stream :data arr)))
+    ;; NOTE: this means that sbcl internally knows how to call gray streams' implementation
+    ;;   methods when operating on a stream class instance that is derived from the gray
+    ;;   streams class(es):
     (loop for octet = (read-byte stream nil nil)
           while octet
           do (format t "~8,'0b~%" octet))))
