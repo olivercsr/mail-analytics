@@ -10,7 +10,8 @@
 (deftype octet () '(unsigned-byte 8))
 
 (defclass octet-input-stream (fundamental-binary-input-stream)
-  ((data :initarg :data :type (vector octet))
+  ((data :initarg :data
+         :type (vector octet))
    (position :initform 0)))
 
 (defmethod stream-element-type ((stream octet-input-stream))
