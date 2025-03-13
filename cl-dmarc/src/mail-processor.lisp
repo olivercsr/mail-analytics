@@ -49,7 +49,7 @@
                                                         :properties '((:app-id . "Application id")))))))))
   nil)
 
-(foo)
+;;(foo)
 
 ;;(with-input-from-string (in "foobar")
 ;;  (with-output-to-string (out)
