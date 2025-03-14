@@ -5,8 +5,8 @@
          :initarg  :host)
    (port :initform 5672
          :initarg  :port)
-   (handler :initform #'(lambda (arg)
-                          (format t "HANDLER: ~a~%" arg))
+   (handler :initform #'(lambda (arg &rest args)
+                          (format t "HANDLER: ~a ~a~%" arg args))
             :initarg  :handler)
    (handler-thread)))
 
@@ -37,6 +37,7 @@
                                                        (body (babel:octets-to-string (rb:message/body message)
                                                                                      :encoding :utf-8))
                                                        (props (rb:message/properties message)))
+                                                  (funcall (slot-value event-listener 'handler) body props)
                                                   (format t "Got message: ~a~%content: ~a~%props: ~a~%"
                                                           result body props)
                                                   (rb:basic-ack conn 1 (rb:envelope/delivery-tag result))

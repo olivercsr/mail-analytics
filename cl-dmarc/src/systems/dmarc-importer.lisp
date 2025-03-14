@@ -29,15 +29,15 @@
     (help)
     (uiop:quit))
 
-  ;;(let ((event-listener (make-instance 'elr:rabbit-event-listener
-  ;;                                     :host "localhost"
-  ;;                                     :port 5672
-  ;;                                     ;;:handler #'(lambda (arg)
-  ;;                                     ;;             )
-  ;;                                     )))
-  ;;  (el:connect event-listener)
-  ;;  (sleep 30)
-  ;;  (el:disconnect event-listener))
+  (let ((event-listener (make-instance 'elr:rabbit-event-listener
+                                       :host "localhost"
+                                       :port 5672
+                                       ;;:handler #'(lambda (arg)
+                                       ;;             )
+                                       )))
+    (el:connect event-listener)
+    (sleep 30)
+    (el:disconnect event-listener))
 
   ;;(let ((event-listener (-> (make-instance 'elk:kafka-event-listener
   ;;                                         :address "localhost:9092"

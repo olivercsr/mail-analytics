@@ -27,9 +27,8 @@
     (process-part mime file-handler)))
 
 
-(defun foo ()
-  (with-open-file (in #p"../../../dmarc-data/mails/mail01.eml"
-                      :direction :input)
+(defun foo (path)
+  (with-open-file (in path :direction :input)
     (process-mail in #'(lambda (filename content-stream)
                          (format t "HANDLER ~a ~a~%" filename content-stream)
                          (cl-rabbit:with-connection (conn)
@@ -42,14 +41,15 @@
                                                         :exchange ""
                                                         :routing-key "xx"
                                                         :body (with-output-to-string (out)
-                                                                (loop for c = (read-char content-stream nil)
-                                                                      while c
-                                                                      do (write-char c out)))
+                                                                (let ((buf (make-array 128)))
+                                                                  (loop for len = (read-sequence buf content-stream)
+                                                                        while (> len 0)
+                                                                        do (write-sequence buf out :end len))))
                                                         :encoding :utf-8
                                                         :properties '((:app-id . "Application id")))))))))
   nil)
 
-;;(foo)
+;;(foo #p"../../dmarc-data/mails/mail01.eml")
 
 ;;(with-input-from-string (in "foobar")
 ;;  (with-output-to-string (out)
