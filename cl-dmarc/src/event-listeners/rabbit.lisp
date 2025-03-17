@@ -84,7 +84,7 @@
 
 (defmethod el:send-message ((event-listener rabbit-event-listener) message &key (encoding :utf-8))
   (format t "RABBIT SEND-MESSAGE ~a~%" message)
-  (with-slots (exchange routing-key) event-listener
+  (with-slots (exchange routing-key connection) event-listener
     (cl-rabbit:with-channel (connection 1)
       (cl-rabbit:basic-publish connection 1
                                :exchange exchange
