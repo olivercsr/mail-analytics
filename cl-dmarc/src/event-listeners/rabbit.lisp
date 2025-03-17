@@ -22,52 +22,56 @@
    (handler :initform #'(lambda (arg &rest args)
                           (format t "HANDLER: ~a ~a~%" arg args))
             :initarg  :handler)
-   (connection)
+   (connection :initarg :connection)
+   (channel :initarg :channel)
    (socket)
    (listener-thread)))
 
 (defmethod el:connect ((event-listener rabbit-event-listener))
   (format t "RABBIT CONNECT~%")
   (with-slots (host port vhost user password exchange exchange-type routing-key queue
-               connection socket listener-thread)
+               connection channel socket listener-thread)
       event-listener
-    (let* ((conn (cl-rabbit:new-connection))
-           (sock (rb:tcp-socket-new conn)))
-      (rb:socket-open sock host port)
-      (rb:login-sasl-plain conn vhost user password)
-      (setf connection conn)
-      (setf socket sock)
+    (let* (;;(conn (cl-rabbit:new-connection))
+           ;;(sock (rb:tcp-socket-new conn))
+           )
+      ;;(rb:socket-open sock host port)
+      ;;(rb:login-sasl-plain conn vhost user password)
+      ;;(setf connection conn)
+      ;;(setf socket sock)
       (setf listener-thread
             (bt2:make-thread #'(lambda ()
                                  (format t "LISTENER-THREAD START~%")
-                                 (rb:with-channel (connection 1)
-                                   (rb:exchange-declare conn 1 exchange exchange-type
+                                 ;;(rb:with-channel (connection 1)
+                                   (rb:exchange-declare connection 1 exchange exchange-type
                                                         :durable t
                                                         :auto-delete t)
-                                   (rb:queue-declare conn 1 :queue queue
-                                                            :durable t
-                                                            :auto-delete nil)
-                                   (rb:queue-bind conn 1 :queue queue
-                                                         :exchange exchange
-                                                         :routing-key routing-key)
-                                   (rb:basic-consume conn 1 queue)
-                                   (loop for result = (rb:consume-message conn)
+                                   (rb:queue-declare connection 1 :queue queue
+                                                                  :durable t
+                                                                  :auto-delete nil)
+                                   (rb:queue-bind connection 1 :queue queue
+                                                               :exchange exchange
+                                                               :routing-key routing-key)
+                                   (rb:basic-consume connection 1 queue)
+                                   (loop for result = (rb:consume-message connection)
                                          do (when result
                                               (let* ((message (rb:envelope/message result))
                                                      (body (babel:octets-to-string (rb:message/body message)
                                                                                    :encoding :utf-8))
                                                      (props (rb:message/properties message)))
-                                                (funcall (slot-value event-listener 'handler) body props)
+                                                (funcall (slot-value event-listener 'handler) event-listener body props)
                                                 (format t "Got message: ~a~%content: ~a~%props: ~a~%"
                                                         result body props)
-                                                (rb:basic-ack conn 1 (rb:envelope/delivery-tag result))
-                                                body))))
+                                                (rb:basic-ack connection 1 (rb:envelope/delivery-tag result))
+                                                body)))
+                                   ;;)
                                  ;;(rb:with-connection (conn)
                                  ;;  (let ((socket (rb:tcp-socket-new conn)))
                                  ;;    (rb:socket-open socket "localhost" 5672)
                                  ;;    (rb:login-sasl-plain conn "/" "guest" "guest")
                                  ;;    ))
-                                 (format t "LISTENER-THREAD END~%")))))))
+                                 (format t "LISTENER-THREAD END~%"))))
+      )))
 
 (defmethod el:disconnect ((event-listener rabbit-event-listener))
   (format t "RABBIT DISCONNECT~%")

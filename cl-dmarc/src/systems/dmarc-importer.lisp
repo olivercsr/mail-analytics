@@ -29,21 +29,45 @@
     (help)
     (uiop:quit))
 
-  (let ((event-listener (make-instance 'elr:rabbit-event-listener
-                                       :host "localhost"
-                                       :port 5672
-                                       :vhost "/"
-                                       :user "guest"
-                                       :password "guest"
-                                       :exchange "dmarcEmailMessages"
-                                       :exchange-type "direct"
-                                       :routing-key "xx"
-                                       :queue "dmarcEmails"
-                                       :handler #'(lambda (&rest args)
-                                                    (format t "LLLLLLLLLLLLLLLLL ~a~%" args)))))
-    (el:connect event-listener)
+  (let* ((rabbit-connection (cl-rabbit:new-connection))
+         (rabbit-socket (cl-rabbit:tcp-socket-new rabbit-connection))
+         (_ (progn (cl-rabbit:socket-open rabbit-socket "localhost" 5672)
+                   (cl-rabbit:login-sasl-plain rabbit-connection "/" "guest" "guest")))
+         (rabbit-channel (cl-rabbit:channel-open rabbit-connection 1))
+         (file-processor (make-instance 'elr:rabbit-event-listener
+                                        :host "localhost"
+                                        :port 5672
+                                        :vhost "/"
+                                        :user "guest"
+                                        :password "guest"
+                                        :connection rabbit-connection
+                                        :channel rabbit-channel
+                                        :exchange ""
+                                        :exchange-type "direct"
+                                        :routing-key "xx"
+                                        :queue "attachments"
+                                        :handler #'(lambda (&rest args)
+                                                     (format t "AAAAAAAAAAAAAAAA ~a~%" args))))
+         (mail-processor (make-instance 'elr:rabbit-event-listener
+                                        :host "localhost"
+                                        :port 5672
+                                        :vhost "/"
+                                        :user "guest"
+                                        :password "guest"
+                                        :connection rabbit-connection
+                                        :channel rabbit-channel
+                                        :exchange "dmarcEmailMessages"
+                                        :exchange-type "direct"
+                                        :routing-key "xx"
+                                        :queue "dmarcEmails"
+                                        :handler #'(lambda (event-listener &rest args)
+                                                     (format t "LLLLLLLLLLLLLLLL ~a ~a~%" event-listener args)
+                                                     (el:send-message event-listener "foobar")))))
+    (el:connect mail-processor)
+    (el:connect file-processor)
     (sleep 30)
-    (el:disconnect event-listener))
+    (el:disconnect file-processor)
+    (el:disconnect mail-processor))
 
   ;;(let ((event-listener (-> (make-instance 'elk:kafka-event-listener
   ;;                                         :address "localhost:9092"
