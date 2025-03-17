@@ -32,9 +32,15 @@
   (let ((event-listener (make-instance 'elr:rabbit-event-listener
                                        :host "localhost"
                                        :port 5672
-                                       ;;:handler #'(lambda (arg)
-                                       ;;             )
-                                       )))
+                                       :vhost "/"
+                                       :user "guest"
+                                       :password "guest"
+                                       :exchange "dmarcEmailMessages"
+                                       :exchange-type "direct"
+                                       :routing-key "xx"
+                                       :queue "dmarcEmails"
+                                       :handler #'(lambda (&rest args)
+                                                    (format t "LLLLLLLLLLLLLLLLL ~a~%" args)))))
     (el:connect event-listener)
     (sleep 30)
     (el:disconnect event-listener))

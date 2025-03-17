@@ -4,3 +4,4 @@
 
 (se:defgeneric connect (event-listener))
 (se:defgeneric disconnect (event-listener))
+(se:defgeneric send-message (event-listener message &key encoding))
