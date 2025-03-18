@@ -28,6 +28,27 @@
    (socket)
    (listener-thread)))
 
+(defmethod st:start ((event-listener rabbit-event-listener) &rest args)
+  (with-slots (host port vhost user password
+               connection channel-number)
+      event-listener
+    (format t "start~%")
+    ))
+
+(defmethod st:stop ((event-listener rabbit-event-listener))
+  (with-slots (connection)
+      event-listener
+    (format t "stop~%")
+    ))
+
+(defmethod el:consume ((event-listener rabbit-event-listener))
+  (format t "consume~%")
+  )
+
+(defmethod el:produce ((event-listener rabbit-event-listener) message &rest args)
+  (format t "produce ~a ~a~%" message args)
+  )
+
 (defmethod el:connect ((event-listener rabbit-event-listener))
   (with-slots (host port vhost user password exchange exchange-type routing-key queue handler
                connection channel-number channel socket listener-thread)
