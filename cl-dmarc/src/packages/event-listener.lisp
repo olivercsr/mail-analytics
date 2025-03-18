@@ -38,5 +38,6 @@
    (:a :alexandria)
    (:s :serapeum)
    (:se :serapeum.exporting)
+   (:st :startable)
    (:el :event-listener)
    (:rb :cl-rabbit)))
