@@ -2,6 +2,5 @@
 
 (in-package :event-listener)
 
-(se:defgeneric connect (event-listener))
-(se:defgeneric disconnect (event-listener))
-(se:defgeneric send-message (event-sender message &key encoding))
+(se:defgeneric consume (event-listener))
+(se:defgeneric produce (event-listener message &rest args))
