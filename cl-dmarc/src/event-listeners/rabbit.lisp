@@ -29,7 +29,7 @@
    (listener-thread)))
 
 (defmethod el:connect ((event-listener rabbit-event-listener))
-  (with-slots (host port vhost user password exchange exchange-type routing-key queue
+  (with-slots (host port vhost user password exchange exchange-type routing-key queue handler
                connection channel-number channel socket listener-thread)
       event-listener
     (format t "RABBIT CONNECT ~a~%" channel-number)
@@ -42,7 +42,39 @@
       ;;(setf socket sock)
       (setf listener-thread
             (bt2:make-thread #'(lambda ()
-                                 (format t "LISTENER-THREAD START ~a~%" channel-number)
+                                 (format t "LISTENER-THREAD START ~a ~a~%" queue channel-number)
+                                 (cl-rabbit:with-connection (conn)
+                                   (let ((sock (cl-rabbit:tcp-socket-new conn)))
+                                     (cl-rabbit:socket-open sock host port)
+                                     (cl-rabbit:login-sasl-plain conn vhost user password)
+                                     (setf connection conn)
+                                     (cl-rabbit:with-channel (conn channel-number)
+                                       (cl-rabbit:exchange-declare conn channel-number exchange exchange-type
+                                                                   :durable t
+                                                                   :auto-delete t)
+                                       (cl-rabbit:queue-declare conn channel-number
+                                                                :queue queue
+                                                                :durable t
+                                                                :auto-delete nil)
+                                       (cl-rabbit:queue-bind conn channel-number
+                                                             :queue queue
+                                                             :exchange exchange
+                                                             :routing-key queue)
+                                       (cl-rabbit:basic-consume conn channel-number queue)
+                                       (loop for result = (cl-rabbit:consume-message conn)
+                                             do (when result
+                                                  (let* ((message (cl-rabbit:envelope/message result))
+                                                         (body (-> message
+                                                                 (cl-rabbit:message/body)
+                                                                 (babel:octets-to-string :encoding :utf-8)))
+                                                         (props (cl-rabbit:message/properties message)))
+                                                    (funcall handler event-listener body props)
+                                                    (format t "got message: ~a~%content: ~a~%props: ~a~%"
+                                                            result body props)
+                                                    (->> result
+                                                      (cl-rabbit:envelope/delivery-tag)
+                                                      (cl-rabbit:basic-ack conn channel-number))
+                                                    body))))))
                                  ;;(rb:with-channel (connection 1)
                                    ;;(rb:exchange-declare connection 1 exchange exchange-type
                                    ;;                     :durable t
@@ -50,25 +82,25 @@
                                    ;;(rb:queue-declare connection 1 :queue queue
                                    ;;                               :durable t
                                    ;;                               :auto-delete nil)
-                                   (format t "before queue-bind ~a~%" channel-number)
-                                   (rb:queue-bind connection channel-number
-                                                  :queue queue
-                                                  :exchange exchange
-                                                  :routing-key routing-key)
-                                   (format t "before basic-consume ~a~%" channel-number)
-                                   (rb:basic-consume connection channel-number queue)
-                                   (format t "before loop ~a~%" channel-number)
-                                   (loop for result = (rb:consume-message connection)
-                                         do (when result
-                                              (let* ((message (rb:envelope/message result))
-                                                     (body (babel:octets-to-string (rb:message/body message)
-                                                                                   :encoding :utf-8))
-                                                     (props (rb:message/properties message)))
-                                                (funcall (slot-value event-listener 'handler) event-listener body props)
-                                                (format t "Got message: ~a~%content: ~a~%props: ~a~%"
-                                                        result body props)
-                                                (rb:basic-ack connection channel-number (rb:envelope/delivery-tag result))
-                                                body)))
+                  ;;                 (format t "before queue-bind ~a~%" channel-number)
+                  ;;                 (rb:queue-bind connection channel-number
+                  ;;                                :queue queue
+                  ;;                                :exchange exchange
+                  ;;                                :routing-key routing-key)
+                  ;;                 (format t "before basic-consume ~a~%" channel-number)
+                  ;;                 (rb:basic-consume connection channel-number queue)
+                  ;;                 (format t "before loop ~a~%" channel-number)
+                  ;;                 (loop for result = (rb:consume-message connection)
+                  ;;                       do (when result
+                  ;;                            (let* ((message (rb:envelope/message result))
+                  ;;                                   (body (babel:octets-to-string (rb:message/body message)
+                  ;;                                                                 :encoding :utf-8))
+                  ;;                                   (props (rb:message/properties message)))
+                  ;;                              (funcall (slot-value event-listener 'handler) event-listener body props)
+                  ;;                              (format t "Got message: ~a~%content: ~a~%props: ~a~%"
+                  ;;                                      result body props)
+                  ;;                              (rb:basic-ack connection channel-number (rb:envelope/delivery-tag result))
+                  ;;                              body)))
                                    ;;)
                                  ;;(rb:with-connection (conn)
                                  ;;  (let ((socket (rb:tcp-socket-new conn)))
