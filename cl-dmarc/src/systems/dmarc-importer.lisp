@@ -29,23 +29,46 @@
     (help)
     (uiop:quit))
 
-  (let* ((rabbit-connection (cl-rabbit:new-connection))
-         (rabbit-socket (cl-rabbit:tcp-socket-new rabbit-connection))
-         (_ (progn (cl-rabbit:socket-open rabbit-socket "localhost" 5672)
-                   (cl-rabbit:login-sasl-plain rabbit-connection "/" "guest" "guest")))
-         (rabbit-channel (cl-rabbit:channel-open rabbit-connection 1))
+  (let* ((rabbit-connection-mails (cl-rabbit:new-connection))
+         (rabbit-socket-mails (cl-rabbit:tcp-socket-new rabbit-connection-mails))
+         (_ (progn (cl-rabbit:socket-open rabbit-socket-mails "localhost" 5672)
+                   (cl-rabbit:login-sasl-plain rabbit-connection-mails "/" "guest" "guest")))
+         (rabbit-channel-mails (cl-rabbit:channel-open rabbit-connection-mails 1))
+
+         (rabbit-connection-attachments (cl-rabbit:new-connection))
+         (rabbit-socket-attachments (cl-rabbit:tcp-socket-new rabbit-connection-attachments))
+         (_ (progn (cl-rabbit:socket-open rabbit-socket-attachments "localhost" 5672)
+                   (cl-rabbit:login-sasl-plain rabbit-connection-attachments "/" "guest" "guest")))
+         (rabbit-channel-attachments (cl-rabbit:channel-open rabbit-connection-attachments 2))
+
+         (_ (progn (cl-rabbit:exchange-declare rabbit-connection-mails 1 "dmarcEmailMessages" "direct"
+                                               :durable t
+                                               :auto-delete t)
+                   (cl-rabbit:queue-declare rabbit-connection-mails 1
+                                            :queue "dmarcEmails"
+                                            :durable t
+                                            :auto-delete nil)
+
+                   (cl-rabbit:exchange-declare rabbit-connection-attachments 2 "mail-attachments" "direct"
+                                               :durable t
+                                               :auto-delete t)
+                   (cl-rabbit:queue-declare rabbit-connection-attachments 2
+                                            :queue "mail-attachments-queue"
+                                            :durable t
+                                            :auto-delete nil)))
          (file-processor (make-instance 'elr:rabbit-event-listener
                                         :host "localhost"
                                         :port 5672
                                         :vhost "/"
                                         :user "guest"
                                         :password "guest"
-                                        :connection rabbit-connection
-                                        :channel rabbit-channel
-                                        :exchange ""
+                                        :connection rabbit-connection-attachments
+                                        :channel-number 2
+                                        :channel rabbit-channel-attachments
+                                        :exchange "mail-attachments"
                                         :exchange-type "direct"
                                         :routing-key "xx"
-                                        :queue "attachments"
+                                        :queue "mail-attachments-queue"
                                         :handler #'(lambda (&rest args)
                                                      (format t "AAAAAAAAAAAAAAAA ~a~%" args))))
          (mail-processor (make-instance 'elr:rabbit-event-listener
@@ -54,20 +77,27 @@
                                         :vhost "/"
                                         :user "guest"
                                         :password "guest"
-                                        :connection rabbit-connection
-                                        :channel rabbit-channel
+                                        :connection rabbit-connection-mails
+                                        :channel-number 1
+                                        :channel rabbit-channel-mails
                                         :exchange "dmarcEmailMessages"
                                         :exchange-type "direct"
                                         :routing-key "xx"
                                         :queue "dmarcEmails"
                                         :handler #'(lambda (event-listener &rest args)
                                                      (format t "LLLLLLLLLLLLLLLL ~a ~a~%" event-listener args)
-                                                     (el:send-message event-listener "foobar")))))
+                                                     (el:send-message event-listener "foobar")
+                                                     ))))
+    ;;(break)
     (el:connect mail-processor)
+    ;;(break)
     (el:connect file-processor)
+    ;;(break)
     (sleep 30)
     (el:disconnect file-processor)
-    (el:disconnect mail-processor))
+    (el:disconnect mail-processor)
+    (cl-rabbit:destroy-connection rabbit-connection-attachments)
+    (cl-rabbit:destroy-connection rabbit-connection-mails))
 
   ;;(let ((event-listener (-> (make-instance 'elk:kafka-event-listener
   ;;                                         :address "localhost:9092"
