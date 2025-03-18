@@ -29,6 +29,8 @@
     (help)
     (uiop:quit))
 
+  ;; NOTE: rabbitmq-c (which we're using via ffi beneath the surface) does not support connection-sharing
+  ;;   across threads and instead recommends creating a separate connection for each thread
   (let* ((rabbit-connection-mails (cl-rabbit:new-connection))
          (rabbit-socket-mails (cl-rabbit:tcp-socket-new rabbit-connection-mails))
          (_ (progn (cl-rabbit:socket-open rabbit-socket-mails "localhost" 5672)
@@ -67,10 +69,10 @@
                                         :channel rabbit-channel-attachments
                                         :exchange "mail-attachments"
                                         :exchange-type "direct"
-                                        :routing-key "xx"
+                                        :routing-key "mail-attachments"
                                         :queue "mail-attachments-queue"
                                         :handler #'(lambda (&rest args)
-                                                     (format t "AAAAAAAAAAAAAAAA ~a~%" args))))
+                                                     (format t "FILE PROCESSOR ~a~%~%" args))))
          (mail-processor (make-instance 'elr:rabbit-event-listener
                                         :host "localhost"
                                         :port 5672
@@ -82,10 +84,10 @@
                                         :channel rabbit-channel-mails
                                         :exchange "dmarcEmailMessages"
                                         :exchange-type "direct"
-                                        :routing-key "xx"
+                                        :routing-key "dmarcEmailMessages"
                                         :queue "dmarcEmails"
                                         :handler #'(lambda (event-listener &rest args)
-                                                     (format t "LLLLLLLLLLLLLLLL ~a ~a~%" event-listener args)
+                                                     (format t "MAIL PROCESSOR ~a ~a~%~%" event-listener args)
                                                      (el:send-message event-listener "foobar")
                                                      ))))
     ;;(break)

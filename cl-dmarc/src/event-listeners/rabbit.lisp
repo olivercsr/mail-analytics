@@ -29,10 +29,10 @@
    (listener-thread)))
 
 (defmethod el:connect ((event-listener rabbit-event-listener))
-  (format t "RABBIT CONNECT~%")
   (with-slots (host port vhost user password exchange exchange-type routing-key queue
                connection channel-number channel socket listener-thread)
       event-listener
+    (format t "RABBIT CONNECT ~a~%" channel-number)
     (let* (;;(conn (cl-rabbit:new-connection))
            ;;(sock (rb:tcp-socket-new conn))
            )
@@ -42,7 +42,7 @@
       ;;(setf socket sock)
       (setf listener-thread
             (bt2:make-thread #'(lambda ()
-                                 (format t "LISTENER-THREAD START~%")
+                                 (format t "LISTENER-THREAD START ~a~%" channel-number)
                                  ;;(rb:with-channel (connection 1)
                                    ;;(rb:exchange-declare connection 1 exchange exchange-type
                                    ;;                     :durable t
@@ -50,10 +50,14 @@
                                    ;;(rb:queue-declare connection 1 :queue queue
                                    ;;                               :durable t
                                    ;;                               :auto-delete nil)
-                                   (rb:queue-bind connection channel-number :queue queue
-                                                               :exchange exchange
-                                                               :routing-key routing-key)
+                                   (format t "before queue-bind ~a~%" channel-number)
+                                   (rb:queue-bind connection channel-number
+                                                  :queue queue
+                                                  :exchange exchange
+                                                  :routing-key routing-key)
+                                   (format t "before basic-consume ~a~%" channel-number)
                                    (rb:basic-consume connection channel-number queue)
+                                   (format t "before loop ~a~%" channel-number)
                                    (loop for result = (rb:consume-message connection)
                                          do (when result
                                               (let* ((message (rb:envelope/message result))
@@ -75,25 +79,25 @@
       )))
 
 (defmethod el:disconnect ((event-listener rabbit-event-listener))
-  (format t "RABBIT DISCONNECT~%")
-  (with-slots (connection channel listener-thread) event-listener
+  (with-slots (connection channel-number channel listener-thread) event-listener
+    (format t "RABBIT DISCONNECT ~a~%" channel-number)
     (when (bt2:thread-alive-p listener-thread)
       (bt2:destroy-thread listener-thread))
     (handler-case
         (bt2:join-thread listener-thread)
       (bt2:abnormal-exit (c)
-        (format t "ABNORMAL-EXIT ~a~%" c)))
+        (format t "ABNORMAL-EXIT ~a ~a~%" channel-number c)))
     (setf listener-thread nil)
     ;;(cl-rabbit:destroy-connection connection)
     (setf channel nil)
     (setf connection nil)))
 
 (defmethod el:send-message ((event-listener rabbit-event-listener) message &key (encoding :utf-8))
-  (format t "RABBIT SEND-MESSAGE ~a~%" message)
-  (with-slots (exchange routing-key connection channel) event-listener
-    (cl-rabbit:basic-publish connection 1
+  (with-slots (exchange routing-key connection channel-number channel) event-listener
+    (format t "RABBIT SEND-MESSAGE ~a ~a~%" channel-number message)
+    (cl-rabbit:basic-publish connection channel-number
                              :exchange "mail-attachments"
-                             :routing-key routing-key
+                             :routing-key "mail-attachments"
                              :body message
                              :encoding encoding
                              :properties '((:app-id . "Application id")))))
