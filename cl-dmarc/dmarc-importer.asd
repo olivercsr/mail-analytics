@@ -60,7 +60,7 @@
                         :components ((:module "packages"
                                               :serial t
                                               :components ((:file "shared")
-                                                           (:file "startable")
+                                                           (:file "apputils")
                                                            (:file "event-listener")
                                                            (:file "mail-processor")
                                                            (:file "archiver")
@@ -71,7 +71,7 @@
                                                            (:file "dmarc-importer")))
                                      (:file "types")
                                      (:file "trees")
-                                     (:file "startable")
+                                     (:file "apputils")
                                      (:file "event-listener")
                                      (:module "event-listeners"
                                               :serial t

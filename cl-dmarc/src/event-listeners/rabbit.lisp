@@ -28,14 +28,14 @@
    (socket)
    (listener-thread)))
 
-(defmethod st:start ((event-listener rabbit-event-listener) &rest args)
+(defmethod au:start ((event-listener rabbit-event-listener) &rest args)
   (with-slots (host port vhost user password
                connection channel-number)
       event-listener
     (format t "start~%")
     ))
 
-(defmethod st:stop ((event-listener rabbit-event-listener))
+(defmethod au:stop ((event-listener rabbit-event-listener))
   (with-slots (connection)
       event-listener
     (format t "stop~%")
