@@ -22,34 +22,42 @@
    (handler :initform #'(lambda (arg &rest args)
                           (format t "HANDLER: ~a ~a~%" arg args))
             :initarg  :handler)
-   (connection :initarg :connection)
    (channel-number :initarg :channel-number)
-   (channel :initarg :channel)
+   (connection)
+   (channel)
    (socket)
    (listener-thread)))
 
 (defmethod au:start ((event-listener rabbit-event-listener) &rest args)
-  (with-slots (host port vhost user password
-               connection channel-number)
+  (with-slots (host port vhost user password channel-number
+               connection socket channel)
       event-listener
     (format t "start~%")
-    ))
+    (let* ((conn (cl-rabbit:new-connection))
+           (sock (cl-rabbit:tcp-socket-new conn)))
+      (cl-rabbit:socket-open sock host port)
+      (cl-rabbit:login-sasl-plain conn vhost user password)
+      (let ((chan (cl-rabbit:channel-open conn channel-number)))
+        (setf connection conn)
+        (setf socket sock)
+        (setf channel chan)
+        event-listener))))
 
 (defmethod au:stop ((event-listener rabbit-event-listener))
-  (with-slots (connection)
+  (with-slots (connection socket channel)
       event-listener
     (format t "stop~%")
-    ))
-
-(defmethod el:consume ((event-listener rabbit-event-listener))
-  (format t "consume~%")
-  )
+    (cl-rabbit:channel-close channel)
+    (cl-rabbit:destroy-connection connection)
+    (setf channel nil)
+    (setf socket nil)
+    (setf connection nil)))
 
 (defmethod el:produce ((event-listener rabbit-event-listener) message &rest args)
   (format t "produce ~a ~a~%" message args)
   )
 
-(defmethod el:connect ((event-listener rabbit-event-listener))
+(defmethod el:consume ((event-listener rabbit-event-listener))
   (with-slots (host port vhost user password exchange exchange-type routing-key queue handler
                connection channel-number channel socket listener-thread)
       event-listener
@@ -131,21 +139,21 @@
                                  (format t "LISTENER-THREAD END~%"))))
       )))
 
-(defmethod el:disconnect ((event-listener rabbit-event-listener))
-  (with-slots (connection channel-number channel listener-thread) event-listener
-    (format t "RABBIT DISCONNECT ~a~%" channel-number)
-    (when (bt2:thread-alive-p listener-thread)
-      (bt2:destroy-thread listener-thread))
-    (handler-case
-        (bt2:join-thread listener-thread)
-      (bt2:abnormal-exit (c)
-        (format t "ABNORMAL-EXIT ~a ~a~%" channel-number c)))
-    (setf listener-thread nil)
-    ;;(cl-rabbit:destroy-connection connection)
-    (setf channel nil)
-    (setf connection nil)))
+;;(defmethod el:disconnect ((event-listener rabbit-event-listener))
+;;  (with-slots (connection channel-number channel listener-thread) event-listener
+;;    (format t "RABBIT DISCONNECT ~a~%" channel-number)
+;;    (when (bt2:thread-alive-p listener-thread)
+;;      (bt2:destroy-thread listener-thread))
+;;    (handler-case
+;;        (bt2:join-thread listener-thread)
+;;      (bt2:abnormal-exit (c)
+;;        (format t "ABNORMAL-EXIT ~a ~a~%" channel-number c)))
+;;    (setf listener-thread nil)
+;;    ;;(cl-rabbit:destroy-connection connection)
+;;    (setf channel nil)
+;;    (setf connection nil)))
 
-(defmethod el:send-message ((event-listener rabbit-event-listener) message &key (encoding :utf-8))
+(defmethod el:produce ((event-listener rabbit-event-listener) message &key (encoding :utf-8))
   (with-slots (exchange routing-key connection channel-number channel) event-listener
     (format t "RABBIT SEND-MESSAGE ~a ~a~%" channel-number message)
     (cl-rabbit:basic-publish connection channel-number
