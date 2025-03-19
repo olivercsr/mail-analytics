@@ -11,6 +11,8 @@
          :initarg :user)
    (password :initform "guest"
              :initarg :password)
+   (channel-number :initform 1
+                   :initarg :channel-number)
    (exchange :initform ""
              :initarg :exchange)
    (exchange-type :initform "direct"
@@ -22,14 +24,13 @@
    (handler :initform #'(lambda (arg &rest args)
                           (format t "HANDLER: ~a ~a~%" arg args))
             :initarg  :handler)
-   (channel-number :initarg :channel-number)
    (connection)
    (channel)
    (socket)
    (listener-thread)))
 
 (defmethod au:start ((event-listener rabbit-event-listener) &rest args)
-  (with-slots (host port vhost user password channel-number
+  (with-slots (host port vhost user password channel-number exchange exchange-type queue routing-key
                connection socket channel)
       event-listener
     (format t "start~%")
@@ -38,6 +39,17 @@
       (cl-rabbit:socket-open sock host port)
       (cl-rabbit:login-sasl-plain conn vhost user password)
       (let ((chan (cl-rabbit:channel-open conn channel-number)))
+        (cl-rabbit:exchange-declare conn channel-number exchange exchange-type
+                                    :durable t
+                                    :auto-delete t)
+        (cl-rabbit:queue-declare conn channel-number
+                                 :queue queue
+                                 :durable t
+                                 :auto-delete nil)
+        (cl-rabbit:queue-bind conn channel-number
+                              :queue queue
+                              :exchange exchange
+                              :routing-key routing-key)
         (setf connection conn)
         (setf socket sock)
         (setf channel chan)
@@ -61,7 +73,18 @@
   (with-slots (host port vhost user password exchange exchange-type routing-key queue handler
                connection channel-number channel socket listener-thread)
       event-listener
-    (format t "RABBIT CONNECT ~a~%" channel-number)
+    (format t "consume ~a~%" channel-number)
+    (cl-rabbit:basic-consume connection channel-numbe queue)
+    (let* ((packet (cl-rabbit:consume-message conn))
+           (message (cl-rabbit:envelope/message packet))
+           (body (-> message
+                   (cl-rabbit:message/body)
+                   (babel:octets-to-string :encoding :utf-8))))
+      (format t "got packet. body: ~a~%" body)
+      (->> packet
+        (cl-rabbit:envelope/delivery-tag)
+        (cl-rabbit:basic-ack conn channel-number)))
+
     (let* (;;(conn (cl-rabbit:new-connection))
            ;;(sock (rb:tcp-socket-new conn))
            )
