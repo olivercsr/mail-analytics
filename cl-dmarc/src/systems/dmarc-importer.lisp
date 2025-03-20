@@ -65,7 +65,7 @@
                                         :user "guest"
                                         :password "guest"
                                         ;;:connection rabbit-connection-attachments
-                                        :channel-number 2
+                                        :channel 2
                                         ;;:channel rabbit-channel-attachments
                                         :exchange "mail-attachments"
                                         :exchange-type "direct"
@@ -80,7 +80,7 @@
                                         :user "guest"
                                         :password "guest"
                                         ;;:connection rabbit-connection-mails
-                                        :channel-number 1
+                                        :channel 1
                                         ;;:channel rabbit-channel-mails
                                         :exchange "dmarcEmailMessages"
                                         :exchange-type "direct"

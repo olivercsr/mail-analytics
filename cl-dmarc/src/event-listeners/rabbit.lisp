@@ -11,8 +11,8 @@
          :initarg :user)
    (password :initform "guest"
              :initarg :password)
-   (channel-number :initform 1
-                   :initarg :channel-number)
+   (channel :initform 1
+            :initarg :channel)
    (exchange :initform ""
              :initarg :exchange)
    (exchange-type :initform "direct"
@@ -25,34 +25,32 @@
                           (format t "HANDLER: ~a ~a~%" arg args))
             :initarg  :handler)
    (connection)
-   (channel)
    (socket)
    (listener-thread)))
 
 (defmethod au:start ((event-listener rabbit-event-listener) &rest args)
-  (with-slots (host port vhost user password channel-number exchange exchange-type queue routing-key
-               connection socket channel)
+  (with-slots (host port vhost user password channel exchange exchange-type queue routing-key
+               connection socket)
       event-listener
-    (format t "start ~a~%" channel-number)
+    (format t "start ~a~%" channel)
     (let* ((conn (cl-rabbit:new-connection))
            (sock (cl-rabbit:tcp-socket-new conn)))
       (cl-rabbit:socket-open sock host port)
       (cl-rabbit:login-sasl-plain conn vhost user password)
-      (let ((chan (cl-rabbit:channel-open conn channel-number)))
-        (cl-rabbit:exchange-declare conn channel-number exchange exchange-type
+      (let ((chan (cl-rabbit:channel-open conn channel)))
+        (cl-rabbit:exchange-declare conn channel exchange exchange-type
                                     :durable t
                                     :auto-delete t)
-        (cl-rabbit:queue-declare conn channel-number
+        (cl-rabbit:queue-declare conn channel
                                  :queue queue
                                  :durable t
                                  :auto-delete nil)
-        (cl-rabbit:queue-bind conn channel-number
+        (cl-rabbit:queue-bind conn channel
                               :queue queue
                               :exchange exchange
                               :routing-key routing-key)
         (setf connection conn)
         (setf socket sock)
-        (setf channel chan)
         event-listener))))
 
 (defmethod au:stop ((event-listener rabbit-event-listener))
@@ -61,16 +59,15 @@
     (format t "stop~%")
     (cl-rabbit:channel-close connection channel)
     (cl-rabbit:destroy-connection connection)
-    (setf channel nil)
     (setf socket nil)
     (setf connection nil)))
 
 (defmethod el:consume ((event-listener rabbit-event-listener))
   (with-slots (host port vhost user password exchange exchange-type routing-key queue handler
-               connection channel-number channel socket listener-thread)
+               connection channel socket listener-thread)
       event-listener
-    (format t "consume ~a~%" channel-number)
-    (cl-rabbit:basic-consume connection channel-number queue)
+    (format t "consume ~a~%" channel)
+    (cl-rabbit:basic-consume connection channel queue)
     (let* ((packet (cl-rabbit:consume-message connection))
            (message (cl-rabbit:envelope/message packet))
            (body (-> message
@@ -79,7 +76,7 @@
       (format t "got packet. body: ~a~%" body)
       (->> packet
         (cl-rabbit:envelope/delivery-tag)
-        (cl-rabbit:basic-ack connection channel-number)))
+        (cl-rabbit:basic-ack connection channel)))
 
     ;;(let* (;;(conn (cl-rabbit:new-connection))
     ;;       ;;(sock (rb:tcp-socket-new conn))
