@@ -33,7 +33,7 @@
   (with-slots (host port vhost user password channel-number exchange exchange-type queue routing-key
                connection socket channel)
       event-listener
-    (format t "start~%")
+    (format t "start ~a~%" channel-number)
     (let* ((conn (cl-rabbit:new-connection))
            (sock (cl-rabbit:tcp-socket-new conn)))
       (cl-rabbit:socket-open sock host port)
@@ -59,23 +59,19 @@
   (with-slots (connection socket channel)
       event-listener
     (format t "stop~%")
-    (cl-rabbit:channel-close channel)
+    (cl-rabbit:channel-close connection channel)
     (cl-rabbit:destroy-connection connection)
     (setf channel nil)
     (setf socket nil)
     (setf connection nil)))
-
-(defmethod el:produce ((event-listener rabbit-event-listener) message &rest args)
-  (format t "produce ~a ~a~%" message args)
-  )
 
 (defmethod el:consume ((event-listener rabbit-event-listener))
   (with-slots (host port vhost user password exchange exchange-type routing-key queue handler
                connection channel-number channel socket listener-thread)
       event-listener
     (format t "consume ~a~%" channel-number)
-    (cl-rabbit:basic-consume connection channel-numbe queue)
-    (let* ((packet (cl-rabbit:consume-message conn))
+    (cl-rabbit:basic-consume connection channel-number queue)
+    (let* ((packet (cl-rabbit:consume-message connection))
            (message (cl-rabbit:envelope/message packet))
            (body (-> message
                    (cl-rabbit:message/body)
@@ -83,84 +79,84 @@
       (format t "got packet. body: ~a~%" body)
       (->> packet
         (cl-rabbit:envelope/delivery-tag)
-        (cl-rabbit:basic-ack conn channel-number)))
+        (cl-rabbit:basic-ack connection channel-number)))
 
-    (let* (;;(conn (cl-rabbit:new-connection))
-           ;;(sock (rb:tcp-socket-new conn))
-           )
-      ;;(rb:socket-open sock host port)
-      ;;(rb:login-sasl-plain conn vhost user password)
-      ;;(setf connection conn)
-      ;;(setf socket sock)
-      (setf listener-thread
-            (bt2:make-thread #'(lambda ()
-                                 (format t "LISTENER-THREAD START ~a ~a~%" queue channel-number)
-                                 (cl-rabbit:with-connection (conn)
-                                   (let ((sock (cl-rabbit:tcp-socket-new conn)))
-                                     (cl-rabbit:socket-open sock host port)
-                                     (cl-rabbit:login-sasl-plain conn vhost user password)
-                                     (setf connection conn)
-                                     (cl-rabbit:with-channel (conn channel-number)
-                                       (cl-rabbit:exchange-declare conn channel-number exchange exchange-type
-                                                                   :durable t
-                                                                   :auto-delete t)
-                                       (cl-rabbit:queue-declare conn channel-number
-                                                                :queue queue
-                                                                :durable t
-                                                                :auto-delete nil)
-                                       (cl-rabbit:queue-bind conn channel-number
-                                                             :queue queue
-                                                             :exchange exchange
-                                                             :routing-key queue)
-                                       (cl-rabbit:basic-consume conn channel-number queue)
-                                       (loop for result = (cl-rabbit:consume-message conn)
-                                             do (when result
-                                                  (let* ((message (cl-rabbit:envelope/message result))
-                                                         (body (-> message
-                                                                 (cl-rabbit:message/body)
-                                                                 (babel:octets-to-string :encoding :utf-8)))
-                                                         (props (cl-rabbit:message/properties message)))
-                                                    (funcall handler event-listener body props)
-                                                    (format t "got message: ~a~%content: ~a~%props: ~a~%"
-                                                            result body props)
-                                                    (->> result
-                                                      (cl-rabbit:envelope/delivery-tag)
-                                                      (cl-rabbit:basic-ack conn channel-number))
-                                                    body))))))
-                                 ;;(rb:with-channel (connection 1)
-                                   ;;(rb:exchange-declare connection 1 exchange exchange-type
-                                   ;;                     :durable t
-                                   ;;                     :auto-delete t)
-                                   ;;(rb:queue-declare connection 1 :queue queue
-                                   ;;                               :durable t
-                                   ;;                               :auto-delete nil)
-                  ;;                 (format t "before queue-bind ~a~%" channel-number)
-                  ;;                 (rb:queue-bind connection channel-number
-                  ;;                                :queue queue
-                  ;;                                :exchange exchange
-                  ;;                                :routing-key routing-key)
-                  ;;                 (format t "before basic-consume ~a~%" channel-number)
-                  ;;                 (rb:basic-consume connection channel-number queue)
-                  ;;                 (format t "before loop ~a~%" channel-number)
-                  ;;                 (loop for result = (rb:consume-message connection)
-                  ;;                       do (when result
-                  ;;                            (let* ((message (rb:envelope/message result))
-                  ;;                                   (body (babel:octets-to-string (rb:message/body message)
-                  ;;                                                                 :encoding :utf-8))
-                  ;;                                   (props (rb:message/properties message)))
-                  ;;                              (funcall (slot-value event-listener 'handler) event-listener body props)
-                  ;;                              (format t "Got message: ~a~%content: ~a~%props: ~a~%"
-                  ;;                                      result body props)
-                  ;;                              (rb:basic-ack connection channel-number (rb:envelope/delivery-tag result))
-                  ;;                              body)))
-                                   ;;)
-                                 ;;(rb:with-connection (conn)
-                                 ;;  (let ((socket (rb:tcp-socket-new conn)))
-                                 ;;    (rb:socket-open socket "localhost" 5672)
-                                 ;;    (rb:login-sasl-plain conn "/" "guest" "guest")
-                                 ;;    ))
-                                 (format t "LISTENER-THREAD END~%"))))
-      )))
+    ;;(let* (;;(conn (cl-rabbit:new-connection))
+    ;;       ;;(sock (rb:tcp-socket-new conn))
+    ;;       )
+    ;;  ;;(rb:socket-open sock host port)
+    ;;  ;;(rb:login-sasl-plain conn vhost user password)
+    ;;  ;;(setf connection conn)
+    ;;  ;;(setf socket sock)
+    ;;  (setf listener-thread
+    ;;        (bt2:make-thread #'(lambda ()
+    ;;                             (format t "LISTENER-THREAD START ~a ~a~%" queue channel-number)
+    ;;                             (cl-rabbit:with-connection (conn)
+    ;;                               (let ((sock (cl-rabbit:tcp-socket-new conn)))
+    ;;                                 (cl-rabbit:socket-open sock host port)
+    ;;                                 (cl-rabbit:login-sasl-plain conn vhost user password)
+    ;;                                 (setf connection conn)
+    ;;                                 (cl-rabbit:with-channel (conn channel-number)
+    ;;                                   (cl-rabbit:exchange-declare conn channel-number exchange exchange-type
+    ;;                                                               :durable t
+    ;;                                                               :auto-delete t)
+    ;;                                   (cl-rabbit:queue-declare conn channel-number
+    ;;                                                            :queue queue
+    ;;                                                            :durable t
+    ;;                                                            :auto-delete nil)
+    ;;                                   (cl-rabbit:queue-bind conn channel-number
+    ;;                                                         :queue queue
+    ;;                                                         :exchange exchange
+    ;;                                                         :routing-key queue)
+    ;;                                   (cl-rabbit:basic-consume conn channel-number queue)
+    ;;                                   (loop for result = (cl-rabbit:consume-message conn)
+    ;;                                         do (when result
+    ;;                                              (let* ((message (cl-rabbit:envelope/message result))
+    ;;                                                     (body (-> message
+    ;;                                                             (cl-rabbit:message/body)
+    ;;                                                             (babel:octets-to-string :encoding :utf-8)))
+    ;;                                                     (props (cl-rabbit:message/properties message)))
+    ;;                                                (funcall handler event-listener body props)
+    ;;                                                (format t "got message: ~a~%content: ~a~%props: ~a~%"
+    ;;                                                        result body props)
+    ;;                                                (->> result
+    ;;                                                  (cl-rabbit:envelope/delivery-tag)
+    ;;                                                  (cl-rabbit:basic-ack conn channel-number))
+    ;;                                                body))))))
+    ;;                             ;;(rb:with-channel (connection 1)
+    ;;                               ;;(rb:exchange-declare connection 1 exchange exchange-type
+    ;;                               ;;                     :durable t
+    ;;                               ;;                     :auto-delete t)
+    ;;                               ;;(rb:queue-declare connection 1 :queue queue
+    ;;                               ;;                               :durable t
+    ;;                               ;;                               :auto-delete nil)
+    ;;              ;;                 (format t "before queue-bind ~a~%" channel-number)
+    ;;              ;;                 (rb:queue-bind connection channel-number
+    ;;              ;;                                :queue queue
+    ;;              ;;                                :exchange exchange
+    ;;              ;;                                :routing-key routing-key)
+    ;;              ;;                 (format t "before basic-consume ~a~%" channel-number)
+    ;;              ;;                 (rb:basic-consume connection channel-number queue)
+    ;;              ;;                 (format t "before loop ~a~%" channel-number)
+    ;;              ;;                 (loop for result = (rb:consume-message connection)
+    ;;              ;;                       do (when result
+    ;;              ;;                            (let* ((message (rb:envelope/message result))
+    ;;              ;;                                   (body (babel:octets-to-string (rb:message/body message)
+    ;;              ;;                                                                 :encoding :utf-8))
+    ;;              ;;                                   (props (rb:message/properties message)))
+    ;;              ;;                              (funcall (slot-value event-listener 'handler) event-listener body props)
+    ;;              ;;                              (format t "Got message: ~a~%content: ~a~%props: ~a~%"
+    ;;              ;;                                      result body props)
+    ;;              ;;                              (rb:basic-ack connection channel-number (rb:envelope/delivery-tag result))
+    ;;              ;;                              body)))
+    ;;                               ;;)
+    ;;                             ;;(rb:with-connection (conn)
+    ;;                             ;;  (let ((socket (rb:tcp-socket-new conn)))
+    ;;                             ;;    (rb:socket-open socket "localhost" 5672)
+    ;;                             ;;    (rb:login-sasl-plain conn "/" "guest" "guest")
+    ;;                             ;;    ))
+    ;;                             (format t "LISTENER-THREAD END~%")))))
+    ))
 
 ;;(defmethod el:disconnect ((event-listener rabbit-event-listener))
 ;;  (with-slots (connection channel-number channel listener-thread) event-listener
@@ -178,7 +174,7 @@
 
 (defmethod el:produce ((event-listener rabbit-event-listener) message &key (encoding :utf-8))
   (with-slots (exchange routing-key connection channel-number channel) event-listener
-    (format t "RABBIT SEND-MESSAGE ~a ~a~%" channel-number message)
+    (format t "RABBIT PRODUCE ~a ~a~%" channel-number message)
     (cl-rabbit:basic-publish connection channel-number
                              :exchange "mail-attachments"
                              :routing-key "mail-attachments"

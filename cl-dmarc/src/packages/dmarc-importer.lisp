@@ -1,6 +1,7 @@
 (defpackage :dmarc-importer
   (:use :cl :arrow-macros :shared)
   (:local-nicknames
+   (:au :apputils)
    ;;(:x :xmls)
    (:x :cxml)
    (:xd :cxml-dom)

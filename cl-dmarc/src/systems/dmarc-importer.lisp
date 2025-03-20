@@ -64,9 +64,9 @@
                                         :vhost "/"
                                         :user "guest"
                                         :password "guest"
-                                        :connection rabbit-connection-attachments
+                                        ;;:connection rabbit-connection-attachments
                                         :channel-number 2
-                                        :channel rabbit-channel-attachments
+                                        ;;:channel rabbit-channel-attachments
                                         :exchange "mail-attachments"
                                         :exchange-type "direct"
                                         :routing-key "mail-attachments"
@@ -79,9 +79,9 @@
                                         :vhost "/"
                                         :user "guest"
                                         :password "guest"
-                                        :connection rabbit-connection-mails
+                                        ;;:connection rabbit-connection-mails
                                         :channel-number 1
-                                        :channel rabbit-channel-mails
+                                        ;;:channel rabbit-channel-mails
                                         :exchange "dmarcEmailMessages"
                                         :exchange-type "direct"
                                         :routing-key "dmarcEmailMessages"
@@ -91,13 +91,15 @@
                                                      (el:produce event-listener "foobar")
                                                      ))))
     ;;(break)
+    (au:start mail-processor)
+    (au:start file-processor)
     (el:consume mail-processor)
     ;;(break)
-    (el:consume file-processor)
+    ;;(el:consume file-processor)
     ;;(break)
     (sleep 30)
-    ;;(el:disconnect file-processor)
-    ;;(el:disconnect mail-processor)
+    (au:stop file-processor)
+    (au:stop mail-processor)
     (cl-rabbit:destroy-connection rabbit-connection-attachments)
     (cl-rabbit:destroy-connection rabbit-connection-mails))
 
