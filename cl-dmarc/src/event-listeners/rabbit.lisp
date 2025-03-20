@@ -28,10 +28,10 @@
    (socket)
    (listener-thread)))
 
-(defmethod au:start ((event-listener rabbit-event-listener) &rest args)
+(defmethod au:start ((startable rabbit-event-listener) &rest args)
   (with-slots (host port vhost user password channel exchange exchange-type queue routing-key
                connection socket)
-      event-listener
+      startable
     (format t "start ~a~%" channel)
     (let* ((conn (cl-rabbit:new-connection))
            (sock (cl-rabbit:tcp-socket-new conn)))
@@ -51,11 +51,11 @@
                               :routing-key routing-key)
         (setf connection conn)
         (setf socket sock)
-        event-listener))))
+        startable))))
 
-(defmethod au:stop ((event-listener rabbit-event-listener))
+(defmethod au:stop ((startable rabbit-event-listener))
   (with-slots (connection socket channel)
-      event-listener
+      startable
     (format t "stop~%")
     (cl-rabbit:channel-close connection channel)
     (cl-rabbit:destroy-connection connection)
