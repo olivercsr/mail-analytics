@@ -72,8 +72,11 @@
            (message (cl-rabbit:envelope/message packet))
            (body (-> message
                    (cl-rabbit:message/body)
-                   (babel:octets-to-string :encoding :utf-8))))
-      (format t "got packet. body: ~a~%" body)
+                   (babel:octets-to-string :encoding :utf-8)))
+           (props (-> message
+                    (cl-rabbit:message/properties))))
+      (format t "got packet. calling handler...~%")
+      (funcall handler event-listener body props)
       (->> packet
         (cl-rabbit:envelope/delivery-tag)
         (cl-rabbit:basic-ack connection channel)))
@@ -170,9 +173,9 @@
 ;;    (setf connection nil)))
 
 (defmethod el:produce ((event-listener rabbit-event-listener) message &key (encoding :utf-8))
-  (with-slots (exchange routing-key connection channel-number channel) event-listener
-    (format t "RABBIT PRODUCE ~a ~a~%" channel-number message)
-    (cl-rabbit:basic-publish connection channel-number
+  (with-slots (exchange routing-key connection channel) event-listener
+    (format t "RABBIT PRODUCE ~a ~a~%" channel message)
+    (cl-rabbit:basic-publish connection channel
                              :exchange "mail-attachments"
                              :routing-key "mail-attachments"
                              :body message

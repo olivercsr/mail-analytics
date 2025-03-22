@@ -46,10 +46,10 @@
                                                                                        :exchange-type "direct"
                                                                                        :routing-key "mail-attachments"
                                                                                        :queue "mail-attachments-queue"
-                                                                                       :handler #'(lambda (&rest args)
+                                                                                       :handler #'(lambda (event-listener &rest args)
                                                                                                     (format t "FILE PROCESSOR ~a~%~%" args)))))
                                                     (au:start file-processor)
-                                                    ;;(el:consume file-processor)
+                                                    (el:consume file-processor)
                                                     (sleep 30)
                                                     (au:stop file-processor)))))
          (mail-thread (make-instance 'au:bordeaux-threadable
