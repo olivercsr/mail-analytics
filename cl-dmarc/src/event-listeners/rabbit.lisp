@@ -2,31 +2,43 @@
 
 (se:defclass rabbit-event-listener ()
   ((host :initform "localhost"
-         :initarg  :host)
+         :initarg  :host
+         :reader host)
    (port :initform 5672
-         :initarg  :port)
+         :initarg  :port
+         :reader port)
    (vhost :initform "/"
-          :initarg :vhost)
+          :initarg :vhost
+          :reader vhost)
    (user :initform "guest"
-         :initarg :user)
+         :initarg :user
+         :reader user)
    (password :initform "guest"
-             :initarg :password)
+             :initarg :password
+             :reader password)
    (channel :initform 1
-            :initarg :channel)
+            :initarg :channel
+            :reader channel)
    (exchange :initform ""
-             :initarg :exchange)
+             :initarg :exchange
+             :reader exchange)
    (exchange-type :initform "direct"
-                  :initarg :exchange-type)
+                  :initarg :exchange-type
+                  :reader exchange-type)
    (routing-key :initform "xx"
-                :initarg :routing-key)
+                :initarg :routing-key
+                :reader routing-key)
    (queue :initform ""
-          :initarg :queue)
+          :initarg :queue
+          :reader queue)
    (handler :initform #'(lambda (arg &rest args)
                           (format t "HANDLER: ~a ~a~%" arg args))
-            :initarg  :handler)
-   (connection)
-   (socket)
-   (listener-thread)))
+            :initarg  :handler
+            :reader handler)
+   (connection :accessor connection)
+   (socket :accessor socket)
+   ;;(listener-thread :accessor listener-thread)
+   ))
 
 (defmethod au:start ((startable rabbit-event-listener) &rest args)
   (with-slots (host port vhost user password channel exchange exchange-type queue routing-key
