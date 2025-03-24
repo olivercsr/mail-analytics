@@ -33,14 +33,15 @@
           :reader queue)
    (handler :initform #'(lambda (arg &rest args)
                           (format t "HANDLER: ~a ~a~%" arg args))
-            :initarg  :handler
+            :initarg :handler
             :reader handler)
-   (connection :accessor connection)
-   (socket :accessor socket)
+   (connection)
+   (socket)
    ;;(listener-thread :accessor listener-thread)
    ))
 
 (defmethod au:start ((startable rabbit-pubsub) &rest args)
+  (declare (ignorable args))
   (with-slots (host port vhost user password channel exchange exchange-type queue routing-key
                connection socket)
       startable

@@ -21,33 +21,32 @@
     (t (a:switch ((mi:content-disposition mime) :test #'equal)
          ("attachment" (decode-part mime file-handler))))))
 
-(defun process-mail (mail file-handler)
+(se:defun process-mail (mail file-handler)
   ;;(format t "processing mail ~a~%" mail)
   (let ((mime (mi:parse-mime mail)))
     (process-part mime file-handler)))
 
-
-(defun foo (path)
-  (with-open-file (in path :direction :input)
-    (process-mail in #'(lambda (filename content-stream)
-                         (format t "HANDLER ~a ~a~%" filename content-stream)
-                         (cl-rabbit:with-connection (conn)
-                           (let ((socket (cl-rabbit:tcp-socket-new conn)))
-                             (cl-rabbit:socket-open socket "localhost" 5672)
-                             (cl-rabbit:login-sasl-plain conn "/" "guest" "guest")
-                             (cl-rabbit:with-channel (conn 1)
-                               (cl-rabbit:basic-publish conn 1
-                                                        ;;:exchange "dmarcFilesExchange"
-                                                        :exchange ""
-                                                        :routing-key "xx"
-                                                        :body (with-output-to-string (out)
-                                                                (let ((buf (make-array 128)))
-                                                                  (loop for len = (read-sequence buf content-stream)
-                                                                        while (> len 0)
-                                                                        do (write-sequence buf out :end len))))
-                                                        :encoding :utf-8
-                                                        :properties '((:app-id . "Application id")))))))))
-  nil)
+;;(defun foo (path)
+;;  (with-open-file (in path :direction :input)
+;;    (process-mail in #'(lambda (filename content-stream)
+;;                         (format t "HANDLER ~a ~a~%" filename content-stream)
+;;                         (cl-rabbit:with-connection (conn)
+;;                           (let ((socket (cl-rabbit:tcp-socket-new conn)))
+;;                             (cl-rabbit:socket-open socket "localhost" 5672)
+;;                             (cl-rabbit:login-sasl-plain conn "/" "guest" "guest")
+;;                             (cl-rabbit:with-channel (conn 1)
+;;                               (cl-rabbit:basic-publish conn 1
+;;                                                        ;;:exchange "dmarcFilesExchange"
+;;                                                        :exchange ""
+;;                                                        :routing-key "xx"
+;;                                                        :body (with-output-to-string (out)
+;;                                                                (let ((buf (make-array 128)))
+;;                                                                  (loop for len = (read-sequence buf content-stream)
+;;                                                                        while (> len 0)
+;;                                                                        do (write-sequence buf out :end len))))
+;;                                                        :encoding :utf-8
+;;                                                        :properties '((:app-id . "Application id")))))))))
+;;  nil)
 
 ;;(foo #p"../../dmarc-data/mails/mail01.eml")
 

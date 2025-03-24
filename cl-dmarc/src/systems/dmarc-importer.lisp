@@ -67,9 +67,12 @@
                                                                                        :exchange-type "direct"
                                                                                        :routing-key "dmarcEmailMessages"
                                                                                        :queue "dmarcEmails"
-                                                                                       :handler #'(lambda (pubsub &rest args)
+                                                                                       :handler #'(lambda (pubsub body props &rest args)
                                                                                                     (format t "MAIL PROCESSOR ~a ~a~%~%" pubsub args)
-                                                                                                    (ps:produce pubsub "foobar")
+                                                                                                    (mail-processor:process-mail body
+                                                                                                                                 #'(lambda (filename content-stream)
+                                                                                                                                     (format t "got file ~a~%" filename)
+                                                                                                                                     (ps:produce pubsub "foobar")))
                                                                                                     ))))
                                                     (au:start mail-processor)
                                                     (ps:consume mail-processor)
