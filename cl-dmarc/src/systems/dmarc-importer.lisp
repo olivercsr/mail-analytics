@@ -52,37 +52,12 @@
                                                     (ps:consume file-processor)
                                                     (sleep 30)
                                                     (au:stop file-processor)))))
-         (mail-thread (make-instance 'au:bordeaux-threadable
-                                     :handler #'(lambda ()
-                                                  (let ((mail-processor (make-instance 'psr:rabbit-pubsub
-                                                                                       :host "localhost"
-                                                                                       :port 5672
-                                                                                       :vhost "/"
-                                                                                       :user "guest"
-                                                                                       :password "guest"
-                                                                                       ;;:connection rabbit-connection-mails
-                                                                                       :channel 1
-                                                                                       ;;:channel rabbit-channel-mails
-                                                                                       :exchange "dmarcEmailMessages"
-                                                                                       :exchange-type "direct"
-                                                                                       :routing-key "dmarcEmailMessages"
-                                                                                       :queue "dmarcEmails"
-                                                                                       :handler #'(lambda (pubsub body props &rest args)
-                                                                                                    (format t "MAIL PROCESSOR ~a ~a~%~%" pubsub args)
-                                                                                                    (mail-processor:process-mail body
-                                                                                                                                 #'(lambda (filename content-stream)
-                                                                                                                                     (format t "got file ~a~%" filename)
-                                                                                                                                     (ps:produce pubsub "foobar")))
-                                                                                                    ))))
-                                                    (au:start mail-processor)
-                                                    (ps:consume mail-processor)
-                                                    (sleep 30)
-                                                    (au:stop mail-processor))))))
-    (au:start-thread mail-thread)
+         (mail-processor (make-instance 'mp:mail-processor)))
+    (au:start mail-processor)
     (au:start-thread file-thread)
     (sleep 40)
     (au:stop-thread file-thread)
-    (au:stop-thread mail-thread))
+    (au:stop mail-processor))
 
   ;;(let ((pubsub (-> (make-instance 'elk:kafka-pubsub
   ;;                                         :address "localhost:9092"

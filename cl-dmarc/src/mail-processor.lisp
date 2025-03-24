@@ -1,5 +1,8 @@
 (in-package :mail-processor)
 
+(se:defclass mail-processor ()
+  (pubsub-thread))
+
 (defun decode-part (mime file-handler)
   (format t "decode (~a/~a) ~a~%"
           (mi:content-type mime) (mi:content-subtype mime)
@@ -21,10 +24,51 @@
     (t (a:switch ((mi:content-disposition mime) :test #'equal)
          ("attachment" (decode-part mime file-handler))))))
 
-(se:defun process-mail (mail file-handler)
+(defun process-mail (mail file-handler)
   ;;(format t "processing mail ~a~%" mail)
   (let ((mime (mi:parse-mime mail)))
     (process-part mime file-handler)))
+
+(defmethod au:start ((startable mail-processor) &rest args)
+  (declare (ignorable args))
+  (format t "start mail-processor~%")
+  (with-slots (pubsub-thread)
+      startable
+    (let ((thread (make-instance 'au:bordeaux-threadable
+                                 :handler #'(lambda ()
+                                              (let ((pubsub (make-instance 'psr:rabbit-pubsub
+                                                                           :host "localhost"
+                                                                           :port 5672
+                                                                           :vhost "/"
+                                                                           :user "guest"
+                                                                           :password "guest"
+                                                                           ;;:connection rabbit-connection-mails
+                                                                           :channel 1
+                                                                           ;;:channel rabbit-channel-mails
+                                                                           :exchange "dmarcEmailMessages"
+                                                                           :exchange-type "direct"
+                                                                           :routing-key "dmarcEmailMessages"
+                                                                           :queue "dmarcEmails"
+                                                                           :handler #'(lambda (pubsub body props &rest args)
+                                                                                        (format t "MAIL PROCESSOR ~a ~a~%~%" pubsub args)
+                                                                                        (process-mail body
+                                                                                                      #'(lambda (filename content-stream)
+                                                                                                          (format t "got file ~a~%" filename)
+                                                                                                          (ps:produce pubsub "foobar")))))))
+                                                (au:start pubsub)
+                                                (ps:consume pubsub)
+                                                (au:stop pubsub))))))
+      (au:start-thread thread)
+      (setf pubsub-thread thread)
+      startable)))
+
+(defmethod au:stop ((startable mail-processor))
+  (format t "stop mail-processor~%")
+  (with-slots (pubsub-thread)
+      startable
+    (au:stop-thread pubsub-thread)
+    (setf pubsub-thread nil)
+    startable))
 
 ;;(defun foo (path)
 ;;  (with-open-file (in path :direction :input)
