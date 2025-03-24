@@ -1,15 +1,15 @@
-(in-package :event-listener.amqp)
+(in-package :pubsub.amqp)
 
-(se:defclass amqp-event-listener ()
+(se:defclass amqp-pubsub ()
   ((host :initform "localhost"
          :initarg  :host)
    (port :initform 5672
          :initarg  :port)))
 
-(defmethod el:connect ((event-listener amqp-event-listener))
+(defmethod ps:connect ((pubsub amqp-pubsub))
   (format t "AMQP CONNECT"))
 
-(defmethod el:disconnect ((event-listener amqp-event-listener))
+(defmethod ps:disconnect ((pubsub amqp-pubsub))
   (format t "AMQP DISCONNECT"))
 
 

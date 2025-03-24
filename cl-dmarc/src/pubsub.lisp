@@ -1,0 +1,6 @@
+;;(declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3)))
+
+(in-package :pubsub)
+
+(se:defgeneric consume (pubsub))
+(se:defgeneric produce (pubsub message &rest args))

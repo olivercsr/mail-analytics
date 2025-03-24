@@ -1,6 +1,6 @@
-(in-package :event-listener.rabbit)
+(in-package :pubsub.rabbit)
 
-(se:defclass rabbit-event-listener ()
+(se:defclass rabbit-pubsub ()
   ((host :initform "localhost"
          :initarg  :host
          :reader host)
@@ -40,7 +40,7 @@
    ;;(listener-thread :accessor listener-thread)
    ))
 
-(defmethod au:start ((startable rabbit-event-listener) &rest args)
+(defmethod au:start ((startable rabbit-pubsub) &rest args)
   (with-slots (host port vhost user password channel exchange exchange-type queue routing-key
                connection socket)
       startable
@@ -49,23 +49,23 @@
            (sock (cl-rabbit:tcp-socket-new conn)))
       (cl-rabbit:socket-open sock host port)
       (cl-rabbit:login-sasl-plain conn vhost user password)
-      (let ((chan (cl-rabbit:channel-open conn channel)))
-        (cl-rabbit:exchange-declare conn channel exchange exchange-type
-                                    :durable t
-                                    :auto-delete t)
-        (cl-rabbit:queue-declare conn channel
-                                 :queue queue
-                                 :durable t
-                                 :auto-delete nil)
-        (cl-rabbit:queue-bind conn channel
-                              :queue queue
-                              :exchange exchange
-                              :routing-key routing-key)
-        (setf connection conn)
-        (setf socket sock)
-        startable))))
+      (cl-rabbit:channel-open conn channel)
+      (cl-rabbit:exchange-declare conn channel exchange exchange-type
+                                  :durable t
+                                  :auto-delete t)
+      (cl-rabbit:queue-declare conn channel
+                               :queue queue
+                               :durable t
+                               :auto-delete nil)
+      (cl-rabbit:queue-bind conn channel
+                            :queue queue
+                            :exchange exchange
+                            :routing-key routing-key)
+      (setf connection conn)
+      (setf socket sock)
+      startable)))
 
-(defmethod au:stop ((startable rabbit-event-listener))
+(defmethod au:stop ((startable rabbit-pubsub))
   (with-slots (connection socket channel)
       startable
     (format t "stop~%")
@@ -74,10 +74,10 @@
     (setf socket nil)
     (setf connection nil)))
 
-(defmethod el:consume ((event-listener rabbit-event-listener))
+(defmethod ps:consume ((pubsub rabbit-pubsub))
   (with-slots (host port vhost user password exchange exchange-type routing-key queue handler
                connection channel socket listener-thread)
-      event-listener
+      pubsub
     (format t "consume ~a~%" channel)
     (cl-rabbit:basic-consume connection channel queue)
     (let* ((packet (cl-rabbit:consume-message connection))
@@ -88,7 +88,7 @@
            (props (-> message
                     (cl-rabbit:message/properties))))
       (format t "got packet. calling handler...~%")
-      (funcall handler event-listener body props)
+      (funcall handler pubsub body props)
       (->> packet
         (cl-rabbit:envelope/delivery-tag)
         (cl-rabbit:basic-ack connection channel)))
@@ -128,7 +128,7 @@
     ;;                                                             (cl-rabbit:message/body)
     ;;                                                             (babel:octets-to-string :encoding :utf-8)))
     ;;                                                     (props (cl-rabbit:message/properties message)))
-    ;;                                                (funcall handler event-listener body props)
+    ;;                                                (funcall handler pubsub body props)
     ;;                                                (format t "got message: ~a~%content: ~a~%props: ~a~%"
     ;;                                                        result body props)
     ;;                                                (->> result
@@ -156,7 +156,7 @@
     ;;              ;;                                   (body (babel:octets-to-string (rb:message/body message)
     ;;              ;;                                                                 :encoding :utf-8))
     ;;              ;;                                   (props (rb:message/properties message)))
-    ;;              ;;                              (funcall (slot-value event-listener 'handler) event-listener body props)
+    ;;              ;;                              (funcall (slot-value pubsub 'handler) pubsub body props)
     ;;              ;;                              (format t "Got message: ~a~%content: ~a~%props: ~a~%"
     ;;              ;;                                      result body props)
     ;;              ;;                              (rb:basic-ack connection channel-number (rb:envelope/delivery-tag result))
@@ -170,8 +170,8 @@
     ;;                             (format t "LISTENER-THREAD END~%")))))
     ))
 
-;;(defmethod el:disconnect ((event-listener rabbit-event-listener))
-;;  (with-slots (connection channel-number channel listener-thread) event-listener
+;;(defmethod el:disconnect ((pubsub rabbit-pubsub))
+;;  (with-slots (connection channel-number channel listener-thread) pubsub
 ;;    (format t "RABBIT DISCONNECT ~a~%" channel-number)
 ;;    (when (bt2:thread-alive-p listener-thread)
 ;;      (bt2:destroy-thread listener-thread))
@@ -184,8 +184,8 @@
 ;;    (setf channel nil)
 ;;    (setf connection nil)))
 
-(defmethod el:produce ((event-listener rabbit-event-listener) message &key (encoding :utf-8))
-  (with-slots (exchange routing-key connection channel) event-listener
+(defmethod ps:produce ((pubsub rabbit-pubsub) message &key (encoding :utf-8))
+  (with-slots (exchange routing-key connection channel) pubsub
     (format t "RABBIT PRODUCE ~a ~a~%" channel message)
     (cl-rabbit:basic-publish connection channel
                              :exchange "mail-attachments"

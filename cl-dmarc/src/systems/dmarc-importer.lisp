@@ -33,7 +33,7 @@
   ;;   across threads and instead recommends creating a separate connection for each thread
   (let* ((file-thread (make-instance 'au:bordeaux-threadable
                                      :handler #'(lambda ()
-                                                  (let ((file-processor (make-instance 'elr:rabbit-event-listener
+                                                  (let ((file-processor (make-instance 'psr:rabbit-pubsub
                                                                                        :host "localhost"
                                                                                        :port 5672
                                                                                        :vhost "/"
@@ -46,15 +46,15 @@
                                                                                        :exchange-type "direct"
                                                                                        :routing-key "mail-attachments"
                                                                                        :queue "mail-attachments-queue"
-                                                                                       :handler #'(lambda (event-listener &rest args)
+                                                                                       :handler #'(lambda (pubsub &rest args)
                                                                                                     (format t "FILE PROCESSOR ~a~%~%" args)))))
                                                     (au:start file-processor)
-                                                    (el:consume file-processor)
+                                                    (ps:consume file-processor)
                                                     (sleep 30)
                                                     (au:stop file-processor)))))
          (mail-thread (make-instance 'au:bordeaux-threadable
                                      :handler #'(lambda ()
-                                                  (let ((mail-processor (make-instance 'elr:rabbit-event-listener
+                                                  (let ((mail-processor (make-instance 'psr:rabbit-pubsub
                                                                                        :host "localhost"
                                                                                        :port 5672
                                                                                        :vhost "/"
@@ -67,12 +67,12 @@
                                                                                        :exchange-type "direct"
                                                                                        :routing-key "dmarcEmailMessages"
                                                                                        :queue "dmarcEmails"
-                                                                                       :handler #'(lambda (event-listener &rest args)
-                                                                                                    (format t "MAIL PROCESSOR ~a ~a~%~%" event-listener args)
-                                                                                                    (el:produce event-listener "foobar")
+                                                                                       :handler #'(lambda (pubsub &rest args)
+                                                                                                    (format t "MAIL PROCESSOR ~a ~a~%~%" pubsub args)
+                                                                                                    (ps:produce pubsub "foobar")
                                                                                                     ))))
                                                     (au:start mail-processor)
-                                                    (el:consume mail-processor)
+                                                    (ps:consume mail-processor)
                                                     (sleep 30)
                                                     (au:stop mail-processor))))))
     (au:start-thread mail-thread)
@@ -81,14 +81,14 @@
     (au:stop-thread file-thread)
     (au:stop-thread mail-thread))
 
-  ;;(let ((event-listener (-> (make-instance 'elk:kafka-event-listener
+  ;;(let ((pubsub (-> (make-instance 'elk:kafka-pubsub
   ;;                                         :address "localhost:9092"
   ;;                                         :group   "database-importer"
   ;;                                         :topics  '("dmarc-file-received"))
-  ;;                          (el:connect))))
-  ;;  (format t "EVENT-LISTENER: ~a~%" event-listener)
+  ;;                          (ps:connect))))
+  ;;  (format t "PUBSUB: ~a~%" pubsub)
   ;;  (sleep 60)
-  ;;  (el:disconnect event-listener))
+  ;;  (ps:disconnect pubsub))
 
   ;;(pg:with-connection '("dmarc" "dmarc" "dmarc" "localhost"
   ;;                      :port 5432

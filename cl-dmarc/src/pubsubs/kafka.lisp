@@ -1,8 +1,8 @@
 ;;(declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3)))
 
-(in-package :event-listener.kafka)
+(in-package :pubsub.kafka)
 
-(defclass kafka-event-listener ()
+(defclass kafka-pubsub ()
   ((address :initform "localhost:9092"
             :initarg  :address)
    (handler :initform #'(lambda (arg)
@@ -15,11 +15,11 @@
    (consumer)
    (handler-thread)))
 
-(defmethod connect ((event-listener kafka-event-listener))
-  (format t "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ~a~%" event-listener)
+(defmethod connect ((pubsub kafka-pubsub))
+  (format t "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ~a~%" pubsub)
   (let* ((consumer (make-instance 'kf:consumer
-                                  :conf (list "bootstrap.servers"        (slot-value event-listener 'address)
-                                              "group.id"                 (slot-value event-listener 'group)
+                                  :conf (list "bootstrap.servers"        (slot-value pubsub 'address)
+                                              "group.id"                 (slot-value pubsub 'group)
                                               "enable.auto.commit"       "false"
                                               ;;"auto.offset.reset"        "earliest"
                                               "allow.auto.create.topics" "true")
@@ -39,10 +39,10 @@
     ;;(break)
     ;;(format t "=========================== ~a ~a~%" conf consumer)
     (format t "CONNECT ~a~%" consumer)
-    (kf:subscribe consumer (slot-value event-listener 'topics))
-    (setf (slot-value event-listener 'consumer)
+    (kf:subscribe consumer (slot-value pubsub 'topics))
+    (setf (slot-value pubsub 'consumer)
           consumer)
-    (setf (slot-value event-listener 'handler-thread)
+    (setf (slot-value pubsub 'handler-thread)
           (bt2:make-thread #'(lambda ()
                                (format top-level "HANDLER-THREAD START~%")
                                (loop for msg = (progn
@@ -60,22 +60,22 @@
     ;;(a:when-let ((msg (kf:poll consumer 30000)))
     ;;  (format t "MESSAGE RECEIVED: ~a => ~a~%" (kf:key msg) (kf:value msg))
     ;;  (kf:commit consumer))
-    event-listener))
+    pubsub))
 
-(defmethod disconnect ((event-listener kafka-event-listener))
+(defmethod disconnect ((pubsub kafka-pubsub))
   (format t "DISCONNECTING...~%")
-  (let ((thread (slot-value event-listener 'handler-thread)))
+  (let ((thread (slot-value pubsub 'handler-thread)))
     (when (bt2:thread-alive-p thread)
       (bt2:destroy-thread thread))
     (handler-case
         (bt2:join-thread thread)
       (bt2:abnormal-exit (c)
         (format t "ABNORMAL-EXIT ~a~%" c))))
-  (setf (slot-value event-listener 'handler-thread)
+  (setf (slot-value pubsub 'handler-thread)
         nil)
-  (kf:unsubscribe (slot-value event-listener 'consumer))
-  (kf:close (slot-value event-listener 'consumer))
-  (setf (slot-value event-listener 'consumer)
+  (kf:unsubscribe (slot-value pubsub 'consumer))
+  (kf:close (slot-value pubsub 'consumer))
+  (setf (slot-value pubsub 'consumer)
         nil)
   (format t "DISCONNECTED~%")
-  event-listener)
+  pubsub)

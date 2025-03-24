@@ -1,4 +1,4 @@
-(defpackage :event-listener
+(defpackage :pubsub
   (:use :cl :arrow-macros :shared)
   (:local-nicknames
    (:a :alexandria)
@@ -9,35 +9,35 @@
   ;; :disconnect)
   )
 
-;;(defpackage :event-listener.kafka
+;;(defpackage :pubsub.kafka
 ;;  (:use :cl :arrow-macros :shared)
 ;;  (:local-nicknames
 ;;   (:a :alexandria)
 ;;   (:s :serapeum)
 ;;   (:se :serapeum.exporting)
-;;   (:el :event-listener))
+;;   (:el :pubsub))
 ;;  (:export
-;;   :kafka-event-listener
-;;   :kafka-event-listener-address
-;;   :kafka-event-listener-handler))
+;;   :kafka-pubsub
+;;   :kafka-pubsub-address
+;;   :kafka-pubsub-handler))
 
-;;(defpackage :event-listener.amqp
+;;(defpackage :pubsub.amqp
 ;;  (:use :cl :arrow-macros :shared)
 ;;  (:local-nicknames
 ;;   (:a :alexandria)
 ;;   (:s :serapeum)
 ;;   (:se :serapeum.exporting)
-;;   (:el :event-listener))
+;;   (:el :pubsub))
 ;;  ;;(:export
-;;  ;; :amqp-event-listener)
+;;  ;; :amqp-pubsub)
 ;;  )
 
-(defpackage :event-listener.rabbit
+(defpackage :pubsub.rabbit
   (:use :cl :arrow-macros :shared)
   (:local-nicknames
    (:a :alexandria)
    (:s :serapeum)
    (:se :serapeum.exporting)
    (:au :apputils)
-   (:el :event-listener)
+   (:ps :pubsub)
    (:rb :cl-rabbit)))

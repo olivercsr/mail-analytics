@@ -61,7 +61,7 @@
                                               :serial t
                                               :components ((:file "shared")
                                                            (:file "apputils")
-                                                           (:file "event-listener")
+                                                           (:file "pubsub")
                                                            (:file "mail-processor")
                                                            (:file "archiver")
                                                            ;;(:file "file-processor")
@@ -72,8 +72,8 @@
                                      (:file "types")
                                      (:file "trees")
                                      (:file "apputils")
-                                     (:file "event-listener")
-                                     (:module "event-listeners"
+                                     (:file "pubsub")
+                                     (:module "pubsubs"
                                               :serial t
                                               :components (;;(:file "kafka")
                                                            ;;(:file "amqp")
