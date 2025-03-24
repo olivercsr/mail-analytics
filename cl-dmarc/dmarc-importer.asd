@@ -69,6 +69,7 @@
                                                            (:file "storage")
                                                            (:file "storage.existdb")
                                                            (:file "dmarc-importer")))
+                                     (:file "apputils")
                                      (:file "pubsub")
                                      (:module "pubsubs"
                                               :serial t
@@ -77,7 +78,6 @@
                                                            (:file "rabbit")))
                                      (:file "types")
                                      (:file "trees")
-                                     (:file "apputils")
                                      (:file "mail-processor")
                                      (:file "archiver")
                                      (:module "archivers"
