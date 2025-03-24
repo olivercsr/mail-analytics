@@ -58,7 +58,7 @@
                                                 (au:start pubsub)
                                                 (ps:consume pubsub)
                                                 (au:stop pubsub))))))
-      (au:start-thread thread)
+      (au:start thread)
       (setf pubsub-thread thread)
       startable)))
 
@@ -66,7 +66,7 @@
   (format t "stop mail-processor~%")
   (with-slots (pubsub-thread)
       startable
-    (au:stop-thread pubsub-thread)
+    (au:stop pubsub-thread)
     (setf pubsub-thread nil)
     startable))
 

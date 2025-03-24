@@ -54,9 +54,9 @@
                                                     (au:stop file-processor)))))
          (mail-processor (make-instance 'mp:mail-processor)))
     (au:start mail-processor)
-    (au:start-thread file-thread)
+    (au:start file-thread)
     (sleep 40)
-    (au:stop-thread file-thread)
+    (au:stop file-thread)
     (au:stop mail-processor))
 
   ;;(let ((pubsub (-> (make-instance 'elk:kafka-pubsub
