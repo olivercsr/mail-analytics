@@ -53,7 +53,7 @@
                                                                                         (format t "MAIL PROCESSOR ~a ~a~%~%" pubsub args)
                                                                                         (process-mail body
                                                                                                       #'(lambda (filename content-stream)
-                                                                                                          (format t "got file ~a~%" filename)
+                                                                                                          (format t "processing mail-attachment ~a~%" filename)
                                                                                                           (ps:produce pubsub "foobar")))))))
                                                 (au:start pubsub)
                                                 (ps:consume pubsub)

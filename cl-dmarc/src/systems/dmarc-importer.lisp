@@ -31,32 +31,12 @@
 
   ;; NOTE: rabbitmq-c (which we're using via ffi beneath the surface) does not support connection-sharing
   ;;   across threads and instead recommends creating a separate connection for each thread
-  (let* ((file-thread (make-instance 'au:bordeaux-threadable
-                                     :handler #'(lambda ()
-                                                  (let ((file-processor (make-instance 'psr:rabbit-pubsub
-                                                                                       :host "localhost"
-                                                                                       :port 5672
-                                                                                       :vhost "/"
-                                                                                       :user "guest"
-                                                                                       :password "guest"
-                                                                                       ;;:connection rabbit-connection-attachments
-                                                                                       :channel 2
-                                                                                       ;;:channel rabbit-channel-attachments
-                                                                                       :exchange "mail-attachments"
-                                                                                       :exchange-type "direct"
-                                                                                       :routing-key "mail-attachments"
-                                                                                       :queue "mail-attachments-queue"
-                                                                                       :handler #'(lambda (pubsub &rest args)
-                                                                                                    (format t "FILE PROCESSOR ~a~%~%" args)))))
-                                                    (au:start file-processor)
-                                                    (ps:consume file-processor)
-                                                    (sleep 30)
-                                                    (au:stop file-processor)))))
-         (mail-processor (make-instance 'mp:mail-processor)))
+  (let ((file-processor (make-instance 'fp:file-processor))
+        (mail-processor (make-instance 'mp:mail-processor)))
     (au:start mail-processor)
-    (au:start file-thread)
+    (au:start file-processor)
     (sleep 40)
-    (au:stop file-thread)
+    (au:stop file-processor)
     (au:stop mail-processor))
 
   ;;(let ((pubsub (-> (make-instance 'elk:kafka-pubsub
