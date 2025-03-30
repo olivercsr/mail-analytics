@@ -31,8 +31,38 @@
 
   ;; NOTE: rabbitmq-c (which we're using via ffi beneath the surface) does not support connection-sharing
   ;;   across threads and instead recommends creating a separate connection for each thread
-  (let ((attachment-processor (make-instance 'ap:attachment-processor))
-        (mail-processor (make-instance 'mp:mail-processor)))
+  (let* ((mail-pubsub (make-instance 'psr:rabbit-pubsub
+                                     :host "localhost"
+                                     :port 5672
+                                     :vhost "/"
+                                     :user "guest"
+                                     :password "guest"
+                                     ;;:connection rabbit-connection-mails
+                                     :channel 1
+                                     ;;:channel rabbit-channel-mails
+                                     :exchange "dmarcEmailMessages"
+                                     :exchange-type "direct"
+                                     :routing-key "dmarcEmailMessages"
+                                     :queue "dmarcEmails"
+                                     :handler #'mp:mail-handler))
+         (attachment-pubsub (make-instance 'psr:rabbit-pubsub
+                                           :host "localhost"
+                                           :port 5672
+                                           :vhost "/"
+                                           :user "guest"
+                                           :password "guest"
+                                           ;;:connection rabbit-connection-mails
+                                           :channel 1
+                                           ;;:channel rabbit-channel-mails
+                                           :exchange "mail-attachments"
+                                           :exchange-type "direct"
+                                           :routing-key "mail-attachments"
+                                           :queue "mail-attachments"
+                                           :handler #'ap:attachment-handler))
+         (mail-processor (make-instance 'mp:mail-processor
+                                        :pubsub mail-pubsub))
+         (attachment-processor (make-instance 'ap:attachment-processor
+                                              :pubsub attachment-pubsub)))
     (au:start mail-processor)
     (au:start attachment-processor)
     (sleep 40)
