@@ -31,12 +31,12 @@
 
   ;; NOTE: rabbitmq-c (which we're using via ffi beneath the surface) does not support connection-sharing
   ;;   across threads and instead recommends creating a separate connection for each thread
-  (let ((file-processor (make-instance 'fp:file-processor))
+  (let ((attachment-processor (make-instance 'ap:attachment-processor))
         (mail-processor (make-instance 'mp:mail-processor)))
     (au:start mail-processor)
-    (au:start file-processor)
+    (au:start attachment-processor)
     (sleep 40)
-    (au:stop file-processor)
+    (au:stop attachment-processor)
     (au:stop mail-processor))
 
   ;;(let ((pubsub (-> (make-instance 'elk:kafka-pubsub

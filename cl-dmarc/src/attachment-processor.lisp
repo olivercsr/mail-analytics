@@ -1,15 +1,15 @@
-(in-package :file-processor)
+(in-package :attachment-processor)
 
-(defgeneric lock-next-file (file-processor))
-(defgeneric file-done (file-processor file))
-(defgeneric reset-stuck-files (file-processor))
+;;(defgeneric lock-next-file (attachment-processor))
+;;(defgeneric file-done (attachment-processor file))
+;;(defgeneric reset-stuck-files (attachment-processor))
 
-(se:defclass file-processor ()
+(se:defclass attachment-processor ()
   (pubsub-thread))
 
-(defmethod au:start ((startable file-processor) &rest args)
+(defmethod au:start ((startable attachment-processor) &rest args)
   (declare (ignorable args))
-  (format t "start file-processor~%")
+  (format t "start attachment-processor~%")
   (with-slots (pubsub-thread)
       startable
     (let ((thread (make-instance 'au:bordeaux-threadable
@@ -28,7 +28,7 @@
                                                                            :routing-key "mail-attachments"
                                                                            :queue "mail-attachments"
                                                                            :handler #'(lambda (pubsub body props &rest args)
-                                                                                        (format t "FILE PROCESSOR ~a ~a~%~%" pubsub args)
+                                                                                        (format t "ATTACHMENT PROCESSOR ~a ~a~%~%" pubsub args)
                                                                                         ))))
                                                 (au:start pubsub)
                                                 (ps:consume pubsub)
@@ -37,8 +37,8 @@
       (setf pubsub-thread thread)
       startable)))
 
-(defmethod au:stop ((startable file-processor))
-  (format t "stop file-processor~%")
+(defmethod au:stop ((startable attachment-processor))
+  (format t "stop attachment-processor~%")
   (with-slots (pubsub-thread)
       startable
     (au:stop pubsub-thread)

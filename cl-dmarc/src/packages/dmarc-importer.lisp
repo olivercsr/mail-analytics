@@ -11,7 +11,7 @@
    (:psr :pubsub.rabbit)
    ;;(:psk :pubsub.kafka)
    (:mp :mail-processor)
-   (:fp :file-processor)
+   (:ap :attachment-processor)
    (:ar :archiver)
    (:arz :archiver.zip)
    (:st :storage)

@@ -1,4 +1,4 @@
-(defpackage :file-processor
+(defpackage :attachment-processor
   (:use :cl :arrow-macros :shared)
   (:local-nicknames
    (:a :alexandria)

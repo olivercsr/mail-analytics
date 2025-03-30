@@ -64,7 +64,7 @@
                                                            (:file "pubsub")
                                                            (:file "mail-processor")
                                                            (:file "archiver")
-                                                           (:file "file-processor")
+                                                           (:file "attachment-processor")
                                                            (:file "dmarc-reading")
                                                            (:file "storage")
                                                            (:file "storage.existdb")
@@ -83,7 +83,7 @@
                                      (:module "archivers"
                                               :serial t
                                               :components ((:file "zip")))
-                                     (:file "file-processor")
+                                     (:file "attachment-processor")
                                      ;;(:module "file-processors"
                                      ;;         :serial t
                                      ;;         :components ((:file "noop")
