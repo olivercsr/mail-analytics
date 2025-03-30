@@ -75,7 +75,7 @@
     (setf socket nil)
     (setf connection nil)))
 
-(defmethod ps:consume ((pubsub rabbit-pubsub))
+(defmethod ps:consume ((pubsub rabbit-pubsub) &rest args)
   (with-slots (host port vhost user password exchange exchange-type routing-key queue handler
                connection channel socket listener-thread)
       pubsub
@@ -185,12 +185,12 @@
 ;;    (setf channel nil)
 ;;    (setf connection nil)))
 
-(defmethod ps:produce ((pubsub rabbit-pubsub) message &key (encoding :utf-8))
+(defmethod ps:produce ((pubsub rabbit-pubsub) topic message &key (encoding :utf-8))
   (with-slots (exchange routing-key connection channel) pubsub
-    (format t "RABBIT PRODUCE ~a ~a~%" channel message)
+    (format t "RABBIT PRODUCE ~a ~a ~a~%" channel topic message)
     (cl-rabbit:basic-publish connection channel
-                             :exchange "mail-attachments"
-                             :routing-key "mail-attachments"
+                             :exchange topic
+                             :routing-key topic
                              :body message
                              :encoding encoding
                              :properties '((:app-id . "Application id")))))

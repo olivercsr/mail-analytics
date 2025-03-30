@@ -2,5 +2,5 @@
 
 (in-package :pubsub)
 
-(se:defgeneric consume (pubsub))
-(se:defgeneric produce (pubsub message &rest args))
+(se:defgeneric consume (pubsub &rest args))
+(se:defgeneric produce (pubsub topic message &rest args))
