@@ -79,10 +79,10 @@
                                      (:file "types")
                                      (:file "trees")
                                      (:file "mail-processor")
-                                     (:file "archiver")
                                      (:module "archivers"
                                               :serial t
                                               :components ((:file "zip")))
+                                     (:file "archiver")
                                      (:file "attachment-processor")
                                      ;;(:module "file-processors"
                                      ;;         :serial t

@@ -1,8 +1,6 @@
 (in-package #:archiver.zip)
 
-(se:defclass zip-archiver () ())
-
-(defmethod arch:unarchive ((archiver zip-archiver) in-stream out-handler)
+(se:defun unarchive (in-stream out-handler)
   (format t "unarchive ~a~%" in-stream)
   (zip:with-zip-file (zip-file in-stream)
     (loop for entry across (zip:entries zip-file)

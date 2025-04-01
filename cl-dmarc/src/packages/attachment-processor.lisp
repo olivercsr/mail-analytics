@@ -7,6 +7,7 @@
    (:au :apputils)
    (:ps :pubsub)
    (:psr :pubsub.rabbit)
+   (:ar :archiver)
    ;;(:mi :cl-mime)
    ;;(:b64 :cl-base64)
    ))
