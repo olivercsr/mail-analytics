@@ -32,10 +32,13 @@
 
 (se:defun mail-handler (pubsub body props &rest args)
   (format t "MAIL-HANDLER ~a ~a~%~%" pubsub args)
-  (process-mail body
+  (process-mail (babel:octets-to-string body)
                 #'(lambda (filename content-stream)
-                    (format t "processing mail-attachment ~a~%" filename)
-                    (ps:produce pubsub "mail-attachments" "foobar"))))
+                    (format t "processing mail-attachment ~a ~a ~a~%" filename (type-of content-stream) content-stream)
+                    (ps:produce pubsub "mail-attachments" (-> content-stream
+                                                            (uiop:slurp-stream-string)
+                                                            (babel:string-to-octets :encoding :utf-8)))
+                    )))
 
 (defmethod au:start ((startable mail-processor) &rest args)
   (declare (ignorable args))

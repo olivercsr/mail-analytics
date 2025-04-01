@@ -85,10 +85,11 @@
            (message (cl-rabbit:envelope/message packet))
            (body (-> message
                    (cl-rabbit:message/body)
-                   (babel:octets-to-string :encoding :utf-8)))
+                   ;;(babel:octets-to-string :encoding :utf-8)
+                   ))
            (props (-> message
                     (cl-rabbit:message/properties))))
-      (format t "got packet. calling handler...~%")
+      (format t "CONSUME. calling handler...~a ~a ~a ~%" (type-of (cl-rabbit:message/body message)) (type-of body) body)
       (funcall handler pubsub body props)
       (->> packet
         (cl-rabbit:envelope/delivery-tag)
@@ -187,11 +188,14 @@
 
 (defmethod ps:produce ((pubsub rabbit-pubsub) topic message &key (encoding :utf-8))
   (with-slots (exchange routing-key connection channel) pubsub
-    (format t "RABBIT PRODUCE ~a ~a ~a~%" channel topic message)
+    (format t "RABBIT PRODUCE ~a ~a ~a ~a~%" channel topic (type-of message) message)
     (cl-rabbit:basic-publish connection channel
                              :exchange topic
                              :routing-key topic
-                             :body message
+                             :body message ;;(etypecase message
+                                   ;;  (stream (with-output-to-string (out)
+                                   ;;            (uiop:copy-stream-to-stream message out)))
+                                   ;;  (t message))
                              :encoding encoding
                              :properties '((:app-id . "Application id")))))
 

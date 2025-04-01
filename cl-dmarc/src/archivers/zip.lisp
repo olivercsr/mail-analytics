@@ -1,7 +1,7 @@
 (in-package #:archiver.zip)
 
 (se:defun unarchive (in-stream out-handler)
-  (format t "unarchive ~a~%" in-stream)
+  (format t "unarchive ~a ~a~%" (type-of in-stream) in-stream)
   (zip:with-zip-file (zip-file in-stream)
     (loop for entry across (zip:entries zip-file)
           do (let ((entry-out (flex:make-in-memory-output-stream
