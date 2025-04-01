@@ -9,10 +9,17 @@
           (mi:content-type mime) (mi:content-subtype mime)
           (mi:content-transfer-encoding mime))
   (case (cl-mime:content-transfer-encoding mime)
-    (:base64 (with-input-from-string (content-stream (b64:base64-string-to-string (mi:content mime)))
-               (funcall file-handler "file01" content-stream)))
-    (t (with-input-from-string (content-stream (mi:content mime))
-         (funcall file-handler "file01" content-stream)))))
+    (:base64 (funcall file-handler
+                      "file01"
+                      (-> mime
+                        (mi:content)
+                        (cl-base64:base64-string-to-usb8-array))))
+    ;;(with-input-from-string (content-stream (b64:base64-string-to-string (mi:content mime)))
+    ;;  (funcall file-handler "file01" content-stream)))
+    (t (funcall file-handler "file01" (mi:content mime))
+     ;;(with-input-from-string (content-stream (mi:content mime))
+     ;;  (funcall file-handler "file01" content-stream))
+     )))
 
 (defun process-part (mime file-handler)
   (format t "process-part enter ~a ~a (~a/~a) ~a ~a~%"
@@ -33,12 +40,16 @@
 (se:defun mail-handler (pubsub body props &rest args)
   (format t "MAIL-HANDLER ~a ~a~%~%" pubsub args)
   (process-mail (babel:octets-to-string body)
-                #'(lambda (filename content-stream)
-                    (format t "processing mail-attachment ~a ~a ~a~%" filename (type-of content-stream) content-stream)
-                    (ps:produce pubsub "mail-attachments" (-> content-stream
-                                                            (uiop:slurp-stream-string)
-                                                            (babel:string-to-octets :encoding :utf-8)))
-                    )))
+                #'(lambda (filename content)
+                    (format t "processing mail-attachment ~a ~a ~a~%" filename (type-of content) content)
+                    (let (
+                          ;;(ar (-> content
+                          ;;      (uiop:slurp-stream-string)
+                          ;;      (babel:string-to-octets :encoding :utf-8)))
+                          )
+                      (format t "slurped ~a ~a~%" (type-of content) content)
+                      (ps:produce pubsub "mail-attachments" content)
+                      ))))
 
 (defmethod au:start ((startable mail-processor) &rest args)
   (declare (ignorable args))
@@ -91,3 +102,10 @@
 ;;    (loop for c = (read-char in nil)
 ;;          while c
 ;;          do (write-char c out))))
+
+;;(let ((b "UEsDBAoAAAAAAIydgVqBu8L6FAAAABQAAAADABwAZm9vVVQJAAP4Jexn+CXsZ3V4CwABBOgDAAAE6AMAAGZvb2JhcmJhejEyMzQ1Njc4OTAKUEsBAh4DCgAAAAAAjJ2BWoG7wvoUAAAAFAAAAAMAGAAAAAAAAQAAAKSBAAAAAGZvb1VUBQAD+CXsZ3V4CwABBOgDAAAE6AMAAFBLBQYAAAAAAQABAEkAAABRAAAAAAA="))
+;;  (with-input-from-string (in (cl-base64:base64-string-to-string b))
+;;    (-> in
+;;      (uiop:slurp-stream-string)
+;;      (babel:string-to-octets :encoding :utf-8)))
+;;  (cl-base64:base64-string-to-usb8-array b))

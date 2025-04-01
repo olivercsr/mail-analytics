@@ -22,3 +22,18 @@
   ;;    (zip:with-zip-file (zip in)
   ;;      (format t "~a~%" (zip:entry-to-stream out (elt (zip:entries zip) 0))))))
   )
+
+;;(with-open-file (in #p"../../../dmarc-data/compressed/foo.zip"
+;;                    :element-type '(unsigned-byte 8))
+;;  (let ((ar (make-array 202
+;;                        :adjustable nil
+;;                        :fill-pointer nil
+;;                        :displaced-to nil
+;;                        :element-type (stream-element-type in))))
+;;    (read-sequence ar in)
+;;    (format t "xxx ~a ~a~%" (type-of in) (type-of ar))
+;;    (unarchive ar
+;;               #'(lambda (entry)
+;;                   (format t "ENTRY ~a ~a~%" (type-of entry) (loop for c = (read-byte entry nil :eof)
+;;                                                                   while (not (equal c :eof))
+;;                                                                   collect c))))))
