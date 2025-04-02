@@ -117,9 +117,15 @@
 ;;          while c
 ;;          do (write-char c out))))
 
-;;(let ((b "UEsDBAoAAAAAAIydgVqBu8L6FAAAABQAAAADABwAZm9vVVQJAAP4Jexn+CXsZ3V4CwABBOgDAAAE6AMAAGZvb2JhcmJhejEyMzQ1Njc4OTAKUEsBAh4DCgAAAAAAjJ2BWoG7wvoUAAAAFAAAAAMAGAAAAAAAAQAAAKSBAAAAAGZvb1VUBQAD+CXsZ3V4CwABBOgDAAAE6AMAAFBLBQYAAAAAAQABAEkAAABRAAAAAAA="))
-;;  (with-input-from-string (in (cl-base64:base64-string-to-string b))
-;;    (-> in
-;;      (uiop:slurp-stream-string)
-;;      (babel:string-to-octets :encoding :utf-8)))
-;;  (cl-base64:base64-string-to-usb8-array b))
+(let ((b "UEsDBAoAAAAAAIydgVqBu8L6FAAAABQAAAADABwAZm9vVVQJAAP4Jexn+CXsZ3V4CwABBOgDAAAE6AMAAGZvb2JhcmJhejEyMzQ1Njc4OTAKUEsBAh4DCgAAAAAAjJ2BWoG7wvoUAAAAFAAAAAMAGAAAAAAAAQAAAKSBAAAAAGZvb1VUBQAD+CXsZ3V4CwABBOgDAAAE6AMAAFBLBQYAAAAAAQABAEkAAABRAAAAAAA="))
+  (with-input-from-string (in (cl-base64:base64-string-to-string b))
+    (-> in
+      (uiop:slurp-stream-string)
+      (babel:string-to-octets :encoding :utf-8) ;; this messes things up!
+      ;;(type-of)
+      ))
+  ;;(cl-base64:base64-string-to-usb8-array b)
+  ;;(-> b
+  ;;  (cl-base64:base64-string-to-string)
+  ;;  (type-of))
+  )
