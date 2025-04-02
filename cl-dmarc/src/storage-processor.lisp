@@ -8,6 +8,7 @@
 (se:defun storage-handler (pubsub body props &rest args)
   (declare (ignorable body props))
   (format t "STORAGE-HANDLER ~a ~a~%~%" pubsub args)
+  ;; TODO: implement
   )
 
 (defmethod au:start ((startable storage-processor) &rest args)
