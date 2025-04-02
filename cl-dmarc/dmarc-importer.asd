@@ -22,6 +22,9 @@
                "flexi-streams"
 
                ;; uuid
+               "frugal-uuid"
+
+               ;; uuid
                ;;"uuid"
 
                ;; data conversion
