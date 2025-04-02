@@ -4,22 +4,35 @@
   ((pubsub :initarg :pubsub)
    (pubsub-thread)))
 
+(defun ensure-filename (mime)
+  (or (some->> mime
+        (cl-mime:content-disposition-parameters)
+        (assoc :filename)
+        (cadr))
+      (format nil "mime-attachment-~a-~a"
+              (get-universal-time)
+              (fuuid:to-string (fuuid:make-v4)))))
+
 (defun decode-part (mime file-handler)
-  (format t "decode (~a/~a) ~a~%"
-          (mi:content-type mime) (mi:content-subtype mime)
+  (format t "decode (~a/~a) ~a ~a ~a ~a ~a~%"
+          (mi:content-type mime)
+          (mi:content-subtype mime)
+          (mi:content-id mime)
+          (mi:content-disposition mime)
+          (mi:content-disposition-parameters mime)
+          (->> mime
+            (mi:content-disposition-parameters)
+            (assoc :filename)
+            (cadr))
           (mi:content-transfer-encoding mime))
-  (case (cl-mime:content-transfer-encoding mime)
-    (:base64 (funcall file-handler
-                      "file01"
-                      (-> mime
-                        (mi:content)
-                        (cl-base64:base64-string-to-usb8-array))))
-    ;;(with-input-from-string (content-stream (b64:base64-string-to-string (mi:content mime)))
-    ;;  (funcall file-handler "file01" content-stream)))
-    (t (funcall file-handler "file01" (mi:content mime))
-     ;;(with-input-from-string (content-stream (mi:content mime))
-     ;;  (funcall file-handler "file01" content-stream))
-     )))
+  (let ((filename (ensure-filename mime)))
+    (case (cl-mime:content-transfer-encoding mime)
+      (:base64 (funcall file-handler
+                        filename
+                        (-> mime
+                          (cl-mime:content)
+                          (cl-base64:base64-string-to-usb8-array))))
+      (t (funcall file-handler filename (mi:content mime))))))
 
 (defun process-part (mime file-handler)
   (format t "process-part enter ~a ~a (~a/~a) ~a ~a~%"
