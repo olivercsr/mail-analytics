@@ -76,6 +76,7 @@
     (setf connection nil)))
 
 (defmethod ps:consume ((pubsub rabbit-pubsub) &rest args)
+  (declare (ignorable args))
   (with-slots (host port vhost user password exchange exchange-type routing-key queue handler
                connection channel socket listener-thread)
       pubsub

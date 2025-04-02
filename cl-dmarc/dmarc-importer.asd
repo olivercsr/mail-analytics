@@ -71,6 +71,7 @@
                                                            (:file "dmarc-reading")
                                                            (:file "storage")
                                                            (:file "storage.existdb")
+                                                           (:file "storage-processor")
                                                            (:file "dmarc-importer")))
                                      (:file "apputils")
                                      (:file "pubsub")
@@ -95,9 +96,10 @@
                                      (:file "storage")
                                      (:module "storages"
                                               :serial t
-                                              :components ((:file "memory")
-                                                           (:file "postgres")
+                                              :components (;;(:file "memory")
+                                                           ;;(:file "postgres")
                                                            (:file "existdb")))
+                                     (:file "storage-processor")
                                      (:module "systems"
                                               :serial t
                                               :components ((:file "dmarc-importer"))))))

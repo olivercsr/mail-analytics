@@ -15,5 +15,6 @@
    (:ar :archiver)
    (:arz :archiver.zip)
    (:st :storage)
-   (:ste :storage.existdb))
+   (:ste :storage.existdb)
+   (:stp :storage-processor))
   (:export :main))

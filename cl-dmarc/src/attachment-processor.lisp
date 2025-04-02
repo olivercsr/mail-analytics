@@ -9,6 +9,7 @@
    (pubsub-thread)))
 
 (se:defun attachment-handler (pubsub body props &rest args)
+  (declare (ignorable props))
   (format t "ATTACHMENT-HANDLER ~a ~a~%~%" pubsub args)
   (ar:ensure-unarchived body #'(lambda (entry)
                                  (format t "ensure-unarchived ~a~%" entry))))

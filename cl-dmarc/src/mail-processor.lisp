@@ -51,6 +51,7 @@
     (process-part mime file-handler)))
 
 (se:defun mail-handler (pubsub body props &rest args)
+  (declare (ignorable props))
   (format t "MAIL-HANDLER ~a ~a~%~%" pubsub args)
   (process-mail (babel:octets-to-string body)
                 #'(lambda (filename content)
