@@ -235,3 +235,24 @@
 ;;            body))))))
 ;;
 ;;(foo)
+
+;;(let* ((h (make-hash-table))
+;;       (a (make-array 16 :adjustable t :fill-pointer 16 :initial-element 123))
+;;       (val (list (cons :foo 111)
+;;                  (cons :bar 222)
+;;                  (cons :baz (list 11 22 33)))))
+;;  (format t "~a ~a~%" (length a) (type-of a))
+;;  (setf (gethash :foo h) 123)
+;;  (setf (gethash :bar h) 234)
+;;  (let* ((encoded (cl-json:encode-json-alist-to-string val))
+;;         (decoded (cl-json:decode-json-from-string encoded)))
+;;    (format t "(~a) ~a~%=>~%(~a) ~a~%=>~%(~a) ~a~%=>~%(~a) ~a~%"
+;;            (type-of val) val
+;;            (type-of encoded) encoded
+;;            (type-of decoded) decoded
+;;            (type-of (cdr (assoc :baz decoded))) (cdr (assoc :baz decoded))
+;;            )
+;;    decoded))
+
+;;(equal (list 11 22 33)
+;;       (cons 11 (list 22 33)))

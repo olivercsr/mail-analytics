@@ -18,11 +18,14 @@
                                                               until (eq b :eof)
                                                               do (progn
                                                                    (incf char-count)
-                                                                   (write-byte b out))))))
-                                   (adjust-array entry-vector (length entry-vector))
+                                                                   (write-byte b out)))))
+                                        (data (progn
+                                                (length entry-vector)
+                                                (cl-json:encode-json-alist-to-string (list (cons :filename filename)
+                                                                                         (cons :body entry-vector))))))
                                    (format t "ensure-unarchived ~a ~a ~a ~a ~a ~a~%"
                                            filename char-count (length entry-vector) (type-of entry-vector) entry-stream entry-vector)
-                                   (ps:produce pubsub "dmarc-reports" entry-vector)))))
+                                   (ps:produce pubsub "dmarc-reports" data)))))
 
 (defmethod au:start ((startable attachment-processor) &rest args)
   (declare (ignorable args))

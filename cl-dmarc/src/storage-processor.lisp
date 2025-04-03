@@ -6,10 +6,22 @@
    (pubsub-thread)))
 
 (se:defun make-storage-handler (this)
-  #'(lambda (pubsub body props &rest args)
-      (declare (ignorable body props))
-      (format t "STORAGE-HANDLER ~a ~a ~a ~a~%~%" pubsub (type-of body) body args)
-      (st:store-report this "file02" body)))
+  #'(lambda (pubsub data props &rest args)
+      (declare (ignorable props))
+      (let* ((decoded  (with-input-from-string (in (babel:octets-to-string data))
+                         (cl-json:decode-json in)))
+             (filename (cdr (assoc :filename decoded)))
+             (body     (let ((l (cdr (assoc :body decoded))))
+                         (make-array (length l)
+                                     :initial-contents l
+                                     :element-type '(unsigned-byte 8)))))
+        (format t "STORAGE-HANDLER ~a ~a ~a ~a ~a ~a ~a ~a~%~%"
+                pubsub
+                (type-of data) data
+                (type-of filename) filename
+                (type-of body) body
+                args)
+        (st:store-report this filename body))))
 
 (defmethod au:start ((startable storage-processor) &rest args)
   (declare (ignorable args))
@@ -32,3 +44,6 @@
     (au:stop pubsub-thread)
     (setf pubsub-thread nil)
     startable))
+
+;;(with-input-from-string (in (babel:octets-to-string (babel:string-to-octets "{\"foo\": 123}")))
+;;  (cl-json:decode-json in))

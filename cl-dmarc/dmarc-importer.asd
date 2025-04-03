@@ -34,6 +34,9 @@
                ;; http
                "drakma"
 
+               ;; json
+               "cl-json"
+
                ;; xml processing
                ;;"xmls"
                "cxml"              ;; xml processing
