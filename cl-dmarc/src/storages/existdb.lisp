@@ -18,15 +18,14 @@
 
 
 (defmethod st:store-report ((db existdb-storage) id report)
-  (format t "[EXISTDB] store-report ~a ~a~%" id report)
-  (let ((url (format nil "~a/exist/rest/db/~a/~a"
-                     (base-url db)
-                     (collection db)
-                     id)))
-    (http:http-request url
-                       :method :put
-                       :basic-authorization (list (username db)
-                                                  (password db))
-                       :content-type "application/xml"
-                       :content report
-                       )))
+  (format t "[EXISTDB] store-report ~a ~a~%" id (babel:octets-to-string report
+                                                                        :encoding :iso-8859-1))
+  (with-slots (base-url collection username password)
+      db
+    (let ((url (format nil "~a/exist/rest/~a/~a" base-url collection id)))
+      (format t "URL ~a~%" url)
+      (http:http-request url
+                         :method :put
+                         :basic-authorization (list username password)
+                         :content-type "application/xml"
+                         :content report))))

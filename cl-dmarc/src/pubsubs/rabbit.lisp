@@ -62,7 +62,7 @@
                                :durable t
                                :auto-delete nil
                                :arguments (->> (list (when message-ttl
-                                                       '("x-message-ttl" . message-ttl)))
+                                                       (cons "x-message-ttl" message-ttl)))
                                             (remove-if #'null)))
       (cl-rabbit:queue-bind conn channel
                             :queue queue

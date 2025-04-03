@@ -31,12 +31,7 @@
 
   ;; NOTE: rabbitmq-c (which we're using via ffi beneath the surface) does not support connection-sharing
   ;;   across threads and instead recommends creating a separate connection for each thread
-  (let* ((storage (make-instance 'ste:existdb-storage
-                                 :base-url   "http://localhost:8080"
-                                 :username   "admin"
-                                 :password   ""
-                                 :collection "dmarc"))
-         (mail-pubsub (make-instance 'psr:rabbit-pubsub
+  (let* ((mail-pubsub (make-instance 'psr:rabbit-pubsub
                                      :host "localhost"
                                      :port 5672
                                      :vhost "/"
@@ -65,6 +60,11 @@
                                            :queue "mail-attachments"
                                            :message-ttl 20000
                                            :handler #'ap:attachment-handler))
+         (storage (make-instance 'ste:existdb-storage
+                                 :base-url   "http://localhost:8080"
+                                 :username   "admin"
+                                 :password   ""
+                                 :collection "dmarc"))
          (storage-pubsub (make-instance 'psr:rabbit-pubsub
                                         :host "localhost"
                                         :port 5672
@@ -77,14 +77,14 @@
                                         :routing-key "dmarc-reports"
                                         :queue "dmarc-reports"
                                         :message-ttl 20000
-                                        :handler #'stp:storage-handler))
+                                        :handler (stp:make-storage-handler storage)))
          (mail-processor (make-instance 'mp:mail-processor
                                         :pubsub mail-pubsub))
          (attachment-processor (make-instance 'ap:attachment-processor
                                               :pubsub attachment-pubsub))
          (storage-processor (make-instance 'stp:storage-processor
-                                           :pubsub storage-pubsub
-                                           :storage storage)))
+                                 :pubsub storage-pubsub
+                                 :storage storage)))
     (au:start mail-processor)
     (au:start attachment-processor)
     (au:start storage-processor)

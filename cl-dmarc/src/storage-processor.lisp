@@ -5,11 +5,11 @@
    (storage :initarg :storage)
    (pubsub-thread)))
 
-(se:defun storage-handler (pubsub body props &rest args)
-  (declare (ignorable body props))
-  (format t "STORAGE-HANDLER ~a ~a~%~%" pubsub args)
-  ;; TODO: implement
-  )
+(se:defun make-storage-handler (this)
+  #'(lambda (pubsub body props &rest args)
+      (declare (ignorable body props))
+      (format t "STORAGE-HANDLER ~a ~a ~a ~a~%~%" pubsub (type-of body) body args)
+      (st:store-report this "file02" body)))
 
 (defmethod au:start ((startable storage-processor) &rest args)
   (declare (ignorable args))
