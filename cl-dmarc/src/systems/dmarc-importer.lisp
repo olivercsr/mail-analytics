@@ -63,6 +63,7 @@
                                            :exchange-type "direct"
                                            :routing-key "mail-attachments"
                                            :queue "mail-attachments"
+                                           :message-ttl 20000
                                            :handler #'ap:attachment-handler))
          (storage-pubsub (make-instance 'psr:rabbit-pubsub
                                         :host "localhost"
@@ -75,6 +76,7 @@
                                         :exchange-type "direct"
                                         :routing-key "dmarc-reports"
                                         :queue "dmarc-reports"
+                                        :message-ttl 20000
                                         :handler #'stp:storage-handler))
          (mail-processor (make-instance 'mp:mail-processor
                                         :pubsub mail-pubsub))
