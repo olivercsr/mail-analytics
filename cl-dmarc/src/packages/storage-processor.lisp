@@ -6,6 +6,7 @@
    (:se :serapeum.exporting)
    (:au :apputils)
    (:ps :pubsub)
+   (:st :storage)
    ;;(:psr :pubsub.rabbit)
    ;;(:mi :cl-mime)
    ;;(:b64 :cl-base64)

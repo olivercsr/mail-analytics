@@ -31,6 +31,9 @@
    (queue :initform ""
           :initarg :queue
           :reader queue)
+   (message-ttl :initform nil
+                :initarg :message-ttl
+                :reader message-ttl)
    (handler :initform #'(lambda (arg &rest args)
                           (format t "HANDLER: ~a ~a~%" arg args))
             :initarg :handler
@@ -42,7 +45,7 @@
 
 (defmethod au:start ((startable rabbit-pubsub) &rest args)
   (declare (ignorable args))
-  (with-slots (host port vhost user password channel exchange exchange-type queue routing-key
+  (with-slots (host port vhost user password channel exchange exchange-type queue message-ttl routing-key
                connection socket)
       startable
     (format t "start ~a~%" channel)
@@ -57,7 +60,10 @@
       (cl-rabbit:queue-declare conn channel
                                :queue queue
                                :durable t
-                               :auto-delete nil)
+                               :auto-delete nil
+                               :arguments (->> (list (when message-ttl
+                                                       '("x-message-ttl" . message-ttl)))
+                                            (remove-if #'null)))
       (cl-rabbit:queue-bind conn channel
                             :queue queue
                             :exchange exchange

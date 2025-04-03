@@ -9,9 +9,11 @@
                (format t "processing zip file entry ~a~%"
                        (zip:file-name entry))
                (zip:entry-to-stream entry-out entry)
-               (funcall out-handler (-> entry-out
-                                      (flex:get-output-stream-sequence)
-                                      (flex:make-in-memory-input-stream))))))
+               (funcall out-handler
+                        (zip:file-name entry)
+                        (-> entry-out
+                          (flex:get-output-stream-sequence)
+                          (flex:make-in-memory-input-stream))))))
   ;;(with-open-file (in #p"../../../dmarc-data/compressed/google.com!csr-informatik.de!1728864000!1728950399.zip"
   ;;                    :element-type '(unsigned-byte 8))
   ;;  (with-open-file (out #p"foobar"
