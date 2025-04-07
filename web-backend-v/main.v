@@ -20,10 +20,11 @@ fn main() {
   veb.run[App, Context](mut app, 8081)
 }
 
-@['/api/dmarc/query'; get]
-pub fn (app &App) dmarc_query(mut ctx Context) veb.Result {
-  println('entering index')
+fn (app &App) do_dmarc_query(mut ctx Context) veb.Result {
+  println('entering process index')
+
   time.sleep(5000 * time.millisecond)
+
   user := User{
     '123'
     'Doe'
@@ -37,11 +38,25 @@ pub fn (app &App) dmarc_query(mut ctx Context) veb.Result {
     user: user
     data: data
   }
+
   println(typeof(user).name)
   println(typeof(data).name)
   println(typeof(result).name)
-  println('leaving index')
+  println('leaving process index')
+
   return ctx.json([result])
+}
+
+@['/api/dmarc/query'; get]
+pub fn (app &App) dmarc_query(mut ctx Context) veb.Result {
+  println('entering index')
+
+  ctx.takeover_conn()
+  go app.do_dmarc_query(mut ctx)
+
+  println('leaving index')
+
+  return veb.no_result()
 }
 
 pub fn (app &App) index(mut ctx Context) veb.Result {
