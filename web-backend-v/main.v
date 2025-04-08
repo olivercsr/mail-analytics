@@ -78,7 +78,7 @@ fn test_existdb() {
   })
   body := db.query('foo') or { println('oops'); println(err); '' }
   println('=================')
-  println(body)
+  println('response body:\n' + body)
 }
 
 fn main() {

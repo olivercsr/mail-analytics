@@ -3,6 +3,8 @@ module existdb
 //import time
 import net.http
 
+const api_path := '/exist/rest'
+
 pub struct Config {
 pub:
   baseurl string
@@ -20,7 +22,8 @@ pub fn new_existdb(config Config) ExistDb {
 }
 
 pub fn (db ExistDb) query(query string) !string {
-  response := http.get('http://localhost:8081')!
-  dump(response.body)
+  url := '${db.config.baseurl}${api_path}/${db.config.collection}'
+  response := http.get(url)!
+
   return response.body
 }
