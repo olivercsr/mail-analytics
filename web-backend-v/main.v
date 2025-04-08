@@ -3,6 +3,8 @@ module main
 import time
 import veb
 
+type RequestHandler = fn (&App, mut Context)
+
 pub struct Context {
   veb.Context
 }
@@ -20,44 +22,49 @@ fn main() {
   veb.run[App, Context](mut app, 8081)
 }
 
-fn (app &App) do_dmarc_query(mut ctx Context) veb.Result {
-  println('start processing request ${ctx.req.url}')
-
-  time.sleep(5000 * time.millisecond)
-
-  user := User{
-    '123'
-    'Doe'
-    'John'
-  }
-  data := {
-    'foo': 123
-    'bar': 234
-  }
-  result := struct {
-    user: user
-    data: data
-  }
-
-  println(typeof(user).name)
-  println(typeof(data).name)
-  println(typeof(result).name)
-
-  println('done processing request ${ctx.req.url}')
-
-  return ctx.json([result])
-}
-
-@['/api/dmarc/query'; get]
-pub fn (app &App) dmarc_query(mut ctx Context) veb.Result {
+fn process_request_concurrently(handler RequestHandler, app &App, mut ctx Context) veb.Result {
   println('accepting request ${ctx.req.url}')
 
   ctx.takeover_conn()
-  go app.do_dmarc_query(mut ctx)
+  go handler(app, mut ctx)
 
   println('accepted request ${ctx.req.url}')
 
   return veb.no_result()
+}
+
+@['/api/dmarc/query'; get]
+pub fn (app &App) dmarc_query(mut ctx Context) veb.Result {
+
+  handler := fn (app &App, mut context Context) {
+    println('start processing request ${context.req.url}')
+
+    time.sleep(5000 * time.millisecond)
+
+    user := User{
+      '123'
+      'Doe'
+      'John'
+    }
+    data := {
+      'foo': 123
+      'bar': 234
+    }
+    result := struct {
+    user: user
+    data: data
+  }
+
+    println(typeof(user).name)
+    println(typeof(data).name)
+    println(typeof(result).name)
+
+    println('done processing request ${context.req.url}')
+
+    context.json([result])
+  }
+
+  return process_request_concurrently(handler, app, mut ctx)
 }
 
 pub fn (app &App) index(mut ctx Context) veb.Result {
