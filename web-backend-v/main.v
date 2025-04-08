@@ -21,7 +21,7 @@ fn main() {
 }
 
 fn (app &App) do_dmarc_query(mut ctx Context) veb.Result {
-  println('entering process index')
+  println('start processing request ${ctx.req.url}')
 
   time.sleep(5000 * time.millisecond)
 
@@ -42,19 +42,20 @@ fn (app &App) do_dmarc_query(mut ctx Context) veb.Result {
   println(typeof(user).name)
   println(typeof(data).name)
   println(typeof(result).name)
-  println('leaving process index')
+
+  println('done processing request ${ctx.req.url}')
 
   return ctx.json([result])
 }
 
 @['/api/dmarc/query'; get]
 pub fn (app &App) dmarc_query(mut ctx Context) veb.Result {
-  println('entering index')
+  println('accepting request ${ctx.req.url}')
 
   ctx.takeover_conn()
   go app.do_dmarc_query(mut ctx)
 
-  println('leaving index')
+  println('accepted request ${ctx.req.url}')
 
   return veb.no_result()
 }
