@@ -3,6 +3,8 @@ module main
 import time
 import veb
 
+import existdb
+
 type RequestHandler = fn (&App, mut Context)
 
 pub struct Context {
@@ -15,11 +17,6 @@ struct User {
   id string
   lastname string
   firstname string
-}
-
-fn main() {
-  mut app := &App{}
-  veb.run[App, Context](mut app, 8081)
 }
 
 fn process_request_concurrently(handler RequestHandler, app &App, mut ctx Context) veb.Result {
@@ -70,5 +67,24 @@ pub fn (app &App) dmarc_query(mut ctx Context) veb.Result {
 pub fn (app &App) index(mut ctx Context) veb.Result {
   message := 'Hello world from veb!'
   return $veb.html()
+}
+
+fn test_existdb() {
+  db := existdb.new_existdb(existdb.Config{
+    baseurl: 'http://localhost:8080'
+    username: 'admin'
+    password: ''
+    collection: 'dmarc'
+  })
+  body := db.query('foo') or { println('oops'); println(err); '' }
+  println('=================')
+  println(body)
+}
+
+fn main() {
+  test_existdb()
+
+  mut app := &App{}
+  veb.run[App, Context](mut app, 8081)
 }
 
