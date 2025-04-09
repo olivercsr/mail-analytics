@@ -21,7 +21,7 @@ pub fn new_existdb(config Config) ExistDb {
   return ExistDb{config}
 }
 
-pub fn (db ExistDb) query(query string) !string {
+pub fn (db ExistDb) query_row_count() !string {
   url := '${db.config.baseurl}${api_path}/${db.config.collection}'
   //response := http.get(url)!
   q := '<query xmlns="http://exist.sourceforge.net/NS/exist" start="1" max="5" cache="yes" session-id="">
@@ -52,3 +52,4 @@ for \$row in collection(\'/dmarc\')/feedback/record/row
 
   return response.body
 }
+

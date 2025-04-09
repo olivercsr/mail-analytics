@@ -3,7 +3,12 @@ module renderer
 import time
 import veb
 
-pub struct App {}
+import existdb
+
+pub struct App {
+pub:
+  db existdb.ExistDb @[required]
+}
 
 struct User {
   id string
@@ -27,13 +32,16 @@ pub fn (app &App) dmarc_query(mut ctx renderer.Context) veb.Result {
       'foo': 123
       'bar': 234
     }
+    db_result := app.db.query_row_count() or { println('oops ${err}'); '' }
     result := struct {
-    user: user
-    data: data
-  }
+      user: user
+      data: data
+      db_result: db_result
+    }
 
     println(typeof(user).name)
     println(typeof(data).name)
+    println(typeof(db_result).name)
     println(typeof(result).name)
 
     println('done processing request ${context.req.url}')
