@@ -3,13 +3,8 @@ module main
 import time
 import veb
 
+import renderer
 import existdb
-
-type RequestHandler = fn (&App, mut Context)
-
-pub struct Context {
-  veb.Context
-}
 
 pub struct App {}
 
@@ -19,21 +14,9 @@ struct User {
   firstname string
 }
 
-fn process_request_concurrently(handler RequestHandler, app &App, mut ctx Context) veb.Result {
-  println('accepting request ${ctx.req.url}')
-
-  ctx.takeover_conn()
-  go handler(app, mut ctx)
-
-  println('accepted request ${ctx.req.url}')
-
-  return veb.no_result()
-}
-
 @['/api/dmarc/query'; get]
-pub fn (app &App) dmarc_query(mut ctx Context) veb.Result {
-
-  handler := fn (app &App, mut context Context) {
+pub fn (app &App) dmarc_query(mut ctx renderer.Context) veb.Result {
+  handler := fn (app &App, mut context renderer.Context) {
     println('start processing request ${context.req.url}')
 
     time.sleep(5000 * time.millisecond)
@@ -61,10 +44,10 @@ pub fn (app &App) dmarc_query(mut ctx Context) veb.Result {
     context.json([result])
   }
 
-  return process_request_concurrently(handler, app, mut ctx)
+  return renderer.process_request_concurrently(handler, app, mut ctx)
 }
 
-pub fn (app &App) index(mut ctx Context) veb.Result {
+pub fn (app &App) index(mut ctx renderer.Context) veb.Result {
   message := 'Hello world from veb!'
   return $veb.html()
 }
@@ -85,6 +68,6 @@ fn main() {
   test_existdb()
 
   mut app := &App{}
-  veb.run[App, Context](mut app, 8081)
+  veb.run[App, renderer.Context](mut app, 8081)
 }
 
