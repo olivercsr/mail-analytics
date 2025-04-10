@@ -32,7 +32,8 @@ pub fn (app &App) dmarc_query(mut ctx renderer.Context) veb.Result {
       'foo': 123
       'bar': 234
     }
-    db_result := app.db.query_row_count() or { println('oops ${err}'); '' }
+    //db_result := app.db.query_row_count() or { println('oops ${err}'); '' }
+    db_result := app.db.query_count() or { println('oops ${err}'); ''}
     result := struct {
       user: user
       data: data
