@@ -77,7 +77,7 @@ for \$day in 0 to \$wantedDays
     let \$dayDiff := \$day * \$daySeconds
     let \$dayBeginTS := \$wantedBegin + \$dayDiff
     let \$dayBeginDT := xs:dateTime(\'1970-01-01T00:00:00Z\') + xs:dayTimeDuration(\'PT\' || \$dayBeginTS || \'S\')
-    let \$dayEndTS := $dayBeginTS + $daySeconds - 1
+    let \$dayEndTS := \$dayBeginTS + \$daySeconds - 1
     let \$dayEndDT := xs:dateTime(\'1970-01-01T00:00:00Z\') + xs:dayTimeDuration(\'PT\' || \$dayEndTS || \'S\')
     for \$row in collection(\'/dmarc\')/feedback/record/row
         let \$metadata := \$row/ancestor::feedback/report_metadata

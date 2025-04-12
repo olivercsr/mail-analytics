@@ -53,6 +53,11 @@ pub fn (app &App) dmarc_query(mut ctx renderer.Context) veb.Result {
   return renderer.process_request_concurrently(handler, app, mut ctx)
 }
 
+pub fn (app &App) query(mut ctx renderer.Context) veb.Result {
+  result := 'abb'
+  return $veb.html()
+}
+
 pub fn (app &App) index(mut ctx renderer.Context) veb.Result {
   message := 'Hello world from veb!'
   return $veb.html()
