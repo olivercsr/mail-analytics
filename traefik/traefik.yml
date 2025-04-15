@@ -1,0 +1,9 @@
+providers:
+  #docker:
+  #  defaultRule: "Host(`{{ trimPrefix `/` .Name }}.docker.localhost`)"
+  file:
+    filename: '/etc/traefik/file-provider.yml'
+
+api:
+  insecure: true
+
