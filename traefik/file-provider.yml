@@ -4,25 +4,25 @@ http:
     router0:
       entryPoints:
       - web
-      middlewares:
-      - my-basic-auth
+      #middlewares:
+      #- my-basic-auth
       service: service-foo
-      rule: Path(`/foo`)
+      rule: Path(`/query`)
+      #rule: Host(`localhost`)
 
   # Add the middleware
-  middlewares:
-    my-basic-auth:
-      basicAuth:
-        users:
-        - test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/
-        - test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0
-        usersFile: etc/traefik/.htpasswd
+  #middlewares:
+  #  my-basic-auth:
+  #    basicAuth:
+  #      users:
+  #      - test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/
+  #      - test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0
+  #      usersFile: etc/traefik/.htpasswd
 
   # Add the service
   services:
     service-foo:
       loadBalancer:
         servers:
-        - url: http://foo/
-        - url: http://bar/
+          - url: http://host.containers.internal:8081
         passHostHeader: false
