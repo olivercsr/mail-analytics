@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  labels:
+    app: traefik
+spec:
+  selector:
+    matchLabels:
+      app: traefik
+  replicas: 1
+  revisionHistoryLimit: 2
+  minReadySeconds: 20
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-account
+      terminationGracePeriodSeconds: 20
+      containers:
+      - name: traefik
+        image: traefik:v3.3
+        #args: {}
+        ports:
+        - name: web
+          containerPort: 80
+        - name: dashboard
+          containerPort: 8080
+        #imagePullPolicy: IfNotPresent
+#        env:
+#        - name: POSTGRES_DB
+#          valueFrom:
+#            configMapKeyRef:
+#              name: existdb-config
+#              key: POSTGRES_DB
+#        - name: PGDATA
+#          valueFrom:
+#            configMapKeyRef:
+#              name: existdb-config
+#              key: PGDATA
+#        - name: POSTGRES_USER
+#          valueFrom:
+#            secretKeyRef:
+#              name: existdb-secrets
+#              key: POSTGRES_USER
+#        - name: POSTGRES_PASSWORD
+#          valueFrom:
+#            secretKeyRef:
+#              name: existdb-secrets
+#              key: POSTGRES_PASSWORD
+        volumeMounts:
+        - name: config-files
+          mountPath: '/etc/traefik/'
+          readOnly: true
+        resources:
+          requests:
+            memory: 32Mi
+          limits:
+            memory: 256Mi
+      volumes:
+      - name: config-files
+        configMap:
+          name: traefik-config
+
+#  volumeClaimTemplates:
+#  - metadata:
+#      name: rabbitmq-data
+#    spec:
+#      accessModes:
+#      - ReadWriteOnce
+#      resources:
+#        requests:
+#          storage: 128Mi
