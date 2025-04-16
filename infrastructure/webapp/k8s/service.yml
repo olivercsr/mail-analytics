@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-dashboard
+  labels:
+    app: webapp
+spec:
+  type: LoadBalancer
+  #clusterIP: None  # headless service for statefulset
+  selector:
+    app: webapp
+  ports:
+  - name: webapp
+    port: 8080
+    targetPort: web
+

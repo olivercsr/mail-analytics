@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  labels:
+    app: webapp
+spec:
+  selector:
+    matchLabels:
+      app: webapp
+  replicas: 1
+  revisionHistoryLimit: 2
+  minReadySeconds: 20
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      terminationGracePeriodSeconds: 20
+      containers:
+      - name: webapp
+        image: dmarc-webapp:latest
+        #args: {}
+        ports:
+        - name: web
+          containerPort: 80
+        #imagePullPolicy: IfNotPresent
+#        env:
+#        - name: POSTGRES_DB
+#          valueFrom:
+#            configMapKeyRef:
+#              name: existdb-config
+#              key: POSTGRES_DB
+#        - name: PGDATA
+#          valueFrom:
+#            configMapKeyRef:
+#              name: existdb-config
+#              key: PGDATA
+#        - name: POSTGRES_USER
+#          valueFrom:
+#            secretKeyRef:
+#              name: existdb-secrets
+#              key: POSTGRES_USER
+#        - name: POSTGRES_PASSWORD
+#          valueFrom:
+#            secretKeyRef:
+#              name: existdb-secrets
+#              key: POSTGRES_PASSWORD
+#        volumeMounts:
+#        - name: config-files
+#          mountPath: '/etc/traefik/'
+#          readOnly: true
+        resources:
+          requests:
+            memory: 16Mi
+          limits:
+            memory: 256Mi
+#      volumes:
+#      - name: config-files
+#        configMap:
+#          name: traefik-config
+
+#  volumeClaimTemplates:
+#  - metadata:
+#      name: rabbitmq-data
+#    spec:
+#      accessModes:
+#      - ReadWriteOnce
+#      resources:
+#        requests:
+#          storage: 128Mi
