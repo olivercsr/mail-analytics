@@ -1,6 +1,12 @@
-FROM alpine:3
+FROM vlang:latest as build
 
-RUN apk add clang
+#RUN adduser -D -h /build -u 9876 appuser
+#USER appuser
+WORKDIR /build
 
-RUN git clone --depth=1 https://github.com/vlang/v && cd v && make
+COPY --chown=1000 . /build
+
+RUN v .
+
+ENTRYPOINT ["/build/build"]
 

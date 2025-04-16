@@ -1,0 +1,24 @@
+FROM alpine:3.21 as build
+
+RUN apk --no-cache add clang make git
+
+RUN ln -s /build/v/v /usr/bin/v
+RUN adduser -D -h /build -u 9876 appuser
+USER appuser
+WORKDIR /build
+
+RUN git clone --depth=1 https://github.com/vlang/v \
+  && cd v \
+  && make \
+  && v -prod self
+
+
+FROM alpine:3.21 as run
+
+COPY --from=build /build/v /opt/v
+RUN ln -s /opt/v/v /usr/bin/v
+
+RUN adduser -D -h /app -u 9876 appuser
+USER appuser
+WORKDIR /app
+
