@@ -6,6 +6,9 @@ metadata:
     app: traefik
 data:
   traefik.yml: |
+    log:
+      level: INFO
+
     entryPoints:
       web:
         address: ":80"
@@ -14,6 +17,9 @@ data:
         #address: ":443"
     
     providers:
+      kubernetesCRD:
+        namespaces:
+        - "dmarc-dev"
       kubernetesIngress:
         namespaces:
         - "dmarc-dev"
