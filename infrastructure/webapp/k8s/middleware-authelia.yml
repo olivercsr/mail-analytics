@@ -11,6 +11,7 @@ spec:
   #  prefixes:
   #  - /app
   forwardAuth:
+    #trustForwardHeader: true
     address: 'http://authelia.traefik.svc.cluster.local:9091/api/authz/forward-auth'
     authResponseHeaders:
       - 'Remote-User'

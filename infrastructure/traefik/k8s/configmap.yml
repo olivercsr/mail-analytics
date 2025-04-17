@@ -19,9 +19,11 @@ data:
     providers:
       kubernetesCRD:
         namespaces:
+        - "traefik"
         - "dmarc-dev"
       kubernetesIngress:
         namespaces:
+        - "traefik"
         - "dmarc-dev"
       #file:
         #filename: '/etc/traefik/file-provider.yml'

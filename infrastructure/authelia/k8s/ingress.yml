@@ -1,24 +1,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: webapp
+  name: authelia
   annotations:
     kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     #traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-rewrite-path@kubernetescrd,dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
-    traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
+    #traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
     traefik.ingress.kubernetes.io/router.tls: 'true'
 spec:
   #ingressClassName: traefik
   rules:
-  - host: 'app.oliver.local'
+  - host: 'auth.oliver.local'
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: webapp
+            name: authelia
             port:
-              name: webapp
+              name: authelia
 

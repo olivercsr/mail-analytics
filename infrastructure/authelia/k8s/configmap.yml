@@ -50,7 +50,7 @@ data:
     ##
     ## Server Configuration
     ##
-    # server:
+    server:
       ## The address for the Main server to listen on in the address common syntax.
       ## Formats:
       ##  - [<scheme>://]<hostname>[:<port>][/<path>]
@@ -113,7 +113,7 @@ data:
     
       ## Server Endpoints configuration.
       ## This section is considered advanced and it SHOULD NOT be configured unless you've read the relevant documentation.
-      # endpoints:
+      endpoints:
         ## Enables the pprof endpoint.
         # enable_pprof: false
     
@@ -121,9 +121,9 @@ data:
         # enable_expvars: false
     
         ## Configure the authz endpoints.
-        # authz:
-          # forward-auth:
-            # implementation: 'ForwardAuth'
+        authz:
+          forward-auth:
+            implementation: 'ForwardAuth'
             # authn_strategies: []
           # ext-authz:
             # implementation: 'ExtAuthz'
@@ -740,7 +740,7 @@ data:
       default_policy: 'deny'
     
       rules:
-        - domain: '127.0.0.1'
+        - domain: '*.oliver.local'
           policy: one_factor
         ## Rules applied to everyone
         # - domain: 'public.example.com'
@@ -837,7 +837,8 @@ data:
           ## The domain to protect.
           ## Note: the Authelia portal must also be in that domain.
           # domain: 'example.com'
-          domain: '127.0.0.1'
+          #domain: '127.0.0.1'
+          domain: 'oliver.local'
     
           ## Required. The fully qualified URI of the portal to redirect users to on proxies that support redirections.
           ## Rules:
@@ -846,7 +847,8 @@ data:
           ##      - Match the host portion of this URI.
           ##      - Match the suffix of the host portion when prefixed with '.'.
           # authelia_url: 'https://auth.example.com'
-          authelia_url: 'https://127.0.0.1'
+          #authelia_url: 'https://127.0.0.1'
+          authelia_url: 'https://auth.oliver.local'
     
           ## Optional. The fully qualified URI used as the redirection location if the portal is accessed directly. Not
           ## configuring this option disables the automatic redirection behaviour.
@@ -861,6 +863,7 @@ data:
           ##      - Match the host portion of this URI.
           ##      - Match the suffix of the host portion when prefixed with '.'.
           # default_redirection_url: 'https://www.example.com'
+          default_redirection_url: 'https://app.oliver.local'
     
           ## Sets the Cookie SameSite value. Possible options are none, lax, or strict.
           ## Please read https://www.authelia.com/c/session#same_site
