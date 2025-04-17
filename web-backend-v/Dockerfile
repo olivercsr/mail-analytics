@@ -1,4 +1,4 @@
-FROM vlang:latest as build
+FROM vlang:latest AS build
 
 #RUN adduser -D -h /build -u 9876 appuser
 #USER appuser

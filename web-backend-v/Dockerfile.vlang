@@ -1,4 +1,4 @@
-FROM alpine:3.21 as build
+FROM alpine:3.21 AS build
 
 RUN apk --no-cache add clang make git
 
@@ -13,7 +13,7 @@ RUN git clone --depth=1 https://github.com/vlang/v \
   && v -prod self
 
 
-FROM alpine:3.21 as run
+FROM alpine:3.21 AS run
 
 COPY --from=build /build/v /opt/v
 RUN ln -s /opt/v/v /usr/bin/v
