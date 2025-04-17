@@ -5,7 +5,8 @@ metadata:
   labels:
     app: traefik
 spec:
-  type: LoadBalancer
+  #type: LoadBalancer
+  type: ClusterIP
   #clusterIP: None  # headless service for statefulset
   selector:
     app: traefik
