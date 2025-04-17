@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: authelia
+  labels:
+    app: authelia
+spec:
+  type: LoadBalancer
+  #clusterIP: None  # headless service for statefulset
+  selector:
+    app: authelia
+  ports:
+  - name: authelia
+    port: 8080
+    targetPort: authelia
+
