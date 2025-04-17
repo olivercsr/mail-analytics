@@ -4,12 +4,13 @@ import time
 import veb
 import net.http
 
+import auth
 import existdb
 
 pub struct Context {
   veb.Context
 pub mut:
-  user string
+  userid string
 }
 
 pub struct App {
@@ -24,8 +25,15 @@ struct User {
   firstname string
 }
 
-pub fn check_auth(mut ctx Context) string {
-  return ctx.get_custom_header('remote-user') or { ctx.server_error_with_status(http.Status.unauthorized); '' }
+pub fn authenticate(mut ctx Context) bool {
+  userid := ctx.get_custom_header('remote-user') or { ctx.server_error_with_status(http.Status.unauthorized); '' }
+  if auth.check_userid(userid) {
+    ctx.userid = userid
+    return true
+  } else {
+    ctx.server_error_with_status(http.Status.unauthorized)
+    return false
+  }
 }
 
 @['/api/dmarc/query'; get]
@@ -73,8 +81,9 @@ pub fn (app &App) query(mut ctx renderer.Context) veb.Result {
 
 @[get]
 pub fn (app &App) index(mut ctx renderer.Context) veb.Result {
-  context := ctx
+  userid := ctx.userid
   message := 'Hello world from veb!'
+  context := ctx
   return $veb.html()
 }
 

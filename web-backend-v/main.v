@@ -16,7 +16,7 @@ fn main() {
   mut app := &renderer.App{
     db: db
   }
-  app.use(handler: renderer.check_auth)
+  app.use(handler: renderer.authenticate)
 
   veb.run[renderer.App, renderer.Context](mut app, 8081)
 }
