@@ -5,7 +5,8 @@ metadata:
   labels:
     app: authelia
 spec:
-  type: LoadBalancer
+  #type: LoadBalancer
+  type: ClusterIP
   #clusterIP: None  # headless service for statefulset
   selector:
     app: authelia
