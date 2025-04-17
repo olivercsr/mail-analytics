@@ -8,6 +8,8 @@ metadata:
     #traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-rewrite-path@kubernetescrd,dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
     traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
     traefik.ingress.kubernetes.io/router.tls: 'true'
+  labels:
+    router: traefik
 spec:
   #ingressClassName: traefik
   rules:

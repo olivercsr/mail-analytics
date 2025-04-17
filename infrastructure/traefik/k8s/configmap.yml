@@ -27,10 +27,12 @@ data:
         namespaces:
         - "traefik"
         - "dmarc-dev"
+        labelSelector: 'router=traefik'
       kubernetesIngress:
         namespaces:
         - "traefik"
         - "dmarc-dev"
+        labelSelector: 'router=traefik'
       #file:
         #filename: '/etc/traefik/file-provider.yml'
     
