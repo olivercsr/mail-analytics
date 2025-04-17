@@ -11,6 +11,6 @@ spec:
     app: authelia
   ports:
   - name: authelia
-    port: 8080
+    port: 9091
     targetPort: authelia
 

@@ -7,7 +7,7 @@ metadata:
 data:
   traefik.yml: |
     log:
-      level: INFO
+      level: DEBUG
 
     entryPoints:
       web:
