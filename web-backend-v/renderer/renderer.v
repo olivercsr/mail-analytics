@@ -2,10 +2,18 @@ module renderer
 
 import time
 import veb
+import net.http
 
 import existdb
 
+pub struct Context {
+  veb.Context
+pub mut:
+  user string
+}
+
 pub struct App {
+  veb.Middleware[Context]
 pub:
   db existdb.ExistDb @[required]
 }
@@ -14,6 +22,10 @@ struct User {
   id string
   lastname string
   firstname string
+}
+
+pub fn check_auth(mut ctx Context) string {
+  return ctx.get_custom_header('remote-user') or { ctx.server_error_with_status(http.Status.unauthorized); '' }
 }
 
 @['/api/dmarc/query'; get]

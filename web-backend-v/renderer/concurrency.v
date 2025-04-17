@@ -2,13 +2,9 @@ module renderer
 
 import veb
 
-pub type RequestHandler[T] = fn (&T, mut Context)
+pub type RequestHandler[T, U] = fn (&T, mut U)
 
-pub struct Context {
-  veb.Context
-}
-
-pub fn process_request_concurrently[T](handler RequestHandler[T], app &T, mut ctx Context) veb.Result {
+pub fn process_request_concurrently[T, U](handler RequestHandler[T, U], app &T, mut ctx U) veb.Result {
   println('accepting request ${ctx.req.url}')
 
   ctx.takeover_conn()
