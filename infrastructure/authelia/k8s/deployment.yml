@@ -55,7 +55,7 @@ spec:
           requests:
             memory: 32Mi
           limits:
-            memory: 1024Mi
+            memory: 256Mi
       volumes:
       - name: config-files
         configMap:

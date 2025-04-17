@@ -633,9 +633,9 @@ data:
           #algorithm: 'bcrypt'
           argon2:
             variant: 'argon2id'
-            iterations: 3
-            memory: 65536
-            parallelism: 4
+            iterations: 2
+            memory: 4096
+            parallelism: 2
             key_length: 32
             salt_length: 16
           # scrypt:
