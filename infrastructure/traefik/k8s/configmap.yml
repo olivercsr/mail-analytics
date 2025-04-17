@@ -13,8 +13,8 @@ data:
       web:
         address: ":80"
         asDefault: true
-      #websecure:
-        #address: ":443"
+      websecure:
+        address: ":443"
     
     providers:
       kubernetesCRD:
