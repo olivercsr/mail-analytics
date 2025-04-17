@@ -61,6 +61,7 @@ pub fn (app &App) query(mut ctx renderer.Context) veb.Result {
 
 @[get]
 pub fn (app &App) index(mut ctx renderer.Context) veb.Result {
+  context := ctx
   message := 'Hello world from veb!'
   return $veb.html()
 }
