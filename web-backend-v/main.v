@@ -2,7 +2,7 @@ module main
 
 import veb
 
-import renderer
+import app
 import existdb
 
 fn main() {
@@ -13,11 +13,11 @@ fn main() {
     collection: 'dmarc'
   })
 
-  mut app := &renderer.App{
+  mut theapp := &app.App{
     db: db
   }
-  app.use(handler: renderer.authenticate)
+  theapp.use(handler: app.authenticate)
 
-  veb.run[renderer.App, renderer.Context](mut app, 8081)
+  veb.run[app.App, app.Context](mut theapp, 8081)
 }
 

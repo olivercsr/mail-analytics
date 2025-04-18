@@ -1,4 +1,4 @@
-module auth
+module app
 
 import regex
 
