@@ -17,6 +17,7 @@ fn main() {
     db: db
   }
   theapp.use(handler: app.authenticate)
+  theapp.handle_static('static', false)!
 
   veb.run[app.App, app.Context](mut theapp, 8081)
 }

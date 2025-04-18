@@ -32,6 +32,7 @@ pub mut:
 
 pub struct App {
   veb.Middleware[Context]
+  veb.StaticHandler
 pub:
   db existdb.ExistDb @[required]
 }
