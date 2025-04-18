@@ -1,3 +1,6 @@
 @import "tailwindcss";
 @source "../../app/";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, garden;
+}
 
