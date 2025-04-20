@@ -37,14 +37,22 @@ pub:
   db existdb.ExistDb @[required]
 }
 
-pub fn authenticate(mut ctx Context) bool {
-  userid := ctx.get_custom_header('remote-user') or { ctx.server_error_with_status(http.Status.unauthorized); '' }
-  if check_userid(userid) {
-    ctx.userid = userid
-    return true
-  } else {
-    ctx.res.set_status(http.Status.unauthorized)
-    return false
+pub fn make_authenticate(http_header string) fn(mut app.Context) bool {
+  return fn [http_header] (mut ctx Context) bool {
+    userid := ctx.get_custom_header(http_header) or { ctx.server_error_with_status(http.Status.unauthorized); '' }
+    if check_userid(userid) {
+      ctx.userid = userid
+      return true
+    } else {
+      ctx.res.set_status(http.Status.unauthorized)
+      return false
+    }
   }
 }
 
+pub fn make_fake_authenticate(userid string) fn(mut app.Context) bool {
+  return fn [userid] (mut ctx Context) bool {
+    ctx.userid = userid
+    return true
+  }
+}
