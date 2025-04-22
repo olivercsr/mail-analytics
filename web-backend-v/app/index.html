@@ -1,14 +1,9 @@
-<!doctype html>
-<html data-theme="garden">
-  <head>
-	  <title>V Blog</title>
-	  <link href="/static/styles.css" rel="stylesheet">
-  </head>
-  <body>
+@include 'header'
+
 	  <img src="https://vlang.io/img/v-logo.png" width="100" />
 	  <div>@userid</div>
 	  <div class="text-3xl font-bold underline">@message</div>
 	  <button class="btn">A button</button>
 	  <div><pre>@context</pre></div>
-  </body>
-</html>
+
+@include 'footer'
