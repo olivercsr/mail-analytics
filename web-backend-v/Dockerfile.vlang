@@ -1,3 +1,6 @@
+# NOTE: instead of using this Dockerfile to build vlang in general,
+#  you might want to look at the Dockerfile that the makers of vlang provide.
+
 FROM alpine:3.21 AS build
 
 RUN apk --no-cache add clang make git
