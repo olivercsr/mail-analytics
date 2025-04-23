@@ -1,0 +1,5 @@
+(executable
+ (public_name webapp-ocaml)
+ (name main)
+ (libraries webapp_ocaml dream)
+ (preprocess (pps lwt_ppx)))
