@@ -1,6 +1,8 @@
 package main
 
 import (
+  //"os"
+  "fmt"
   "net/http"
   "github.com/gin-gonic/gin"
 )
@@ -45,8 +47,17 @@ func getAlbumById(c *gin.Context) {
   c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
+func check_auth(c *gin.Context) {
+  var a = c.Request.Header
+  println(fmt.Sprintf("Headers: %s\n", a))
+  c.AbortWithStatus(401)
+}
+
 func main() {
   router := gin.Default()
+
+  router.Use(check_auth)
+
   router.GET("/albums/:id", getAlbumById)
   router.GET("/albums", getAlbums)
   router.POST("/albums", postAlbums)
