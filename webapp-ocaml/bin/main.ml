@@ -11,9 +11,17 @@ let count_requests inner_handler request =
     failed := !failed + 1;
     raise exn
 
+let make_authenticated header_name inner_handler request =
+  let user = Dream.header request header_name in
+  match user with
+  | None -> print_endline "None"; request;
+  | Some user -> Printf.printf "User: %s\n%!" user; request;
+  |> inner_handler
+
 let () =
   Dream.run ~port:8081
   @@ Dream.logger
+  @@ make_authenticated "remote-user"
   @@ count_requests
   @@ Dream.router [
 
