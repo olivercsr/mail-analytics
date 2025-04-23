@@ -8,7 +8,7 @@ pub fn (theapp &App) dmarc_query(mut ctx app.Context) veb.Result {
   handler := fn (theapp &App, mut context app.Context) {
     println('start processing request ${context.req.url}')
 
-    time.sleep(5000 * time.millisecond)
+    time.sleep(2000 * time.millisecond)
 
     user := User{
       '123'
@@ -19,8 +19,8 @@ pub fn (theapp &App) dmarc_query(mut ctx app.Context) veb.Result {
       'foo': 123
       'bar': 234
     }
-    //db_result := theapp.db.query_row_count() or { println('oops ${err}'); '' }
-    db_result := theapp.db.query_count() or { println('oops ${err}'); ''}
+    db_result := theapp.db.query_row_count() or { println('oops ${err}'); '' }
+    //db_result := theapp.db.query_count() or { println('oops ${err}'); ''}
     result := struct {
       user: user
       data: data
@@ -40,9 +40,9 @@ pub fn (theapp &App) dmarc_query(mut ctx app.Context) veb.Result {
   return app.process_request_concurrently(handler, theapp, mut ctx)
 }
 
-@[get]
+@['/query'; get]
 pub fn (theapp &App) query(mut ctx app.Context) veb.Result {
-  result := 'abb'
+  result := theapp.db.query_count() or { panic(err) }
   return $veb.html()
 }
 

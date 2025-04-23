@@ -1,5 +1,5 @@
 watch:
-	v watch run .
+	v -d veb_livereload watch run .
 
 webapp.prod:
 	v -prod -o webapp.prod .
