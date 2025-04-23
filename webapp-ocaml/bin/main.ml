@@ -29,5 +29,9 @@ let () =
       (fun request ->
         Dream.html (Dream.param request "word"));
 
+    Dream.get "/headers"
+      (fun request ->
+        Dream.html ([%derive.show: (string * string) list](Dream.all_headers request)));
+
   ]
 
