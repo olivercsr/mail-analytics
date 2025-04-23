@@ -12,7 +12,7 @@ let count_requests inner_handler request =
     raise exn
 
 let () =
-  Dream.run
+  Dream.run ~port:8081
   @@ Dream.logger
   @@ count_requests
   @@ Dream.router [
