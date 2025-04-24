@@ -1,3 +1,4 @@
+open Lwt
 (*open Lwt.Syntax*)
 
 let successful = ref 0
@@ -63,6 +64,15 @@ let doit x  =
 ;;
 *)
 
+let dorequest =
+  Cohttp_lwt_unix.Client.get (Uri.of_string "https://www.google.de") >>= fun (resp, body) ->
+  let code = resp |> Cohttp.Response.status |> Cohttp.Code.code_of_status in
+  Printf.printf "Response code: %d\n%!" code;
+  Printf.printf "Headers: %s\n%!" (resp |> Cohttp.Response.headers |> Cohttp.Header.to_string);
+  body |> Cohttp_lwt.Body.to_string >|= fun body ->
+  Printf.printf "Body of length: %d\n%!" (String.length body);
+  body
+
 let () =
   let db = Existdb.new_db {
     host = "localhost";
@@ -78,8 +88,12 @@ let () =
   Printf.printf "res: %i\n%!" r;
   *)
 
+  let body = Lwt_main.run dorequest in
+  print_endline ("Received body" ^ body);
+
   let args = read_cli_args () in
   Printf.printf "args: %s\n%!" (show_cli_args args);
+  Printf.printf "DONE\n%!";
 
   Dream.run ~port:8081
   @@ Dream.logger
