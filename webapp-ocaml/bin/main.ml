@@ -33,7 +33,7 @@ type cli_args = {
   static_authuser: string option;
 } [@@deriving show]
 
-let read_cli_args =
+let read_cli_args () =
   let authuser_header = ref "" in
   let static_authuser = ref "" in
   let arglist = [
@@ -54,7 +54,14 @@ let read_cli_args =
 ;;
 
 let () =
-  let args = read_cli_args in
+  let db = Existdb.new_db {
+    host = "localhost";
+    port = 1234;
+    collection = "dmarc";
+  } in
+  Printf.printf "%s\n%!" (Existdb.show_db db);
+
+  let args = read_cli_args () in
   Printf.printf "args: %s\n%!" (show_cli_args args);
 
   Dream.run ~port:8081
