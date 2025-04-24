@@ -1,3 +1,5 @@
+(*open Lwt.Syntax*)
+
 let successful = ref 0
 let failed = ref 0
 
@@ -54,6 +56,13 @@ let read_cli_args () =
   }
 ;;
 
+(*
+let doit x  =
+  let* () = Lwt_unix.sleep (float_of_int x) in
+  Lwt.return (x + 1)
+;;
+*)
+
 let () =
   let db = Existdb.new_db {
     host = "localhost";
@@ -61,6 +70,13 @@ let () =
     collection = "dmarc";
   } in
   Printf.printf "%s\n%!" (Existdb.show_db db);
+
+  (*
+  let p1 = doit 8 in
+  let p2 = doit 3 in
+  let r = Lwt_main.run @@ Lwt.pick [p1; p2;] in
+  Printf.printf "res: %i\n%!" r;
+  *)
 
   let args = read_cli_args () in
   Printf.printf "args: %s\n%!" (show_cli_args args);
@@ -94,6 +110,11 @@ let () =
       (fun request ->
         Dream.log "foobar %s" (Dream.client request);
         Dream.html "dings");
+
+    Dream.get "/wait"
+      (fun _ ->
+        Thread.delay 5.;
+        Dream.html "waited");
 
     Dream.get "/query"
       (fun _ ->
