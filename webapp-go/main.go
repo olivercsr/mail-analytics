@@ -3,6 +3,7 @@ package main
 import (
   //"os"
   "fmt"
+  "regexp"
   "net/http"
   "github.com/gin-gonic/gin"
 )
@@ -47,16 +48,34 @@ func getAlbumById(c *gin.Context) {
   c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
-func check_auth(c *gin.Context) {
-  var a = c.Request.Header
-  println(fmt.Sprintf("Headers: %s\n", a))
-  c.AbortWithStatus(401)
+func make_authenticate(header string) func(*gin.Context) {
+  re, err := regexp.Compile("^[[:alnum:]]*[\\w]+[[:alnum:]]$")
+  if err != nil {
+    panic(err)
+  }
+
+  return func (c *gin.Context) {
+    headers := c.Request.Header
+    fmt.Printf("Headers: %s %s\n", headers, headers.Get(header))
+
+    userid := headers.Get("remote-user")
+    if userid != "" && re.MatchString(userid) {
+      c.Set("userid", userid)
+    } else {
+      c.AbortWithStatus(401)
+    }
+  }
 }
 
 func main() {
+  //f := func (x int) int {
+  //  return x + 1
+  //}
+  //fmt.Printf("x: %d\n", f(11))
+
   router := gin.Default()
 
-  router.Use(check_auth)
+  router.Use(make_authenticate("remote-user"))
 
   router.GET("/albums/:id", getAlbumById)
   router.GET("/albums", getAlbums)

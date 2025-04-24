@@ -51,5 +51,10 @@ let () =
       (fun request ->
         Dream.html ([%derive.show: (string * string) list](Dream.all_headers request)));
 
+    Dream.get "/request"
+      (fun request ->
+        Dream.log "foobar %s" (Dream.client request);
+        Dream.html "dings");
+
   ]
 
