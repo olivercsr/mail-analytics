@@ -12,20 +12,25 @@ let count_requests inner_handler request =
   with exn ->
     failed := !failed + 1;
     raise exn
+;;
 
 let make_authenticated header_name inner_handler request ~header =
-  let groups = Dream.header request header in
-  match groups with
-    | None -> "";
-    | Some x -> x;
+  let info = Dream.header request header in
+  match info with
+  | None -> "";
+  | Some x -> x;
   |> Dream.set_field request field1;
+
   let user = Dream.header request header_name in
   match user with
   | None -> print_endline "None"; request;
   | Some user -> Printf.printf "User: %s\n%!" user; request;
   |> inner_handler
+;;
 
 let () =
+  Array.iter (fun x -> Printf.printf "arg: %s\n" x) Sys.argv;
+
   Dream.run ~port:8081
   @@ Dream.logger
   @@ make_authenticated "remote-user" ~header:"remote-groups"
@@ -57,4 +62,5 @@ let () =
         Dream.html "dings");
 
   ]
+;;
 
