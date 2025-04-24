@@ -87,6 +87,11 @@ let () =
         Dream.log "foobar %s" (Dream.client request);
         Dream.html "dings");
 
+    Dream.get "/query"
+      (fun _ ->
+        View.query "themainpage"
+        |> Dream.html);
+
   ]
 ;;
 

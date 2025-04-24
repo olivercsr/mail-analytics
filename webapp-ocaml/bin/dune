@@ -3,3 +3,9 @@
  (name main)
  (libraries webapp_ocaml dream)
  (preprocess (pps lwt_ppx ppx_deriving.show)))
+
+(rule
+  (targets view.ml)
+  (deps view.eml.html)
+  (action (run dream_eml %{deps} --workspace %{workspace_root})))
+
