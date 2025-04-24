@@ -28,8 +28,34 @@ let make_authenticated header_name inner_handler request ~header =
   |> inner_handler
 ;;
 
+type cli_args = {
+  authuser_header: string option;
+  static_authuser: string option;
+} [@@deriving show]
+
+let read_cli_args =
+  let authuser_header = ref "" in
+  let static_authuser = ref "" in
+  let arglist = [
+    ("-authuser-header", Arg.Set_string authuser_header, "HTTP header to fetch the authuser from");
+    ("-static-authuser", Arg.Set_string static_authuser, "Set authuser to this value (useful for debugging/dev)");
+  ] in
+  Arg.parse arglist (fun _ -> ()) "help me";
+  let au = match !authuser_header with
+    | "" -> None
+    | x -> Some x in
+  let sa = match !static_authuser with
+    | "" -> None
+    | x -> Some x in
+  {
+    authuser_header = au;
+    static_authuser = sa;
+  }
+;;
+
 let () =
-  Array.iter (fun x -> Printf.printf "arg: %s\n" x) Sys.argv;
+  let args = read_cli_args in
+  Printf.printf "args: %s\n%!" (show_cli_args args);
 
   Dream.run ~port:8081
   @@ Dream.logger
