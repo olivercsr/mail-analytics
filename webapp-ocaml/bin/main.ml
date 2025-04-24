@@ -32,6 +32,7 @@ type cli_args = {
   authuser_header: string option;
   static_authuser: string option;
 } [@@deriving show]
+;;
 
 let read_cli_args () =
   let authuser_header = ref "" in
