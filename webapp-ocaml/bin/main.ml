@@ -1,6 +1,6 @@
 open Base
 open Core
-open Core_thread
+(* open Core_thread *)
 open Lwt
 (*open Lwt.Syntax*)
 
@@ -130,7 +130,8 @@ let () =
 
     Dream.get "/wait"
       (fun _ ->
-        delay 5.;
+        let%lwt _ = Lwt_unix.sleep 5. in
+        (* Core_thread.delay 5.; *)
         Dream.html "waited");
 
     Dream.get "/query"
