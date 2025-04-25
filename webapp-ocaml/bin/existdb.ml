@@ -19,7 +19,16 @@ let new_db config =
 
 let query_row_count (db: db) =
   Logs.debug (fun m -> m "start: query_row_count %s\n%!" (show_db db));
-  Logs.debug (fun m -> m "end: query_row_count %s\n%!" (show_db db))
+  let uri = Uri.of_string "http://localhost" in
+  let body = Cohttp_lwt.Body.of_string("foo") in
+  let%lwt (response, response_body) = Cohttp_lwt_unix.Client.post uri ~body in
+  let code = response
+    |> Cohttp.Response.status
+    |> Cohttp.Code.code_of_status in
+  let%lwt response_body_str = response_body
+    |> Cohttp_lwt.Body.to_string in
+  Logs.debug (fun m -> m "end: query_row_count %s %d %s\n%!" (show_db db) code response_body_str);
+  Lwt.return (response, code, response_body_str)
 ;;
 
 let query_row_count1 (d: db) =
