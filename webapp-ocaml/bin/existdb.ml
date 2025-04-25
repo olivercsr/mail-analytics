@@ -17,7 +17,12 @@ let new_db config =
   {config}
 ;;
 
-let query_row_count (d: db) =
+let query_row_count (db: db) =
+  Logs.debug (fun m -> m "start: query_row_count %s\n%!" (show_db db));
+  Logs.debug (fun m -> m "end: query_row_count %s\n%!" (show_db db))
+;;
+
+let query_row_count1 (d: db) =
   Printf.printf "db: %s\n%!" (show_db d);
   let uri = Uri.of_string "https://www.google.de" in
   let* (resp, body) = Cohttp_lwt_unix.Client.get uri in
@@ -28,6 +33,7 @@ let query_row_count (d: db) =
     |> Cohttp_lwt.Body.to_string in
   Printf.printf "code: %d, bodylen: %d\n%!" code (String.length body_str);
   Lwt.return (code, body_str)
+;;
 
 let query_row_count2 (d: db) =
   Printf.printf "db: %s\n%!" (show_db d);
@@ -40,6 +46,7 @@ let query_row_count2 (d: db) =
     |> Cohttp_lwt.Body.to_string in
   Printf.printf "code: %d, bodylen: %d\n%!" code (String.length body_str);
   Lwt.return (code, body_str)
+;;
 
 let query_row_count3 (d: db) =
   Printf.printf "db: %s\n%!" (show_db d);
@@ -50,6 +57,7 @@ let query_row_count3 (d: db) =
         |> Cohttp.Response.status
         |> Cohttp.Code.code_of_status in
       (code, body_str)) (Cohttp_lwt.Body.to_string body))
+;;
 
 let query_row_count4 (d: db) =
   Printf.printf "db: %s\n%!" (show_db d);
@@ -69,4 +77,5 @@ let query_row_count4 (d: db) =
   Printf.printf "Body of length: %d\n%!" (String.length body);
   body
   *)
+;;
 
