@@ -1,3 +1,6 @@
+open Base
+open Core
+open Core_thread
 open Lwt
 (*open Lwt.Syntax*)
 
@@ -27,7 +30,7 @@ let make_authenticated header_name inner_handler request ~header =
   let user = Dream.header request header_name in
   match user with
   | None -> print_endline "None"; request;
-  | Some user -> Printf.printf "User: %s\n%!" user; request;
+  | Some user -> printf "User: %s\n%!" user; request;
   |> inner_handler
 ;;
 
@@ -127,7 +130,7 @@ let () =
 
     Dream.get "/wait"
       (fun _ ->
-        Thread.delay 5.;
+        delay 5.;
         Dream.html "waited");
 
     Dream.get "/query"
