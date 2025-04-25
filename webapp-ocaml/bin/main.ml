@@ -64,7 +64,7 @@ let doit x  =
 ;;
 *)
 
-let dorequest =
+let dorequest () =
   Cohttp_lwt_unix.Client.get (Uri.of_string "https://www.google.de") >>= fun (resp, body) ->
   let code = resp |> Cohttp.Response.status |> Cohttp.Code.code_of_status in
   Printf.printf "Response code: %d\n%!" code;
@@ -88,7 +88,7 @@ let () =
   Printf.printf "res: %i\n%!" r;
   *)
 
-  let body = Lwt_main.run dorequest in
+  let body = Lwt_main.run (dorequest ()) in
   print_endline ("Received body" ^ body);
 
   let args = read_cli_args () in
