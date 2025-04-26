@@ -136,7 +136,7 @@ let () =
 
     Dream.get "/query"
       (fun _ ->
-        View.query "themainpage"
+        Query.query "themainpage"
         |> Dream.html);
 
   ]
