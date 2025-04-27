@@ -1,6 +1,8 @@
 let query title =
   <%s! Header.header title %>
+  <%s! Nav.nav_header "x" %>
     <h1><%s title %></h1>
+  <%s! Nav.nav_footer "x" %>
   <%s! Footer.footer %>
 ;;
 

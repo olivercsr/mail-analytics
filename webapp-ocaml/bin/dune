@@ -5,7 +5,7 @@
  (preprocess (pps lwt_ppx ppx_deriving.show)))
 
 (rule
-  (targets header.ml footer.ml query.ml)
-  (deps header.eml.html footer.eml.html query.eml.html)
+  (targets header.ml footer.ml nav.ml query.ml)
+  (deps header.eml.html footer.eml.html nav.eml.html query.eml.html)
   (action (run dream_eml %{deps} --workspace %{workspace_root})))
 
