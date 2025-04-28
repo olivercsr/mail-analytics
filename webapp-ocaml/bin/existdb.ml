@@ -1,5 +1,5 @@
-open Lwt
-open Lwt.Syntax
+(* open Lwt *)
+(* open Lwt.Syntax *)
 
 type config = {
   host: string;
@@ -31,6 +31,7 @@ let query_row_count (db: db) =
   Lwt.return (response, code, response_body_str)
 ;;
 
+(*
 let query_row_count1 (d: db) =
   Printf.printf "db: %s\n%!" (show_db d);
   let uri = Uri.of_string "https://www.google.de" in
@@ -87,4 +88,5 @@ let query_row_count4 (d: db) =
   body
   *)
 ;;
+*)
 
