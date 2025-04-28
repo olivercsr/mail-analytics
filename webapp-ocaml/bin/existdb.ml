@@ -17,15 +17,24 @@ let new_db config =
   {config}
 ;;
 
+let render_page template_name json_data =
+  let partials _ =
+    Some(Mustache.of_string "justapartial") in
+  (* let template_file = open_in "queries/" ^ template_name ^ ".xquery" in *)
+  let filepath = "bin/queries/" ^ template_name ^ ".xquery" in
+  let template = In_channel.with_open_text filepath In_channel.input_all
+  |> Mustache.of_string in
+  Mustache.render template json_data ~partials
+
 let test_mustache () =
   (* let header = open_in "queries/header.xml" in *)
   (* let footer = open_in "queries/footer.xml" in *)
   (* let query = open_in "queries/row_count.xquery" in *)
-  let partials _ =
-    Some(Mustache.of_string "justafoo") in
-  let template = Mustache.of_string "={{name}}={{>foo}}=" in
+  (* let partials _ = *)
+    (* Some(Mustache.of_string "justafoo") in *)
+  (* let template = Mustache.of_string "={{name}}={{>foo}}=" in *)
   let json = `O ["name", `String "Ocaml"] in
-  let rendered = Mustache.render template json ~partials in
+  let rendered = render_page "query_count" json in
   Printf.printf "thebody: %s\n%!" rendered;
   rendered
 ;;
