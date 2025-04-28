@@ -8,7 +8,7 @@ pub fn (theapp &App) dmarc_query(mut ctx app.Context) veb.Result {
   handler := fn (theapp &App, mut context app.Context) {
     println('start processing request ${context.req.url}')
 
-    time.sleep(2000 * time.millisecond)
+    //time.sleep(2000 * time.millisecond)
 
     user := User{
       '123'

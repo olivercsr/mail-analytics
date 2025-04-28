@@ -1,7 +1,25 @@
 ]]>
   </text>
+  <variables>
+    <variable>
+        <qname>
+            <localname>wantedBegin</localname>
+        </qname>
+        <sx:sequence>
+            <sx:value type="xs:integer">1715689600</sx:value>
+        </sx:sequence>
+    </variable>
+    <variable>
+        <qname>
+            <localname>wantedEnd</localname>
+        </qname>
+        <sx:sequence>
+            <sx:value type="xs:integer">1742974400</sx:value>
+        </sx:sequence>
+    </variable>
+  </variables>
   <properties>
     <property name="foo" value="bar"/>
   </properties>
-</query>'
+</query>
 

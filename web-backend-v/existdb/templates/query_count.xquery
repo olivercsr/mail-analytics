@@ -34,4 +34,3 @@ for $day in 0 to $wantedDays
                 <rowcount>{sum($row/count)}</rowcount>
                 <dividedrowcount>{sum($dividedRowCount)}</dividedrowcount>
             </item>
-
