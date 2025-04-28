@@ -42,7 +42,11 @@ pub fn (theapp &App) dmarc_query(mut ctx app.Context) veb.Result {
 
 @['/query'; get]
 pub fn (theapp &App) query(mut ctx app.Context) veb.Result {
-  result := theapp.db.query_count() or { panic(err) }
-  return $veb.html()
+  handler := fn (theapp &App, mut context app.Context) {
+    result := theapp.db.query_count() or { panic(err) }
+    context.html($veb.html('query.html'))
+  }
+
+  return app.process_request_concurrently(handler, theapp, mut ctx)
 }
 

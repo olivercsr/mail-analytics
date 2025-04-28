@@ -7,11 +7,16 @@ import existdb
 
 pub type RequestHandler[T, U] = fn (&T, mut U)
 
+fn handler_wrapper[T, U](handler RequestHandler[T, U], theapp &T, mut ctx U) {
+  println('calling handler...')
+  handler(theapp, mut ctx)
+}
+
 pub fn process_request_concurrently[T, U](handler RequestHandler[T, U], theapp &T, mut ctx U) veb.Result {
   println('accepting request ${ctx.req.url}')
 
   ctx.takeover_conn()
-  go handler(theapp, mut ctx)
+  go handler_wrapper(handler, theapp, mut ctx)
 
   println('accepted request ${ctx.req.url}')
 
