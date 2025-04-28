@@ -17,6 +17,19 @@ let new_db config =
   {config}
 ;;
 
+let test_mustache () =
+  (* let header = open_in "queries/header.xml" in *)
+  (* let footer = open_in "queries/footer.xml" in *)
+  (* let query = open_in "queries/row_count.xquery" in *)
+  let partials _ =
+    Some(Mustache.of_string "justafoo") in
+  let template = Mustache.of_string "={{name}}={{>foo}}=" in
+  let json = `O ["name", `String "Ocaml"] in
+  let rendered = Mustache.render template json ~partials in
+  Printf.printf "thebody: %s\n%!" rendered;
+  rendered
+;;
+
 let query_row_count (db: db) =
   Logs.debug (fun m -> m "start: query_row_count %s\n%!" (show_db db));
   let uri = Uri.of_string "http://localhost" in

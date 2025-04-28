@@ -136,8 +136,9 @@ let () =
 
     Dream.get "/query"
       (fun _ ->
-        Query.query "themainpage"
-        |> Dream.html);
+        (* Query.query "themainpage" *)
+        (* |> Dream.html *)
+        Existdb.test_mustache () |> Dream.html);
 
   ]
 ;;
