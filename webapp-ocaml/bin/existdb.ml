@@ -86,13 +86,23 @@ let test_mustache () =
 
 let query_row_count (db: db) =
   Logs.debug (fun m -> m "start: query_row_count %s" (show_db db));
-  let json = `O ["name", `String "Ocaml"] in
+  let json =
+    `O ["variables",
+      `A [
+        `O [
+          "key", `String "wantedBegin";
+          "type", `String "integer";
+          "value", `Float 1715689600.];
+        `O [
+          "key", `String "wantedEnd";
+          "type", `String "integer";
+          "value", `Float 1742974400.]]] in
   let query = render_query "query_count" json in
   let%lwt result = submit_query db query in
   match result with
   | Ok result ->
     Logs.debug (fun m -> m "end: query_row_count %s %s" (show_db db) result);
-    Lwt.return @@ Ok(process_response "<xml><aaa>text1</aaa><bbb>text2</bbb></xml")
+    Lwt.return @@ Ok(process_response result)
   | Error (code, reason) ->
     Logs.err (fun m -> m "error: query_row_count %d %s" code reason);
     Lwt.return @@ Error reason

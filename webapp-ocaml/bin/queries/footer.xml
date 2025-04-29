@@ -1,7 +1,17 @@
 ]]>
   </text>
   <variables>
+    {{#variables}}
     <variable>
+        <qname>
+            <localname>{{key}}</localname>
+        </qname>
+        <sx:sequence>
+            <sx:value type="xs:{{type}}">{{value}}</sx:value>
+        </sx:sequence>
+    </variable>
+    {{/variables}}
+    <!-- variable>
         <qname>
             <localname>wantedBegin</localname>
         </qname>
@@ -16,7 +26,7 @@
         <sx:sequence>
             <sx:value type="xs:integer">1742974400</sx:value>
         </sx:sequence>
-    </variable>
+    </variable -->
   </variables>
   <properties>
     <property name="foo" value="bar"/>
