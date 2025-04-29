@@ -35,9 +35,18 @@ let render_query template_name json_data =
   Mustache.render template json_data ~partials:load_partial
 ;;
 
-let process_response res =
-  (* TODO *)
-  res
+let process_response xml_str =
+  let _ = xml_str
+  |> Markup.string
+  |> Markup.parse_xml
+  |> Markup.signals
+  |> Markup.tree
+    ~text:(fun ss -> Printf.printf "TEXT %d\n%!" @@ List.length ss)
+    ~element:(fun (xa, xb) ys zs -> Printf.printf "ELEMENT %s:%s %d %d\n%!" xa xb (List.length ys) (List.length zs)) in
+  (* |> Markup.pretty_print *)
+  (* |> Markup.write_xml *)
+  (* |> Markup.to_string *)
+  "foo"
 ;;
 
 let submit_query (db: db) (query: string) =
@@ -83,7 +92,7 @@ let query_row_count (db: db) =
   match result with
   | Ok result ->
     Logs.debug (fun m -> m "end: query_row_count %s %s" (show_db db) result);
-    Lwt.return @@ Ok result
+    Lwt.return @@ Ok(process_response "<xml><aaa>text1</aaa><bbb>text2</bbb></xml")
   | Error (code, reason) ->
     Logs.err (fun m -> m "error: query_row_count %d %s" code reason);
     Lwt.return @@ Error reason
