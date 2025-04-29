@@ -1,5 +1,5 @@
-open Base
-open Core
+(* open Base *)
+(* open Core *)
 (* open Core_thread *)
 (* open Lwt *)
 (* open Lwt.Syntax *)
@@ -32,7 +32,7 @@ let make_authenticated header_name inner_handler request ~header =
   let user = Dream.header request header_name in
   match user with
   | None -> print_endline "None"; request;
-  | Some user -> printf "User: %s\n%!" user; request;
+  | Some user -> Logs.debug (fun m -> m "User: %s\n%!" user); request;
   |> inner_handler
 ;;
 
