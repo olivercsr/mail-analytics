@@ -84,7 +84,7 @@ let test_mustache () =
 ;;
 *)
 
-let query_row_count (db: db) =
+let query_row_count (db: db) range_begin range_end =
   Logs.debug (fun m -> m "start: query_row_count %s" (show_db db));
   let json =
     `O ["variables",
@@ -92,11 +92,13 @@ let query_row_count (db: db) =
         `O [
           "key", `String "wantedBegin";
           "type", `String "integer";
-          "value", `Float 1715689600.];
+          (* "value", `Float 1715689600. *)
+          "value", `Float range_begin];
         `O [
           "key", `String "wantedEnd";
           "type", `String "integer";
-          "value", `Float 1742974400.]]] in
+          (* "value", `Float 1742974400. *)
+          "value", `Float range_end]]] in
   let query = render_query "query_count" json in
   let%lwt result = submit_query db query in
   match result with
