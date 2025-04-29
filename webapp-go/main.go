@@ -48,6 +48,12 @@ func getAlbumById(c *gin.Context) {
   c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
+func queryCount(c *gin.Context) {
+  start, end := c.Param("start"), c.Param("end")
+
+  c.IndentedJSON(http.StatusNotFound, gin.H{"start": start, "end": end})
+}
+
 func make_authenticate(header string) func(*gin.Context) {
   re, err := regexp.Compile("^[[:alnum:]]*[\\w]+[[:alnum:]]$")
   if err != nil {
@@ -80,6 +86,7 @@ func main() {
   router.GET("/albums/:id", getAlbumById)
   router.GET("/albums", getAlbums)
   router.POST("/albums", postAlbums)
+  router.GET("/query/count/:start/:end", queryCount)
 
   router.Run("localhost:8081")
 }
