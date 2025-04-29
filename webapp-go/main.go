@@ -5,6 +5,7 @@ import (
   // "io"
   "fmt"
   "strings"
+  "time"
   "regexp"
   "net/http"
   "encoding/xml"
@@ -36,7 +37,9 @@ var albums = []album{
 }
 
 func parseXml(xmlData string) {
-  var album album;
+  time.Sleep(5 * time.Second)
+
+  var album album
   err := xml.Unmarshal([]byte(xmlData), &album)
   if err != nil {
     fmt.Fprintf(os.Stderr, "Error unmarshalling XML: %v\n", err)
