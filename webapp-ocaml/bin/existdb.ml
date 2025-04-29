@@ -2,9 +2,7 @@
 (* open Lwt.Syntax *)
 
 type config = {
-  host: string;
-  port: int;
-  collection: string;
+  uri: string;
 } [@@deriving show]
 ;;
 
@@ -24,7 +22,10 @@ let load_partial name =
     |> Mustache.of_string
     |> (fun x -> Some x)
   with
-    e -> Logs.err (fun m -> m "Error while trying to load partial: %s\n%!" (Printexc.to_string e)); None
+    e -> let err_str = Printexc.to_string e in
+      Logs.err (fun m -> m "Error while trying to load partial: %s" err_str);
+      None
+;;
 
 let render_query template_name json_data =
   (* let template_file = open_in "queries/" ^ template_name ^ ".xquery" in *)
@@ -32,7 +33,34 @@ let render_query template_name json_data =
   let template = In_channel.with_open_text filepath In_channel.input_all
   |> Mustache.of_string in
   Mustache.render template json_data ~partials:load_partial
+;;
 
+let process_response res =
+  (* TODO *)
+  res
+;;
+
+let submit_query (db: db) (query: string) =
+  try%lwt
+    let uri = Uri.of_string db.config.uri in
+    let req_body = Cohttp_lwt.Body.of_string query in
+    let%lwt (response, res_body) = Cohttp_lwt_unix.Client.post uri ~body:req_body in
+    let code = response
+      |> Cohttp.Response.status
+      |> Cohttp.Code.code_of_status in
+    if code >= 200 && code <= 299 then
+      let%lwt response_body = res_body
+        |> Cohttp_lwt.Body.to_string in
+      Lwt.return @@ Ok response_body
+    else
+      Lwt.return @@ Error (code, "HTTP unsuccessful code")
+  with
+    err -> let err_str = Printexc.to_string err in
+      Logs.err (fun m -> m "error: submit_query %s" err_str);
+      Lwt.return @@ Error (500, err_str)
+;;
+
+(*
 let test_mustache () =
   (* let header = open_in "queries/header.xml" in *)
   (* let footer = open_in "queries/footer.xml" in *)
@@ -45,7 +73,19 @@ let test_mustache () =
   Printf.printf "thebody: %s\n%!" rendered;
   rendered
 ;;
+*)
 
+let query_row_count (db: db) =
+  Logs.debug (fun m -> m "start: query_row_count %s" (show_db db));
+  let json = `O ["name", `String "Ocaml"] in
+  let query = render_query "query_count" json in
+  let%lwt result = submit_query db query in
+  Logs.err (fun m -> m "tttttttttttttttttttttttttttttttttttttttttt");
+  match result with
+  | Ok result -> Logs.debug (fun m -> m "end: query_row_count %s %s" (show_db db) result); Lwt.return "ok"
+  | Error (code, reason) -> Logs.err (fun m -> m "error: query_row_count %d %s" code reason); Lwt.return "error"
+
+(*
 let query_row_count (db: db) =
   Logs.debug (fun m -> m "start: query_row_count %s\n%!" (show_db db));
   let uri = Uri.of_string "http://localhost" in
@@ -59,6 +99,7 @@ let query_row_count (db: db) =
   Logs.debug (fun m -> m "end: query_row_count %s %d %s\n%!" (show_db db) code response_body_str);
   Lwt.return (response, code, response_body_str)
 ;;
+*)
 
 (*
 let query_row_count1 (d: db) =

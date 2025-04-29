@@ -1,7 +1,7 @@
 open Base
 open Core
 (* open Core_thread *)
-open Lwt
+(* open Lwt *)
 (*open Lwt.Syntax*)
 
 let successful = ref 0
@@ -67,6 +67,7 @@ let doit x  =
 ;;
 *)
 
+(*
 let dorequest () =
   Cohttp_lwt_unix.Client.get (Uri.of_string "https://www.google.de") >>= fun (resp, body) ->
   let code = resp |> Cohttp.Response.status |> Cohttp.Code.code_of_status in
@@ -75,12 +76,24 @@ let dorequest () =
   body |> Cohttp_lwt.Body.to_string >|= fun body ->
   Printf.printf "Body of length: %d\n%!" (String.length body);
   body
+*)
+
+let init_logging level =
+  let loglevel = match Logs.level_of_string level with
+    | Ok level_opt -> level_opt
+    | Error _ -> Some Logs.Info in
+  Logs.set_reporter @@ Logs_fmt.reporter ();
+  Logs.set_level loglevel;
+  (* Logs.debug (fun m -> m "============== DEBUG%!"); *)
+  (* Logs.info (fun m -> m "============== INFO%!"); *)
+  (* Logs.warn (fun m -> m "============== WARN%!"); *)
+;;
 
 let () =
+  init_logging "debug";
+
   let db = Existdb.new_db {
-    host = "localhost";
-    port = 1234;
-    collection = "dmarc";
+    uri = "http://localhost:8080/exist/rest/dmarc";
   } in
   Printf.printf "%s\n%!" (Existdb.show_db db);
 
@@ -91,8 +104,10 @@ let () =
   Printf.printf "res: %i\n%!" r;
   *)
 
+  (*
   let body = Lwt_main.run (dorequest ()) in
   print_endline ("Received body" ^ body);
+  *)
 
   let args = read_cli_args () in
   Printf.printf "args: %s\n%!" (show_cli_args args);
@@ -138,7 +153,10 @@ let () =
       (fun _ ->
         (* Query.query "themainpage" *)
         (* |> Dream.html *)
-        Existdb.test_mustache () |> Dream.html);
+        (* Existdb.test_mustache () |> Dream.html *)
+        let%lwt res = Existdb.query_row_count db in
+        Dream.html res
+      );
 
   ]
 ;;
