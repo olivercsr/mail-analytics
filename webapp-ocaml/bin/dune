@@ -1,7 +1,7 @@
 (executable
  (public_name webapp-ocaml)
  (name main)
- (libraries webapp_ocaml lwt logs dream cohttp-lwt-unix cohttp-async mustache)
+ (libraries webapp_ocaml lwt logs dream cohttp-lwt-unix cohttp-async mustache markup)
  (preprocess (pps lwt_ppx ppx_deriving.show)))
 
 (rule

@@ -1,3 +1,5 @@
+{{> header }}
+
 for $row in collection('/dmarc')/feedback/record/row
     group by $ip := $row/source_ip/text()
     let $rowCount := count($row)
@@ -11,3 +13,5 @@ for $row in collection('/dmarc')/feedback/record/row
             <count>{$totalCount}</count>
             <avgCount>{$avgCount}</avgCount>
         </item>
+
+{{> footer }}

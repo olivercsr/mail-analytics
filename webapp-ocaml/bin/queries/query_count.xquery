@@ -1,3 +1,5 @@
+{{> header }}
+
 declare variable $wantedBegin external;
 declare variable $wantedEnd external;
 
@@ -34,3 +36,4 @@ for $day in 0 to $wantedDays
                 <rowcount>{sum($row/count)}</rowcount>
                 <dividedrowcount>{sum($dividedRowCount)}</dividedrowcount>
             </item>
+{{> footer}}

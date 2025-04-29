@@ -17,14 +17,21 @@ let new_db config =
   {config}
 ;;
 
-let render_page template_name json_data =
-  let partials _ =
-    Some(Mustache.of_string "justapartial") in
+let load_partial name =
+  try
+    let filepath = "bin/queries/" ^ name ^ ".xml" in
+    In_channel.with_open_text filepath In_channel.input_all
+    |> Mustache.of_string
+    |> (fun x -> Some x)
+  with
+    e -> Logs.err (fun m -> m "Error while trying to load partial: %s\n%!" (Printexc.to_string e)); None
+
+let render_query template_name json_data =
   (* let template_file = open_in "queries/" ^ template_name ^ ".xquery" in *)
   let filepath = "bin/queries/" ^ template_name ^ ".xquery" in
   let template = In_channel.with_open_text filepath In_channel.input_all
   |> Mustache.of_string in
-  Mustache.render template json_data ~partials
+  Mustache.render template json_data ~partials:load_partial
 
 let test_mustache () =
   (* let header = open_in "queries/header.xml" in *)
@@ -34,7 +41,7 @@ let test_mustache () =
     (* Some(Mustache.of_string "justafoo") in *)
   (* let template = Mustache.of_string "={{name}}={{>foo}}=" in *)
   let json = `O ["name", `String "Ocaml"] in
-  let rendered = render_page "query_count" json in
+  let rendered = render_query "query_count" json in
   Printf.printf "thebody: %s\n%!" rendered;
   rendered
 ;;
