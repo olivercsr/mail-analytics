@@ -2,12 +2,14 @@ open Base
 open Core
 (* open Core_thread *)
 (* open Lwt *)
-(*open Lwt.Syntax*)
+(* open Lwt.Syntax *)
 
 let successful = ref 0
 let failed = ref 0
 
 let field1 = Dream.new_field ~name:"field1" ()
+
+(* type fox = [ `DaFox | `DaFuq ] *)
 
 let count_requests inner_handler request =
   try%lwt
@@ -82,21 +84,30 @@ let init_logging level =
   let loglevel = match Logs.level_of_string level with
     | Ok level_opt -> level_opt
     | Error _ -> Some Logs.Info in
+  Logs.set_reporter_mutex ~lock:(fun () -> ()) ~unlock:(fun () -> ());
   Logs.set_reporter @@ Logs_fmt.reporter ();
   Logs.set_level loglevel;
   (* Logs.debug (fun m -> m "============== DEBUG%!"); *)
   (* Logs.info (fun m -> m "============== INFO%!"); *)
   (* Logs.warn (fun m -> m "============== WARN%!"); *)
+
+  let dream_level = match level with
+  | "debug" -> `Debug
+  | "info" -> `Info
+  | "warn" -> `Warning
+  | "error" -> `Error
+  | _ -> `Info in
+  Dream.initialize_log ~backtraces:true ~async_exception_hook:true ~level:dream_level ~enable:true ();
 ;;
 
-let () =
-  init_logging "debug";
+let main loglevel =
+  init_logging loglevel;
+  Logs.debug (fun m -> m "application starting...");
 
   let db = Existdb.new_db {
     uri = "http://localhost:8080/exist/rest/dmarc";
   } in
   Printf.printf "%s\n%!" (Existdb.show_db db);
-
   (*
   let p1 = doit 8 in
   let p2 = doit 3 in
@@ -113,6 +124,7 @@ let () =
   Printf.printf "args: %s\n%!" (show_cli_args args);
   Printf.printf "DONE\n%!";
 
+  Lwt.return @@
   Dream.run ~port:8081
   @@ Dream.logger
   @@ make_authenticated "remote-user" ~header:"remote-groups"
@@ -154,10 +166,18 @@ let () =
         (* Query.query "themainpage" *)
         (* |> Dream.html *)
         (* Existdb.test_mustache () |> Dream.html *)
-        let%lwt res = Existdb.query_row_count db in
-        Dream.html res
+        (* let%lwt (Ok res|Error res) = Existdb.query_row_count db in *)
+        (* Logs.set_level (Some Logs.Debug); *)
+        let%lwt result = Existdb.query_row_count db in
+        match result with
+        | Ok res -> Dream.html res
+        | Error err -> Dream.html @@ "ERROR" ^ err
       );
 
   ]
+;;
+
+let () =
+  Lwt_main.run @@ main "debug"
 ;;
 

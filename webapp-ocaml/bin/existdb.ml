@@ -80,10 +80,13 @@ let query_row_count (db: db) =
   let json = `O ["name", `String "Ocaml"] in
   let query = render_query "query_count" json in
   let%lwt result = submit_query db query in
-  Logs.err (fun m -> m "tttttttttttttttttttttttttttttttttttttttttt");
   match result with
-  | Ok result -> Logs.debug (fun m -> m "end: query_row_count %s %s" (show_db db) result); Lwt.return "ok"
-  | Error (code, reason) -> Logs.err (fun m -> m "error: query_row_count %d %s" code reason); Lwt.return "error"
+  | Ok result ->
+    Logs.debug (fun m -> m "end: query_row_count %s %s" (show_db db) result);
+    Lwt.return @@ Ok result
+  | Error (code, reason) ->
+    Logs.err (fun m -> m "error: query_row_count %d %s" code reason);
+    Lwt.return @@ Error reason
 
 (*
 let query_row_count (db: db) =
