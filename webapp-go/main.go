@@ -69,32 +69,6 @@ func parseCliArgs() cliArgs {
   return args
 }
 
-func parseXml(xmlData string) {
-  // time.Sleep(5 * time.Second)
-
-  var album album
-  err := xml.Unmarshal([]byte(xmlData), &album)
-  if err != nil {
-    fmt.Fprintf(os.Stderr, "Error unmarshalling XML: %v\n", err)
-    return
-  }
-
-  fmt.Println("--- Processed via Unmarshalling ---")
-  fmt.Printf("ID: %s, Title: %s, Artist: %s, Price: %.2f\n",
-    album.ID, album.Title, album.Artist, album.Price)
-
-  root, err := xmlquery.Parse(strings.NewReader(xmlData))
-  queryResults, err := xmlquery.QueryAll(root, "//album")
-  if err != nil {
-    fmt.Fprintf(os.Stderr, "Error querying album xml: %v\n", err)
-  } else {
-    fmt.Printf("Album Xml: ")
-    for _, node := range queryResults {
-      fmt.Println(node.InnerText())
-    }
-  }
-}
-
 /*
 type viewRenderer struct {
   partialsProvider mustache.PartialProvider
@@ -148,6 +122,34 @@ func renderXquery() string {
   return buf.String()
 }
 
+func parseXml(xmlData string) {
+  // time.Sleep(5 * time.Second)
+
+  /*
+  var album album
+  err := xml.Unmarshal([]byte(xmlData), &album)
+  if err != nil {
+    fmt.Fprintf(os.Stderr, "Error unmarshalling XML: %v\n", err)
+    return
+  }
+
+  fmt.Println("--- Processed via Unmarshalling ---")
+  fmt.Printf("ID: %s, Title: %s, Artist: %s, Price: %.2f\n",
+    album.ID, album.Title, album.Artist, album.Price)
+  */
+
+  root, err := xmlquery.Parse(strings.NewReader(xmlData))
+  queryResults, err := xmlquery.QueryAll(root, "//rowcount")
+  if err != nil {
+    fmt.Fprintf(os.Stderr, "Error querying album xml: %v\n", err)
+  } else {
+    fmt.Printf("Xpath result: ")
+    for _, node := range queryResults {
+      fmt.Println(node.InnerText())
+    }
+  }
+}
+
 func (db existDb) queryDb(query string) (string, error) {
   buf := strings.NewReader(query)
   resp, err := http.Post(db.uri, "text/xml", buf)
@@ -194,7 +196,7 @@ func getAlbumById(c *gin.Context) {
 func (app webApp) queryCount(c *gin.Context) {
   start, end := c.Param("start"), c.Param("end")
 
-  parseXml(xmlData)
+  // parseXml(xmlData)
 
   query := renderXquery()
   result, err := app.db.queryDb(query)
@@ -202,6 +204,7 @@ func (app webApp) queryCount(c *gin.Context) {
     panic(err)
   }
   fmt.Printf("==================================== %s\n", result)
+  parseXml(result)
 
   /*
   viewRenderer := newViewRenderer("views")
