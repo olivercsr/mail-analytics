@@ -3,6 +3,7 @@ package main
 import (
   "os"
   // "io"
+  "flag"
   "fmt"
   "strings"
   "time"
@@ -12,6 +13,11 @@ import (
   "github.com/gin-gonic/gin"
   "github.com/antchfx/xmlquery"
 )
+
+type cliArgs struct {
+  authuserHeader string
+  devAuthuser string
+}
 
 type album struct {
   XMLName xml.Name `xml:"album"`
@@ -97,18 +103,31 @@ func queryCount(c *gin.Context) {
   c.IndentedJSON(http.StatusNotFound, gin.H{"start": start, "end": end})
 }
 
-func make_authenticate(header string) func(*gin.Context) {
+func makeIsUserIdFormatIsOk() func(string) bool {
   re, err := regexp.Compile("^[[:alnum:]]*[\\w]+[[:alnum:]]$")
   if err != nil {
     panic(err)
   }
 
+  return func (userid string) bool {
+    return userid != "" && re.MatchString(userid)
+  }
+}
+
+func make_authenticate(header string, devUser string) func(*gin.Context) {
+  isUserIdFormatOk := makeIsUserIdFormatIsOk()
+
   return func (c *gin.Context) {
     headers := c.Request.Header
-    fmt.Printf("Headers: %s %s\n", headers, headers.Get(header))
 
-    userid := headers.Get("remote-user")
-    if userid != "" && re.MatchString(userid) {
+    userid := headers.Get(header)
+    if userid == "" {
+      userid = devUser
+    }
+
+    fmt.Printf("Userid: %s - Headers: %s\n", userid, headers)
+
+    if isUserIdFormatOk(userid) {
       c.Set("userid", userid)
     } else {
       c.AbortWithStatus(401)
@@ -116,7 +135,25 @@ func make_authenticate(header string) func(*gin.Context) {
   }
 }
 
+func parseCliArgs() cliArgs {
+  authheader := flag.String("authuser-header", "remote-user", "HTTP header that contains the authenticated users' name.")
+  authuser := flag.String("dev-authuser", "", "Set authuser to this value (useful for dev/debugging).")
+
+  flag.Parse()
+
+  args := cliArgs{
+    authuserHeader: *authheader,
+    devAuthuser: *authuser,
+  }
+
+  fmt.Println("args", args)
+
+  return args
+}
+
 func main() {
+  args := parseCliArgs()
+
   //f := func (x int) int {
   //  return x + 1
   //}
@@ -124,7 +161,7 @@ func main() {
 
   router := gin.Default()
 
-  router.Use(make_authenticate("remote-user"))
+  router.Use(make_authenticate(args.authuserHeader, args.devAuthuser))
 
   router.GET("/albums/:id", getAlbumById)
   router.GET("/albums", getAlbums)
