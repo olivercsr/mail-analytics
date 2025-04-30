@@ -6,7 +6,7 @@ import (
   "flag"
   "fmt"
   "strings"
-  "time"
+  // "time"
   "regexp"
   "net/http"
   "encoding/xml"
@@ -43,7 +43,7 @@ var albums = []album{
 }
 
 func parseXml(xmlData string) {
-  time.Sleep(5 * time.Second)
+  // time.Sleep(5 * time.Second)
 
   var album album
   err := xml.Unmarshal([]byte(xmlData), &album)
@@ -100,7 +100,7 @@ func queryCount(c *gin.Context) {
 
   parseXml(xmlData)
 
-  c.IndentedJSON(http.StatusNotFound, gin.H{"start": start, "end": end})
+  c.IndentedJSON(http.StatusOK, gin.H{"start": start, "end": end})
 }
 
 func makeIsUserIdFormatIsOk() func(string) bool {
@@ -130,7 +130,7 @@ func make_authenticate(header string, devUser string) func(*gin.Context) {
     if isUserIdFormatOk(userid) {
       c.Set("userid", userid)
     } else {
-      c.AbortWithStatus(401)
+      c.AbortWithStatus(http.StatusUnauthorized)
     }
   }
 }
