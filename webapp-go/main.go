@@ -1,6 +1,7 @@
 package main
 
 import (
+  "bytes"
   "os"
   // "io"
   "flag"
@@ -9,7 +10,7 @@ import (
   // "time"
   "regexp"
   "net/http"
-  // "text/template"
+  "text/template"
   "encoding/xml"
   "github.com/gin-gonic/gin"
   "github.com/antchfx/xmlquery"
@@ -112,6 +113,33 @@ func (renderer viewRenderer) render(viewName string, data map[string]string) str
 }
 */
 
+func renderXquery() string {
+  tmpl := template.Must(template.ParseGlob("queries/**"))
+
+  data := map[string][]map[string]any{
+    "variables": {
+      {
+        "key": "wantedBegin",
+        "type": "integer",
+        "value": 1715689600,
+      },
+      {
+        "key": "wantedEnd",
+        "type": "integer",
+        "value": 1742974400,
+      },
+    },
+  }
+
+  buf := new(bytes.Buffer)
+  err := tmpl.ExecuteTemplate(buf, "query_count.xquery", data)
+  if err != nil {
+    panic(err)
+  }
+
+  return buf.String()
+}
+
 func getAlbums(c *gin.Context) {
   c.IndentedJSON(http.StatusOK, albums)
 }
@@ -144,6 +172,8 @@ func queryCount(c *gin.Context) {
 
   parseXml(xmlData)
 
+  fmt.Printf("========================= %s\n", renderXquery())
+
   /*
   viewRenderer := newViewRenderer("views")
   data := make(map[string]string)
@@ -154,7 +184,7 @@ func queryCount(c *gin.Context) {
   */
 
   // c.IndentedJSON(http.StatusOK, gin.H{"start": start, "end": end})
-  c.Header("Content-type", "text/html; charset=utf-8")
+  // c.Header("Content-type", "text/html; charset=utf-8")
   // c.String(http.StatusOK, html)
   c.HTML(http.StatusOK, "queryResult.tmpl", gin.H{
     "title": "thetitle3",
