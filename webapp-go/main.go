@@ -12,6 +12,7 @@ import (
   "encoding/xml"
   "github.com/gin-gonic/gin"
   "github.com/antchfx/xmlquery"
+  "github.com/cbroglie/mustache"
 )
 
 type cliArgs struct {
@@ -42,6 +43,22 @@ var albums = []album{
   {ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 }
 
+func parseCliArgs() cliArgs {
+  authheader := flag.String("authuser-header", "remote-user", "HTTP header that contains the authenticated users' name.")
+  authuser := flag.String("dev-authuser", "", "Set authuser to this value (useful for dev/debugging).")
+
+  flag.Parse()
+
+  args := cliArgs{
+    authuserHeader: *authheader,
+    devAuthuser: *authuser,
+  }
+
+  fmt.Println("args", args)
+
+  return args
+}
+
 func parseXml(xmlData string) {
   // time.Sleep(5 * time.Second)
 
@@ -66,6 +83,30 @@ func parseXml(xmlData string) {
       fmt.Println(node.InnerText())
     }
   }
+}
+
+type viewRenderer struct {
+  partialsProvider mustache.PartialProvider
+}
+
+func newViewRenderer(path string) viewRenderer {
+  return viewRenderer{
+    partialsProvider: &mustache.FileProvider{
+      Paths: []string{path},
+      Extensions: []string{".html"},
+    },
+  }
+}
+
+func (renderer viewRenderer) render(viewName string, data map[string]string) string {
+  rootView := fmt.Sprintf("{{> %s }}", viewName)
+
+  rendered, err := mustache.RenderPartials(rootView, renderer.partialsProvider, data)
+  if err != nil {
+    panic(err)
+  }
+
+  return rendered
 }
 
 func getAlbums(c *gin.Context) {
@@ -100,7 +141,17 @@ func queryCount(c *gin.Context) {
 
   parseXml(xmlData)
 
-  c.IndentedJSON(http.StatusOK, gin.H{"start": start, "end": end})
+  viewRenderer := newViewRenderer("views")
+  data := make(map[string]string)
+  data["title"] = "thetitle2"
+  data["start"] = start
+  data["end"] = end
+  html := viewRenderer.render("queryResult", data)
+  // fmt.Printf("HTML: %s\n", html)
+
+  // c.IndentedJSON(http.StatusOK, gin.H{"start": start, "end": end})
+  c.Header("Content-type", "text/html; charset=utf-8")
+  c.String(http.StatusOK, html)
 }
 
 func makeIsUserIdFormatIsOk() func(string) bool {
@@ -133,22 +184,6 @@ func make_authenticate(header string, devUser string) func(*gin.Context) {
       c.AbortWithStatus(http.StatusUnauthorized)
     }
   }
-}
-
-func parseCliArgs() cliArgs {
-  authheader := flag.String("authuser-header", "remote-user", "HTTP header that contains the authenticated users' name.")
-  authuser := flag.String("dev-authuser", "", "Set authuser to this value (useful for dev/debugging).")
-
-  flag.Parse()
-
-  args := cliArgs{
-    authuserHeader: *authheader,
-    devAuthuser: *authuser,
-  }
-
-  fmt.Println("args", args)
-
-  return args
 }
 
 func main() {
