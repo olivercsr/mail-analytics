@@ -4,7 +4,6 @@ go 1.24.2
 
 require (
 	github.com/antchfx/xmlquery v1.4.4
-	github.com/cbroglie/mustache v1.4.0
 	github.com/gin-gonic/gin v1.10.0
 )
 

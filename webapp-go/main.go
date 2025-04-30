@@ -9,10 +9,11 @@ import (
   // "time"
   "regexp"
   "net/http"
+  // "text/template"
   "encoding/xml"
   "github.com/gin-gonic/gin"
   "github.com/antchfx/xmlquery"
-  "github.com/cbroglie/mustache"
+  // "github.com/cbroglie/mustache"
 )
 
 type cliArgs struct {
@@ -85,6 +86,7 @@ func parseXml(xmlData string) {
   }
 }
 
+/*
 type viewRenderer struct {
   partialsProvider mustache.PartialProvider
 }
@@ -108,6 +110,7 @@ func (renderer viewRenderer) render(viewName string, data map[string]string) str
 
   return rendered
 }
+*/
 
 func getAlbums(c *gin.Context) {
   c.IndentedJSON(http.StatusOK, albums)
@@ -141,17 +144,23 @@ func queryCount(c *gin.Context) {
 
   parseXml(xmlData)
 
+  /*
   viewRenderer := newViewRenderer("views")
   data := make(map[string]string)
   data["title"] = "thetitle2"
   data["start"] = start
   data["end"] = end
   html := viewRenderer.render("queryResult", data)
-  // fmt.Printf("HTML: %s\n", html)
+  */
 
   // c.IndentedJSON(http.StatusOK, gin.H{"start": start, "end": end})
   c.Header("Content-type", "text/html; charset=utf-8")
-  c.String(http.StatusOK, html)
+  // c.String(http.StatusOK, html)
+  c.HTML(http.StatusOK, "queryResult.tmpl", gin.H{
+    "title": "thetitle3",
+    "start": start,
+    "end": end,
+  })
 }
 
 func makeIsUserIdFormatIsOk() func(string) bool {
@@ -197,6 +206,8 @@ func main() {
   router := gin.Default()
 
   router.Use(make_authenticate(args.authuserHeader, args.devAuthuser))
+
+  router.LoadHTMLGlob("views/**")
 
   router.GET("/albums/:id", getAlbumById)
   router.GET("/albums", getAlbums)
