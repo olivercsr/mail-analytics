@@ -3,7 +3,7 @@ package main
 import (
   "bytes"
   "os"
-  // "io"
+  "io"
   "flag"
   "fmt"
   "strings"
@@ -28,6 +28,14 @@ type album struct {
   Title string `json:"title" xml:"title"`
   Artist string `json:"artist" xml:"artist"`
   Price float64 `json:"price" xml:"price"`
+}
+
+type existDb struct {
+  uri string
+}
+
+type webApp struct {
+  db existDb
 }
 
 var xmlData = `
@@ -140,6 +148,22 @@ func renderXquery() string {
   return buf.String()
 }
 
+func (db existDb) queryDb(query string) (string, error) {
+  buf := strings.NewReader(query)
+  resp, err := http.Post(db.uri, "text/xml", buf)
+  if err != nil {
+    return "", nil
+  }
+  defer resp.Body.Close()
+
+  body, err := io.ReadAll(resp.Body)
+  if err != nil {
+    return "", err
+  }
+
+  return string(body), nil
+}
+
 func getAlbums(c *gin.Context) {
   c.IndentedJSON(http.StatusOK, albums)
 }
@@ -167,12 +191,17 @@ func getAlbumById(c *gin.Context) {
   c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
-func queryCount(c *gin.Context) {
+func (app webApp) queryCount(c *gin.Context) {
   start, end := c.Param("start"), c.Param("end")
 
   parseXml(xmlData)
 
-  fmt.Printf("========================= %s\n", renderXquery())
+  query := renderXquery()
+  result, err := app.db.queryDb(query)
+  if err != nil {
+    panic(err)
+  }
+  fmt.Printf("==================================== %s\n", result)
 
   /*
   viewRenderer := newViewRenderer("views")
@@ -228,10 +257,11 @@ func make_authenticate(header string, devUser string) func(*gin.Context) {
 func main() {
   args := parseCliArgs()
 
-  //f := func (x int) int {
-  //  return x + 1
-  //}
-  //fmt.Printf("x: %d\n", f(11))
+  app := webApp{
+    db: existDb{
+      uri: "http://localhost:8080/exist/rest/dmarc",
+    },
+  }
 
   router := gin.Default()
 
@@ -242,7 +272,7 @@ func main() {
   router.GET("/albums/:id", getAlbumById)
   router.GET("/albums", getAlbums)
   router.POST("/albums", postAlbums)
-  router.GET("/query/count/:start/:end", queryCount)
+  router.GET("/query/count/:start/:end", app.queryCount)
 
   router.Run("localhost:8081")
 }
