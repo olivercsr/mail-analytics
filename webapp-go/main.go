@@ -154,13 +154,13 @@ func (db existDb) queryDb(query string) (string, error) {
   buf := strings.NewReader(query)
   resp, err := http.Post(db.uri, "text/xml", buf)
   if err != nil {
-    return "", nil
+    panic(err)
   }
   defer resp.Body.Close()
 
   body, err := io.ReadAll(resp.Body)
   if err != nil {
-    return "", err
+    panic(err)
   }
 
   return string(body), nil
