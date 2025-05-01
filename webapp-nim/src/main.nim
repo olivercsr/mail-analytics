@@ -1,4 +1,5 @@
 import std/os
+import std/strutils
 #import std/asyncdispatch
 #import std/asynchttpserver
 import prologue
@@ -18,15 +19,23 @@ proc hello*(ctx: Context) {.async.} =
   sleep(5000)
   resp "<h1>Hello Prologue!</h1>"
 
+proc query*(ctx: Context) {.async.} =
+  resp "<h1>query $# $#</h1>" % [
+    ctx.getPathParamsOption("start").get("(undefined)"),
+    ctx.getPathParamsOption("end").get("(undefined)"),
+  ]
+
 proc prologue_main =
   var i = 0
   let res = foo(11)
   echo type res
   echo res
-  i = res.value
+  if res.ok:
+    i = res.value
   let settings = newSettings(debug = true, port = Port(8081))
   let app = newApp(settings = settings)
   app.addRoute("/", hello)
+  app.addRoute("/query/count/{start}/{end}", query)
   app.run()
 
 #proc main {.async.} =
