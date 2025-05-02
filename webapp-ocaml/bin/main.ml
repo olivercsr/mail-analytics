@@ -100,7 +100,7 @@ let init_logging level =
   Dream.initialize_log ~backtraces:true ~async_exception_hook:true ~level:dream_level ~enable:true ();
 ;;
 
-let main loglevel =
+let _main loglevel =
   init_logging loglevel;
   Logs.debug (fun m -> m "application starting...");
 
@@ -181,7 +181,16 @@ let main loglevel =
   ]
 ;;
 
+let _task n =
+  Printf.printf "[%d] task start\n%!" n;
+  let%lwt _ = Lwt_unix.sleep 10. in
+  Printf.printf "[%d] task end\n%!" n;
+  Lwt.return ()
+
 let () =
-  Lwt_main.run @@ main "debug"
+  (* Lwt_main.run @@ Lwt.join [task (); task ()] *)
+  (* Lwt_main.run @@ Lwt.join @@ List.init 100_0000 task; *)
+  (* Lwt_main.run @@ task () *)
+  Lwt_main.run @@ _main "debug"
 ;;
 
