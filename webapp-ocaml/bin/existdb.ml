@@ -86,6 +86,7 @@ let test_mustache () =
 
 let query_row_count (db: db) range_begin range_end =
   Logs.debug (fun m -> m "start: query_row_count %s" (show_db db));
+  let%lwt _ = Lwt_unix.sleep 5. in
   let json =
     `O ["variables",
       `A [
