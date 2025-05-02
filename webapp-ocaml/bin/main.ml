@@ -161,17 +161,19 @@ let _main loglevel =
         (* Core_thread.delay 5.; *)
         Dream.html "waited");
 
-    Dream.get "/query"
-      (fun _ ->
+    Dream.get "/query/count/:start/:end"
+      (fun request ->
         (* Query.query "themainpage" *)
         (* |> Dream.html *)
         (* Existdb.test_mustache () |> Dream.html *)
         (* let%lwt (Ok res|Error res) = Existdb.query_row_count db in *)
         (* Logs.set_level (Some Logs.Debug); *)
-        let day = 60. *. 60. *. 24.
-        and now = Unix.time () in
-        let range_begin = now -. day *. 30.
-        and range_end = now in
+        (* let day = 60. *. 60. *. 24. *)
+        (* and now = Unix.time () in *)
+        (* let range_begin = now -. day *. 30. *)
+        (* and range_end = now *)
+        let range_begin = Dream.param request "start" |> float_of_string
+        and range_end = Dream.param request "end" |> float_of_string in
         let%lwt result = Existdb.query_row_count db range_begin range_end in
         match result with
         | Ok res -> Dream.html res
