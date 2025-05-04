@@ -1,0 +1,10 @@
+[package]
+name = "webapp-rust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = "0.8.4"
+tokio = { version = "1.44.2", features = ["full"] }
+# rocket = "0.5.1"
+
