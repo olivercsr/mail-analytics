@@ -35,14 +35,36 @@ let render_query template_name json_data =
   Mustache.render template json_data ~partials:load_partial
 ;;
 
+type my_dom =
+  | Text of string
+  | Element of string * my_dom list
+  [@@deriving show]
+
 let process_response xml_str =
-  let _ = xml_str
+  let _result = xml_str
   |> Markup.string
   |> Markup.parse_xml
   |> Markup.signals
+  (* |> Markup.map (fun x -> match x with | `Start_element (_n, _) -> "el" | _ -> "o") *)
+  (* |> Markup.filter (function `Text _ -> true | `Start_element _ -> true | _ -> false) *)
   |> Markup.tree
-    ~text:(fun ss -> Printf.printf "TEXT %d\n%!" @@ List.length ss)
-    ~element:(fun (xa, xb) ys zs -> Printf.printf "ELEMENT %s:%s %d %d\n%!" xa xb (List.length ys) (List.length zs)) in
+    ~text:(fun ss -> Printf.printf "TEXT %d %s\n%!" (List.length ss) ([%derive.show: string list]ss); Text (String.concat " " ss))
+    ~element:(fun (xa, xb) ys zs -> Printf.printf "ELEMENT %s:%s %d:%s %d:%s\n%!"
+        xa xb
+        (List.length ys)
+        (* ([%derive.show: (Markup.name * string) list]ys) *)
+        (String.concat " " @@ List.map (fun ((na, nb), s) -> Printf.sprintf "%s/%s:%s" na nb s) ys)
+        (List.length zs)
+        ([%derive.show: my_dom list]zs);
+        Element (xa, zs)
+        (* match xb with *)
+        (* | "item" -> Some { *)
+        (*   qbegin = 123; *)
+        (*   qend = 234; *)
+        (*   rowcount = 345; *)
+        (* } *)
+        (*   | _ -> None *)
+      ) in
   (* |> Markup.pretty_print *)
   (* |> Markup.write_xml *)
   (* |> Markup.to_string *)
@@ -86,7 +108,7 @@ let test_mustache () =
 
 let query_row_count (db: db) range_begin range_end =
   Logs.debug (fun m -> m "start: query_row_count %s" (show_db db));
-  let%lwt _ = Lwt_unix.sleep 5. in
+  (* let%lwt _ = Lwt_unix.sleep 5. in *)
   let json =
     `O ["variables",
       `A [
