@@ -1,0 +1,35 @@
+]]>
+  </text>
+  <variables>
+    {{#each variables}}
+    <variable>
+        <qname>
+            <localname>{{key}}</localname>
+        </qname>
+        <sx:sequence>
+            <sx:value type="xs:{{type}}">{{value}}</sx:value>
+        </sx:sequence>
+    </variable>
+    {{/each}}
+    <!-- variable>
+        <qname>
+            <localname>wantedBegin</localname>
+        </qname>
+        <sx:sequence>
+            <sx:value type="xs:integer">1715689600</sx:value>
+        </sx:sequence>
+    </variable>
+    <variable>
+        <qname>
+            <localname>wantedEnd</localname>
+        </qname>
+        <sx:sequence>
+            <sx:value type="xs:integer">1742974400</sx:value>
+        </sx:sequence>
+    </variable -->
+  </variables>
+  <properties>
+    <property name="foo" value="bar"/>
+  </properties>
+</query>
+

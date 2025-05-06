@@ -1,8 +1,11 @@
+// use std::error::Error;
 use axum::{
     routing::get,
     extract::Path,
     Router,
 };
+use serde_json::json;
+use handlebars::Handlebars;
 
 async fn get_foo() -> &'static str {
     "Hello foo!"
@@ -13,7 +16,27 @@ async fn post_foo() -> &'static str {
 }
 
 async fn query(Path((start, end)): Path<(i32, i32)>) -> String {
-    format!("query {start}-{end}")
+    let mut hbs = Handlebars::new();
+
+    hbs.register_template_file("header", "./src/queries/header.hbs").unwrap();
+    hbs.register_template_file("footer", "./src/queries/footer.hbs").unwrap();
+    hbs.register_template_file("queryCount", "./src/queries/query_row_count.hbs").unwrap();
+
+    let data = json!({
+        "variables": [
+            {
+                "key": "start",
+                "type": "integer",
+                "value": start,
+            },
+            {
+                "key": "end",
+                "type": "integer",
+                "value": end
+            }
+        ]
+    });
+    hbs.render("queryCount", &data).unwrap()
 }
 
 #[tokio::main]
