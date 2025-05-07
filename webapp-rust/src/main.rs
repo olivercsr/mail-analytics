@@ -1,16 +1,42 @@
 // use std::error::Error;
 use std::sync::Arc;
 use axum::{
-    routing::get,
-    extract::{Path, State},
+    extract::{Request, Path, State},
+    http::header::HeaderMap,
+    http::StatusCode,
+    middleware::Next,
+    response::Response,
     Router,
+    routing::get,
 };
+use tower::ServiceBuilder;
 use serde_json::json;
 use handlebars::Handlebars;
 
 #[derive(Debug)]
 struct AppState {
     db: &'static str // TODO: implement
+}
+
+#[derive(Debug, Clone)]
+struct UserId {
+    user_id: &'static str
+}
+
+async fn auth_header(mut req: Request, next: Next) -> Result<Response, StatusCode> {
+    let userid_opt = req.headers()
+        .get("remote-user")
+        .and_then(|header| header.to_str().ok());
+
+    let userid = if let Some(userid) = userid_opt {
+        userid
+    } else {
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+
+    req.extensions_mut().insert(UserId { user_id: userid });
+
+    Ok(next.run(req).await)
 }
 
 async fn get_foo() -> &'static str {
@@ -33,11 +59,13 @@ fn make_renderer() -> Handlebars<'static> {
 }
 
 async fn query_row_count(
-    Path((start, end)): Path<(i32, i32)>,
+    headers: HeaderMap,
+    Path((start, end)): Path<(u32, u32)>,
     State(state): State<Arc<AppState>>
 ) -> String {
     let hbs = make_renderer();
 
+    println!("headers: {:#?}\n", headers);
     println!("app_state: {:#?}\n", state);
     println!("db: {:#?}\n", state.db);
 
@@ -89,6 +117,10 @@ async fn main() {
         .route("/foo", get(get_foo).post(post_foo))
         .route("/query/rowcount/{start}/{end}", get(query_row_count))
         .route("/query/count/{start}/{end}", get(query_count))
+        // .layer(
+        //     ServiceBuilder::new()
+        //         .layer(auth_header)
+        // )
         .with_state(app_state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8081").await.unwrap();
