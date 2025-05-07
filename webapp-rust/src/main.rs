@@ -1,11 +1,17 @@
 // use std::error::Error;
+use std::sync::Arc;
 use axum::{
     routing::get,
-    extract::Path,
+    extract::{Path, State},
     Router,
 };
 use serde_json::json;
 use handlebars::Handlebars;
+
+#[derive(Debug)]
+struct AppState {
+    db: &'static str // TODO: implement
+}
 
 async fn get_foo() -> &'static str {
     "Hello foo!"
@@ -26,8 +32,14 @@ fn make_renderer() -> Handlebars<'static> {
     hbs
 }
 
-async fn query_row_count(Path((start, end)): Path<(i32, i32)>) -> String {
+async fn query_row_count(
+    Path((start, end)): Path<(i32, i32)>,
+    State(state): State<Arc<AppState>>
+) -> String {
     let hbs = make_renderer();
+
+    println!("app_state: {:#?}\n", state);
+    println!("db: {:#?}\n", state.db);
 
     let data = json!({
         "variables": [
@@ -68,11 +80,16 @@ async fn query_count(Path((start, end)): Path<(i32, i32)>) -> String {
 
 #[tokio::main]
 async fn main() {
+    let app_state = Arc::new(AppState {
+        db: "thedb"
+    });
+
     let app = Router::new()
         .route("/", get(|| async { "Hello world!" }))
         .route("/foo", get(get_foo).post(post_foo))
         .route("/query/rowcount/{start}/{end}", get(query_row_count))
-        .route("/query/count/{start}/{end}", get(query_count));
+        .route("/query/count/{start}/{end}", get(query_count))
+        .with_state(app_state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8081").await.unwrap();
     axum::serve(listener, app).await.unwrap();
