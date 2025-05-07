@@ -1,7 +1,7 @@
 // use std::error::Error;
 use std::sync::Arc;
 use axum::{
-    extract::{Request, Path, State},
+    extract::{Request, Path, State, Extension},
     http::header::HeaderMap,
     http::StatusCode,
     middleware::Next,
@@ -15,12 +15,12 @@ use handlebars::Handlebars;
 
 #[derive(Debug)]
 struct AppState {
-    db: &'static str // TODO: implement
+    db: String // TODO: implement
 }
 
 #[derive(Debug, Clone)]
 struct UserId {
-    user_id: &'static str
+    user_id: String
 }
 
 async fn auth_header(mut req: Request, next: Next) -> Result<Response, StatusCode> {
@@ -29,7 +29,7 @@ async fn auth_header(mut req: Request, next: Next) -> Result<Response, StatusCod
         .and_then(|header| header.to_str().ok());
 
     let userid = if let Some(userid) = userid_opt {
-        userid
+        String::from(userid)
     } else {
         return Err(StatusCode::UNAUTHORIZED);
     };
@@ -61,13 +61,15 @@ fn make_renderer() -> Handlebars<'static> {
 async fn query_row_count(
     headers: HeaderMap,
     Path((start, end)): Path<(u32, u32)>,
-    State(state): State<Arc<AppState>>
+    State(state): State<Arc<AppState>>,
+    Extension(userid): Extension<UserId>,
 ) -> String {
     let hbs = make_renderer();
 
     println!("headers: {:#?}\n", headers);
     println!("app_state: {:#?}\n", state);
     println!("db: {:#?}\n", state.db);
+    println!("userid: {:#?} {:#?}\n", userid, userid.user_id);
 
     let data = json!({
         "variables": [
@@ -109,7 +111,7 @@ async fn query_count(Path((start, end)): Path<(i32, i32)>) -> String {
 #[tokio::main]
 async fn main() {
     let app_state = Arc::new(AppState {
-        db: "thedb"
+        db: String::from("thedb")
     });
 
     let app = Router::new()
@@ -117,10 +119,11 @@ async fn main() {
         .route("/foo", get(get_foo).post(post_foo))
         .route("/query/rowcount/{start}/{end}", get(query_row_count))
         .route("/query/count/{start}/{end}", get(query_count))
-        // .layer(
-        //     ServiceBuilder::new()
-        //         .layer(auth_header)
-        // )
+        .layer(
+            ServiceBuilder::new()
+                .layer(axum::middleware::from_fn(auth_header)),
+        )
+        // .layer(axum::middleware::from_fn(auth_header))
         .with_state(app_state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8081").await.unwrap();
