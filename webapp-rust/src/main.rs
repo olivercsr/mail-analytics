@@ -1,5 +1,6 @@
 // use std::error::Error;
 use std::sync::Arc;
+use clap::Parser;
 use axum::{
     extract::{Request, Path, State, Extension},
     http::header::HeaderMap,
@@ -16,10 +17,25 @@ use handlebars::{
     //registry::Registry,
 };
 
+#[derive(Parser, Debug)]
+struct Cli {
+    #[arg(short, long, default_value = "remote-user")]
+    authuser_header: String,
+    #[arg(long)]
+    dev_authuser: Option<String>,
+    #[arg(short, long)]
+    existdb_uri: String,
+}
+
+#[derive(Debug)]
+struct ExistDb {
+    uri: String
+}
+
 #[derive(Debug)]
 struct AppState<'a> {
     query_renderer: Handlebars<'a>,
-    db: String // TODO: implement
+    db: ExistDb
 }
 
 #[derive(Debug, Clone)]
@@ -113,9 +129,12 @@ fn make_renderer() -> Handlebars<'static> {
 
 #[tokio::main]
 async fn main() {
+    let args = Cli::parse();
+    println!("args: {:#?}", args);
+
     let app_state = Arc::new(AppState {
         query_renderer: make_renderer(),
-        db: String::from("thedb")
+        db: ExistDb { uri: args.existdb_uri }
     });
 
     let app = Router::new()
