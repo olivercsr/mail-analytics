@@ -11,10 +11,14 @@ use axum::{
 };
 use tower::ServiceBuilder;
 use serde_json::json;
-use handlebars::Handlebars;
+use handlebars::{
+    Handlebars,
+    //registry::Registry,
+};
 
 #[derive(Debug)]
-struct AppState {
+struct AppState<'a> {
+    query_renderer: Handlebars<'a>,
     db: String // TODO: implement
 }
 
@@ -47,25 +51,12 @@ async fn post_foo() -> &'static str {
     "Hello foo post!"
 }
 
-fn make_renderer() -> Handlebars<'static> {
-    let mut hbs = Handlebars::new();
-
-    hbs.register_template_file("header", "./src/queries/header.hbs").unwrap();
-    hbs.register_template_file("footer", "./src/queries/footer.hbs").unwrap();
-    hbs.register_template_file("queryCount", "./src/queries/query_count.hbs").unwrap();
-    hbs.register_template_file("queryRowCount", "./src/queries/query_row_count.hbs").unwrap();
-
-    hbs
-}
-
-async fn query_row_count(
+async fn query_row_count<'a>(
     headers: HeaderMap,
     Path((start, end)): Path<(u32, u32)>,
-    State(state): State<Arc<AppState>>,
+    State(state): State<Arc<AppState<'a>>>,
     Extension(userid): Extension<UserId>,
 ) -> String {
-    let hbs = make_renderer();
-
     println!("headers: {:#?}\n", headers);
     println!("app_state: {:#?}\n", state);
     println!("db: {:#?}\n", state.db);
@@ -85,12 +76,13 @@ async fn query_row_count(
             }
         ]
     });
-    hbs.render("queryRowCount", &data).unwrap()
+    state.query_renderer.render("queryRowCount", &data).unwrap()
 }
 
-async fn query_count(Path((start, end)): Path<(i32, i32)>) -> String {
-    let hbs = make_renderer();
-
+async fn query_count<'a>(
+    Path((start, end)): Path<(i32, i32)>,
+    State(state): State<Arc<AppState<'a>>>,
+) -> String {
     let data = json!({
         "variables": [
             {
@@ -105,12 +97,24 @@ async fn query_count(Path((start, end)): Path<(i32, i32)>) -> String {
             }
         ]
     });
-    hbs.render("queryCount", &data).unwrap()
+    state.query_renderer.render("queryCount", &data).unwrap()
+}
+
+fn make_renderer() -> Handlebars<'static> {
+    let mut hbs = Handlebars::new();
+
+    hbs.register_template_file("header", "./src/queries/header.hbs").unwrap();
+    hbs.register_template_file("footer", "./src/queries/footer.hbs").unwrap();
+    hbs.register_template_file("queryCount", "./src/queries/query_count.hbs").unwrap();
+    hbs.register_template_file("queryRowCount", "./src/queries/query_row_count.hbs").unwrap();
+
+    hbs
 }
 
 #[tokio::main]
 async fn main() {
     let app_state = Arc::new(AppState {
+        query_renderer: make_renderer(),
         db: String::from("thedb")
     });
 
