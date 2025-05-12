@@ -12,12 +12,9 @@ use axum::{
 };
 use tower::ServiceBuilder;
 use serde_json::json;
-use handlebars::{
-    Handlebars,
-    //registry::Registry,
-};
 use existdb::{
     ExistDb,
+    new_existdb,
 };
 
 mod existdb;
@@ -35,8 +32,7 @@ struct Cli {
 #[derive(Debug, Clone)]
 struct AppState<'a> {
     cli: Cli,
-    query_renderer: Handlebars<'a>,
-    db: ExistDb
+    db: ExistDb<'a>
 }
 
 #[derive(Debug, Clone)]
@@ -97,7 +93,8 @@ async fn query_row_count<'a>(
             }
         ]
     });
-    state.query_renderer.render("queryRowCount", &data).unwrap()
+
+    state.db.query_db("queryRowCount", data).await
 }
 
 async fn query_count<'a>(
@@ -118,18 +115,8 @@ async fn query_count<'a>(
             }
         ]
     });
-    state.query_renderer.render("queryCount", &data).unwrap()
-}
 
-fn make_renderer() -> Handlebars<'static> {
-    let mut hbs = Handlebars::new();
-
-    hbs.register_template_file("header", "./src/queries/header.hbs").unwrap();
-    hbs.register_template_file("footer", "./src/queries/footer.hbs").unwrap();
-    hbs.register_template_file("queryCount", "./src/queries/query_count.hbs").unwrap();
-    hbs.register_template_file("queryRowCount", "./src/queries/query_row_count.hbs").unwrap();
-
-    hbs
+    state.db.query_db("queryCount", data).await
 }
 
 #[tokio::main]
@@ -137,9 +124,8 @@ async fn main() {
     let args = Cli::parse();
 
     let app_state = AppState {
-        db: ExistDb { uri: String::from(&args.existdb_uri) },
+        db: new_existdb(String::from(&args.existdb_uri)),
         cli: args,
-        query_renderer: make_renderer(),
     };
 
     let app = Router::new()
