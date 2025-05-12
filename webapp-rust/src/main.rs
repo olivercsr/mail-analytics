@@ -1,5 +1,5 @@
 // use std::error::Error;
-use std::sync::Arc;
+// use std::sync::Arc;
 use clap::Parser;
 use axum::{
     extract::{Request, Path, State, Extension},
@@ -17,7 +17,7 @@ use handlebars::{
     //registry::Registry,
 };
 
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 struct Cli {
     #[arg(short, long, default_value = "remote-user")]
     authuser_header: String,
@@ -27,13 +27,14 @@ struct Cli {
     existdb_uri: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct ExistDb {
-    uri: String
+    uri: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct AppState<'a> {
+    cli: Cli,
     query_renderer: Handlebars<'a>,
     db: ExistDb
 }
@@ -43,13 +44,17 @@ struct UserId {
     user_id: String
 }
 
-async fn auth_header(mut req: Request, next: Next) -> Result<Response, StatusCode> {
+async fn auth_header<'a>(
+    State(state): State<AppState<'a>>,
+    mut req: Request,
+    next: Next
+) -> Result<Response, StatusCode> {
     let userid_opt = req.headers()
-        .get("remote-user")
-        .and_then(|header| header.to_str().ok());
+        .get(state.cli.authuser_header)
+        .and_then(|header| Some(String::from(header.to_str().unwrap())));
 
     let userid = if let Some(userid) = userid_opt {
-        String::from(userid)
+        userid
     } else {
         return Err(StatusCode::UNAUTHORIZED);
     };
@@ -70,7 +75,7 @@ async fn post_foo() -> &'static str {
 async fn query_row_count<'a>(
     headers: HeaderMap,
     Path((start, end)): Path<(u32, u32)>,
-    State(state): State<Arc<AppState<'a>>>,
+    State(state): State<AppState<'a>>,
     Extension(userid): Extension<UserId>,
 ) -> String {
     println!("headers: {:#?}\n", headers);
@@ -97,7 +102,7 @@ async fn query_row_count<'a>(
 
 async fn query_count<'a>(
     Path((start, end)): Path<(i32, i32)>,
-    State(state): State<Arc<AppState<'a>>>,
+    State(state): State<AppState<'a>>,
 ) -> String {
     let data = json!({
         "variables": [
@@ -130,12 +135,12 @@ fn make_renderer() -> Handlebars<'static> {
 #[tokio::main]
 async fn main() {
     let args = Cli::parse();
-    println!("args: {:#?}", args);
 
-    let app_state = Arc::new(AppState {
+    let app_state = AppState {
+        db: ExistDb { uri: String::from(&args.existdb_uri) },
+        cli: args,
         query_renderer: make_renderer(),
-        db: ExistDb { uri: args.existdb_uri }
-    });
+    };
 
     let app = Router::new()
         .route("/", get(|| async { "Hello world!" }))
@@ -144,7 +149,7 @@ async fn main() {
         .route("/query/count/{start}/{end}", get(query_count))
         .layer(
             ServiceBuilder::new()
-                .layer(axum::middleware::from_fn(auth_header)),
+                .layer(axum::middleware::from_fn_with_state(app_state.clone(), auth_header)),
         )
         // .layer(axum::middleware::from_fn(auth_header))
         .with_state(app_state);
