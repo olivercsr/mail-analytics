@@ -16,6 +16,11 @@ use handlebars::{
     Handlebars,
     //registry::Registry,
 };
+use existdb::{
+    ExistDb,
+};
+
+mod existdb;
 
 #[derive(Parser, Debug, Clone)]
 struct Cli {
@@ -25,11 +30,6 @@ struct Cli {
     dev_authuser: Option<String>,
     #[arg(short, long)]
     existdb_uri: String,
-}
-
-#[derive(Debug, Clone)]
-struct ExistDb {
-    uri: String,
 }
 
 #[derive(Debug, Clone)]
