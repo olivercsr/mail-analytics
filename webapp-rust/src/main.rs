@@ -21,6 +21,10 @@ mod existdb;
 
 #[derive(Parser, Debug, Clone)]
 struct Cli {
+    #[arg(long, default_value = "0.0.0.0")]
+    host: String,
+    #[arg(short, long, default_value = "8080")]
+    port: u16,
     #[arg(short, long, default_value = "remote-user")]
     authuser_header: String,
     #[arg(long)]
@@ -125,7 +129,7 @@ async fn main() {
 
     let app_state = AppState {
         db: new_existdb(String::from(&args.existdb_uri)),
-        cli: args,
+        cli: args.clone(),
     };
 
     let app = Router::new()
@@ -140,7 +144,8 @@ async fn main() {
         // .layer(axum::middleware::from_fn(auth_header))
         .with_state(app_state);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8081").await.unwrap();
+    let bind_address = format!("{}:{}", &args.host, &args.port);
+    let listener = tokio::net::TcpListener::bind(bind_address).await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
 

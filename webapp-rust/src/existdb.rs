@@ -31,7 +31,20 @@ impl ExistDb<'_> {
         query_name: &str,
         data: Value,
     ) -> String {
-        self.renderer.render(query_name, &data).unwrap()
+        let query = self.renderer.render(query_name, &data).unwrap();
+
+        let client = reqwest::Client::new();
+        let request = client.post(&self.uri)
+            .body(query);
+        let response = request
+            .send()
+            .await
+            .unwrap()
+            .text()
+            .await
+            .unwrap();
+
+        response
     }
 }
 
