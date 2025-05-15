@@ -1,5 +1,7 @@
 use handlebars::Handlebars;
 use serde_json::Value;
+use quick_xml::reader::Reader;
+use quick_xml::events::Event;
 
 #[derive(Debug, Clone)]
 pub struct ExistDb<'a> {
@@ -43,6 +45,22 @@ impl ExistDb<'_> {
             .text()
             .await
             .unwrap();
+
+        let mut reader = Reader::from_str(&response);
+        reader.config_mut().trim_text(true);
+
+        let mut buf = Vec::new();
+        println!("=============================== {}", &response);
+        loop {
+            match reader.read_event_into(&mut buf) {
+                Ok(Event::Start(tag)) => println!("start {:#?}", String::from_utf8(Vec::from(tag.name().local_name().into_inner())).unwrap()),
+                Ok(Event::Text(text)) => println!("text {}", text.unescape().unwrap().into_owned()),
+                Ok(Event::End(tag)) => println!("end {:#?}", String::from_utf8(Vec::from(tag.local_name().into_inner())).unwrap()),
+                Err(e) => panic!("Error at position {}: {:?}", reader.error_position(), e),
+                Ok(Event::Eof) => break,
+                _ => (),
+            }
+        }
 
         response
     }

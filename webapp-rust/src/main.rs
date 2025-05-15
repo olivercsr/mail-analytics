@@ -78,10 +78,10 @@ async fn query_row_count<'a>(
     State(state): State<AppState<'a>>,
     Extension(userid): Extension<UserId>,
 ) -> String {
-    println!("headers: {:#?}\n", headers);
-    println!("app_state: {:#?}\n", state);
-    println!("db: {:#?}\n", state.db);
-    println!("userid: {:#?} {:#?}\n", userid, userid.user_id);
+    // println!("headers: {:#?}\n", headers);
+    // println!("app_state: {:#?}\n", state);
+    // println!("db: {:#?}\n", state.db);
+    // println!("userid: {:#?} {:#?}\n", userid, userid.user_id);
 
     let data = json!({
         "variables": [
