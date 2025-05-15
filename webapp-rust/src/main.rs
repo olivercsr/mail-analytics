@@ -110,12 +110,17 @@ async fn query_row_count<'a>(
         ]
     });
 
-    state.db.query_db("queryRowCount", data).await
+    state.db.query_db(
+        &userid.user_id,
+        "queryRowCount",
+        data
+    ).await
 }
 
 async fn query_count<'a>(
     Path((start, end)): Path<(i32, i32)>,
     State(state): State<AppState<'a>>,
+    Extension(userid): Extension<UserId>,
 ) -> String {
     let data = json!({
         "variables": [
@@ -132,7 +137,11 @@ async fn query_count<'a>(
         ]
     });
 
-    state.db.query_db("queryCount", data).await
+    state.db.query_db(
+        &userid.user_id,
+        "queryCount",
+        data
+    ).await
 }
 
 #[tokio::main]

@@ -30,13 +30,16 @@ pub fn new_existdb<'a>(uri: String) -> ExistDb<'a> {
 impl ExistDb<'_> {
     pub async fn query_db(
         &self,
+        user_id: &str,
         query_name: &str,
         data: Value,
     ) -> String {
         let query = self.renderer.render(query_name, &data).unwrap();
 
         let client = reqwest::Client::new();
-        let request = client.post(&self.uri)
+        let uri = format!("{}/{}", &self.uri, &user_id);
+        println!("existdb uri: {}", &uri);
+        let request = client.post(uri)
             .body(query);
         let response = request
             .send()
