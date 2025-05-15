@@ -16,8 +16,13 @@ use existdb::{
     ExistDb,
     new_existdb,
 };
+use views::{
+    Views,
+    new_views,
+};
 
 mod existdb;
+mod views;
 
 #[derive(Parser, Debug, Clone)]
 struct Cli {
@@ -36,7 +41,8 @@ struct Cli {
 #[derive(Debug, Clone)]
 struct AppState<'a> {
     cli: Cli,
-    db: ExistDb<'a>
+    db: ExistDb<'a>,
+    views: Views<'a>,
 }
 
 #[derive(Debug, Clone)]
@@ -64,12 +70,18 @@ async fn auth_header<'a>(
     Ok(next.run(req).await)
 }
 
-async fn get_foo() -> &'static str {
-    "Hello foo!"
+async fn get_foo<'a>(
+    State(state): State<AppState<'a>>,
+) -> String {
+    let data = json!({
+        "title": "Hello foo!"
+    });
+
+    state.views.render_view("queryResult", data)
 }
 
-async fn post_foo() -> &'static str {
-    "Hello foo post!"
+async fn post_foo() -> String {
+    String::from("Hello foo post!")
 }
 
 async fn query_row_count<'a>(
@@ -128,8 +140,9 @@ async fn main() {
     let args = Cli::parse();
 
     let app_state = AppState {
-        db: new_existdb(String::from(&args.existdb_uri)),
         cli: args.clone(),
+        db: new_existdb(String::from(&args.existdb_uri)),
+        views: new_views(),
     };
 
     let app = Router::new()
