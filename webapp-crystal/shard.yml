@@ -1,0 +1,22 @@
+name: webapp
+version: 0.1.0
+
+# authors:
+#   - name <email@example.com>
+
+# description: |
+#   Short description of webapp
+
+#dependencies:
+##   pg:
+##     github: will/crystal-pg
+##     version: "~> 0.5"
+#  athena:
+#    github: athena-framework/athena
+#    version: ~> 0.1.0
+
+# development_dependencies:
+#   webmock:
+#     github: manastech/webmock.cr
+
+# license: MIT
