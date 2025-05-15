@@ -36,29 +36,51 @@ let make_authenticated header_name inner_handler request ~header =
   |> inner_handler
 ;;
 
-type cli_args = {
-  authuser_header: string option;
+type app_config = {
+  port: int;
+  loglevel: string;
+  existdb_uri: string;
+  authuser_header: string;
   static_authuser: string option;
 } [@@deriving show]
 ;;
 
-let read_cli_args () =
-  let authuser_header = ref "" in
-  let static_authuser = ref "" in
-  let arglist = [
-    ("-authuser-header", Arg.Set_string authuser_header, "HTTP header to fetch the authuser from");
-    ("-static-authuser", Arg.Set_string static_authuser, "Set authuser to this value (useful for debugging/dev)");
-  ] in
-  Arg.parse arglist (fun _ -> ()) "help me";
-  let au = match !authuser_header with
-    | "" -> None
-    | x -> Some x in
-  let sa = match !static_authuser with
-    | "" -> None
-    | x -> Some x in
+let read_app_config () =
+  (* let port = ref 8080 in *)
+  (* let existdb_uri = ref "" in *)
+  (* let authuser_header = ref "remote-user" in *)
+  (* let static_authuser = ref "" in *)
+  (* let arglist = [ *)
+  (*   ("-port", Arg.Set_int port, "Port to listen on"); *)
+  (*   ("-existdb-uri", Arg.Set_string existdb_uri, "URI to ExistDb"); *)
+  (*   ("-authuser-header", Arg.Set_string authuser_header, "HTTP header to fetch the authuser from"); *)
+  (*   ("-static-authuser", Arg.Set_string static_authuser, "Set authuser to this value (useful for debugging/dev)"); *)
+  (* ] in *)
+  (* Arg.parse arglist (fun _ -> ()) "help me"; *)
+  (* if !existdb_uri = "" then ( *)
+  (*   Printf.eprintf "Please provide -existdb-uri\n%!"; *)
+  (*   exit 1; *)
+  (* ); *)
   {
-    authuser_header = au;
-    static_authuser = sa;
+    port = (match (Sys.getenv_opt "PORT") with
+      | None -> 8080
+      | Some p -> int_of_string p);
+    loglevel = (match (Sys.getenv_opt "LOGLEVEL") with
+      | None -> "info"
+      | Some l -> l);
+    existdb_uri = (match (Sys.getenv_opt "EXISTDB_URI") with
+      | None -> (
+        Printf.eprintf "Please provide EXISTDB_URI.\n%!";
+        exit 1
+      )
+      | Some u -> u);
+    authuser_header = (match (Sys.getenv_opt "AUTHUSER_HEADER") with
+      | None -> "remote-user"
+      | Some h -> h);
+    static_authuser = (match (Sys.getenv_opt "STATIC_AUTHUSER") with
+      | None -> None
+      | Some "" -> None
+      | Some u -> Some u);
   }
 ;;
 
@@ -104,8 +126,12 @@ let _main loglevel =
   init_logging loglevel;
   Logs.debug (fun m -> m "application starting...");
 
+  let app_config = read_app_config () in
+  Printf.printf "app_config: %s\n%!" (show_app_config app_config);
+
   let db = Existdb.new_db {
-    uri = "http://localhost:8080/exist/rest/dmarc";
+    (* uri = "http://localhost:8080/exist/rest/dmarc"; *)
+    uri = app_config.existdb_uri;
   } in
   Printf.printf "%s\n%!" (Existdb.show_db db);
   (*
@@ -119,10 +145,6 @@ let _main loglevel =
   let body = Lwt_main.run (dorequest ()) in
   print_endline ("Received body" ^ body);
   *)
-
-  let args = read_cli_args () in
-  Printf.printf "args: %s\n%!" (show_cli_args args);
-  Printf.printf "DONE\n%!";
 
   Lwt.return @@
   Dream.run ~port:8081
