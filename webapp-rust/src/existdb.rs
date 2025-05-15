@@ -9,7 +9,7 @@ pub struct ExistDb<'a> {
     uri: String,
 }
 
-fn make_renderer() -> Handlebars<'static> {
+fn make_renderer<'a>() -> Handlebars<'a> {
     let mut hbs = Handlebars::new();
 
     hbs.register_template_file("header", "./src/queries/header.hbs").unwrap();

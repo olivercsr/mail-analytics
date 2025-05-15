@@ -6,7 +6,7 @@ pub struct Views<'a> {
     renderer: Handlebars<'a>
 }
 
-fn make_renderer() -> Handlebars<'static> {
+fn make_renderer<'a>() -> Handlebars<'a> {
     let mut hbs = Handlebars::new();
 
     hbs.register_template_file("pageHeader", "./src/views/pageHeader.hbs").unwrap();
