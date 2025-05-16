@@ -55,19 +55,21 @@ struct AppState<'a> {
 }
 
 #[derive(Debug, Clone)]
-struct UserId {
-    user_id: String
+struct UserInfo {
+    userid: String,
+    groups: Vec<String>,
 }
 
 trait WebResultHandling<T> {
-    fn map_err_to_statuscode(self) -> Result<T, StatusCode>;
+    fn map_err_to_statuscode(self, status_code: StatusCode) -> Result<T, StatusCode>;
 }
 
 impl<T> WebResultHandling<T> for Result<T, Box<dyn Error>> {
-    fn map_err_to_statuscode(self) -> Result<T, StatusCode> {
+    fn map_err_to_statuscode(self, status_code: StatusCode) -> Result<T, StatusCode> {
         self.map_err(|e| {
             println!("Error: {:#?}", e);
-            StatusCode::INTERNAL_SERVER_ERROR
+            // StatusCode::INTERNAL_SERVER_ERROR
+            status_code
         })
     }
 }
@@ -77,17 +79,18 @@ async fn auth_header<'a>(
     mut req: Request,
     next: Next
 ) -> Result<Response, StatusCode> {
-    let userid_opt = req.headers()
+    let userid = req
+        .headers()
         .get(state.appconfig.auth_userheader)
-        .and_then(|header| Some(String::from(header.to_str().unwrap())));
+        .ok_or_else(|| { eprintln!("Error: authuser missing"); StatusCode::UNAUTHORIZED })?
+        .to_str()
+        .map_err(|_| { eprintln!("Error: could not parse authuser");StatusCode::UNAUTHORIZED })?
+        .to_string();
 
-    let userid = if let Some(userid) = userid_opt {
-        userid
-    } else {
-        return Err(StatusCode::UNAUTHORIZED);
-    };
-
-    req.extensions_mut().insert(UserId { user_id: userid });
+    req.extensions_mut().insert(UserInfo {
+        userid,
+        groups: Vec::new(),
+    });
 
     Ok(next.run(req).await)
 }
@@ -99,7 +102,7 @@ async fn get_foo<'a>(
         "title": "Hello foo!"
     });
 
-    state.views.render_view("queryResult", data).map_err_to_statuscode()
+    state.views.render_view("queryResult", data).map_err_to_statuscode(StatusCode::INTERNAL_SERVER_ERROR)
 }
 
 async fn post_foo() -> String {
@@ -110,7 +113,7 @@ async fn query_row_count<'a>(
     headers: HeaderMap,
     Path((start, end)): Path<(u32, u32)>,
     State(state): State<AppState<'a>>,
-    Extension(userid): Extension<UserId>,
+    Extension(userinfo): Extension<UserInfo>,
 ) -> Result<String, StatusCode> {
     // println!("headers: {:#?}\n", headers);
     // println!("app_state: {:#?}\n", state);
@@ -133,21 +136,21 @@ async fn query_row_count<'a>(
     });
 
     let query_result = state.db.query_db(
-        &userid.user_id,
+        &userinfo.userid,
         "queryRowCount",
         data
-    ).await.map_err_to_statuscode()?;
+    ).await.map_err_to_statuscode(StatusCode::INTERNAL_SERVER_ERROR)?;
 
     state.views.render_view(
         "queryResult",
         query_result
-    ).map_err_to_statuscode()
+    ).map_err_to_statuscode(StatusCode::INTERNAL_SERVER_ERROR)
 }
 
 async fn query_count<'a>(
     Path((start, end)): Path<(i32, i32)>,
     State(state): State<AppState<'a>>,
-    Extension(userid): Extension<UserId>,
+    Extension(userinfo): Extension<UserInfo>,
 ) -> Result<String, StatusCode> {
     let data = json!({
         "variables": [
@@ -165,15 +168,15 @@ async fn query_count<'a>(
     });
 
     let query_result = state.db.query_db(
-        &userid.user_id,
+        &userinfo.userid,
         "queryCount",
         data
-    ).await.map_err_to_statuscode()?;
+    ).await.map_err_to_statuscode(StatusCode::INTERNAL_SERVER_ERROR)?;
 
     state.views.render_view(
         "queryCount",
         query_result,
-    ).map_err_to_statuscode()
+    ).map_err_to_statuscode(StatusCode::INTERNAL_SERVER_ERROR)
 }
 
 #[tokio::main]
