@@ -59,6 +59,19 @@ struct UserId {
     user_id: String
 }
 
+trait WebResultHandling<T> {
+    fn map_err_to_statuscode(self) -> Result<T, StatusCode>;
+}
+
+impl<T> WebResultHandling<T> for Result<T, Box<dyn Error>> {
+    fn map_err_to_statuscode(self) -> Result<T, StatusCode> {
+        self.map_err(|e| {
+            println!("Error: {:#?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })
+    }
+}
+
 async fn auth_header<'a>(
     State(state): State<AppState<'a>>,
     mut req: Request,
@@ -86,7 +99,7 @@ async fn get_foo<'a>(
         "title": "Hello foo!"
     });
 
-    state.views.render_view("queryResult", data).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+    state.views.render_view("queryResult", data).map_err_to_statuscode()
 }
 
 async fn post_foo() -> String {
@@ -123,15 +136,12 @@ async fn query_row_count<'a>(
         &userid.user_id,
         "queryRowCount",
         data
-    ).await.map_err(|e| { println!("aaaaaaaa {:#?}", e); StatusCode::INTERNAL_SERVER_ERROR })?;
+    ).await.map_err_to_statuscode()?;
 
     state.views.render_view(
         "queryResult",
         query_result
-    ).map_err(|e| {
-            println!("bbbbbbbbbbbbbbbb {:#?}", e);
-            StatusCode::INTERNAL_SERVER_ERROR
-        })
+    ).map_err_to_statuscode()
 }
 
 async fn query_count<'a>(
@@ -158,12 +168,12 @@ async fn query_count<'a>(
         &userid.user_id,
         "queryCount",
         data
-    ).await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    ).await.map_err_to_statuscode()?;
 
     state.views.render_view(
         "queryCount",
         query_result,
-    ).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+    ).map_err_to_statuscode()
 }
 
 #[tokio::main]
