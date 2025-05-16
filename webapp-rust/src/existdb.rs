@@ -1,7 +1,10 @@
 use std::error::Error;
 
 use handlebars::Handlebars;
-use serde_json::Value;
+use serde_json::{
+    Value,
+    json,
+};
 use quick_xml::reader::Reader;
 use quick_xml::events::Event;
 
@@ -35,7 +38,7 @@ impl ExistDb<'_> {
         user_id: &str,
         query_name: &str,
         data: Value,
-    ) -> Result<String, Box<dyn Error>> {
+    ) -> Result<Value, Box<dyn Error>> {
         let query = self.renderer.render(query_name, &data)?;
 
         let client = reqwest::Client::new();
@@ -65,7 +68,13 @@ impl ExistDb<'_> {
             }
         }
 
-        Ok(response)
+        // Ok(response)
+        Ok(json!({
+            "foo": {
+                "bar": 123
+            },
+            "title": "json title!"
+        }))
     }
 }
 

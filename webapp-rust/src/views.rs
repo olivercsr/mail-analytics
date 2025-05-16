@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use handlebars::Handlebars;
 use serde_json::Value;
 
@@ -29,7 +31,7 @@ impl Views<'_> {
         &self,
         view_name: &str,
         data: Value,
-    ) -> String {
-        self.renderer.render(view_name, &data).unwrap()
+    ) -> Result<String, Box<dyn Error>> {
+        Ok(self.renderer.render(view_name, &data)?)
     }
 }

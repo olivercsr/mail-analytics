@@ -81,12 +81,12 @@ async fn auth_header<'a>(
 
 async fn get_foo<'a>(
     State(state): State<AppState<'a>>,
-) -> String {
+) -> Result<String, StatusCode> {
     let data = json!({
         "title": "Hello foo!"
     });
 
-    state.views.render_view("queryResult", data)
+    state.views.render_view("queryResult", data).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
 async fn post_foo() -> String {
@@ -123,12 +123,15 @@ async fn query_row_count<'a>(
         &userid.user_id,
         "queryRowCount",
         data
-    ).await;
+    ).await.map_err(|e| { println!("aaaaaaaa {:#?}", e); StatusCode::INTERNAL_SERVER_ERROR })?;
 
-    match query_result {
-        Ok(s) => Ok(s),
-        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR)
-    }
+    state.views.render_view(
+        "queryResult",
+        query_result
+    ).map_err(|e| {
+            println!("bbbbbbbbbbbbbbbb {:#?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })
 }
 
 async fn query_count<'a>(
@@ -155,12 +158,12 @@ async fn query_count<'a>(
         &userid.user_id,
         "queryCount",
         data
-    ).await;
+    ).await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    match query_result {
-        Ok(s) => Ok(s),
-        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR)
-    }
+    state.views.render_view(
+        "queryCount",
+        query_result,
+    ).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
 #[tokio::main]
