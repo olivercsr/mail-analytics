@@ -84,7 +84,7 @@ async fn auth_header<'a>(
         .get(state.appconfig.auth_userheader)
         .ok_or_else(|| { eprintln!("Error: authuser missing"); StatusCode::UNAUTHORIZED })?
         .to_str()
-        .map_err(|_| { eprintln!("Error: could not parse authuser");StatusCode::UNAUTHORIZED })?
+        .map_err(|e| { eprintln!("Error: could not parse authuser: {:?}", e);StatusCode::UNAUTHORIZED })?
         .to_string();
 
     req.extensions_mut().insert(UserInfo {
