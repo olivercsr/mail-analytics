@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use handlebars::Handlebars;
 use serde_json::Value;
 use quick_xml::reader::Reader;
@@ -33,8 +35,8 @@ impl ExistDb<'_> {
         user_id: &str,
         query_name: &str,
         data: Value,
-    ) -> String {
-        let query = self.renderer.render(query_name, &data).unwrap();
+    ) -> Result<String, Box<dyn Error>> {
+        let query = self.renderer.render(query_name, &data)?;
 
         let client = reqwest::Client::new();
         let uri = format!("{}/{}", &self.uri, &user_id);
@@ -43,11 +45,9 @@ impl ExistDb<'_> {
             .body(query);
         let response = request
             .send()
-            .await
-            .unwrap()
+            .await?
             .text()
-            .await
-            .unwrap();
+            .await?;
 
         let mut reader = Reader::from_str(&response);
         reader.config_mut().trim_text(true);
@@ -56,16 +56,16 @@ impl ExistDb<'_> {
         println!("=============================== {}", &response);
         loop {
             match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(tag)) => println!("start {:#?}", String::from_utf8(Vec::from(tag.name().local_name().into_inner())).unwrap()),
+                Ok(Event::Start(tag)) => println!("start {:#?}", String::from_utf8(Vec::from(tag.name().local_name().into_inner()))?),
                 Ok(Event::Text(text)) => println!("text {}", text.unescape().unwrap().into_owned()),
-                Ok(Event::End(tag)) => println!("end {:#?}", String::from_utf8(Vec::from(tag.local_name().into_inner())).unwrap()),
+                Ok(Event::End(tag)) => println!("end {:#?}", String::from_utf8(Vec::from(tag.local_name().into_inner()))?),
                 Err(e) => panic!("Error at position {}: {:?}", reader.error_position(), e),
                 Ok(Event::Eof) => break,
                 _ => (),
             }
         }
 
-        response
+        Ok(response)
     }
 }
 

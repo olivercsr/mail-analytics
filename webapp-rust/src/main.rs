@@ -1,6 +1,8 @@
+use std::error::Error;
+
 // use std::error::Error;
 // use std::sync::Arc;
-use clap::Parser;
+// use clap::Parser;
 use axum::{
     extract::{Request, Path, State, Extension},
     http::header::HeaderMap,
@@ -12,35 +14,42 @@ use axum::{
 };
 use tower::ServiceBuilder;
 use serde_json::json;
-use existdb::{
+
+use crate::appconfig::{
+    AppConfig,
+    read_appconfig,
+};
+use crate::existdb::{
     ExistDb,
     new_existdb,
 };
-use views::{
+use crate::views::{
     Views,
     new_views,
 };
 
+mod appconfig;
 mod existdb;
 mod views;
 
-#[derive(Parser, Debug, Clone)]
-struct Cli {
-    #[arg(long, default_value = "0.0.0.0")]
-    host: String,
-    #[arg(short, long, default_value = "8080")]
-    port: u16,
-    #[arg(short, long, default_value = "remote-user")]
-    authuser_header: String,
-    #[arg(long)]
-    dev_authuser: Option<String>,
-    #[arg(short, long)]
-    existdb_uri: String,
-}
+// #[derive(Parser, Debug, Clone)]
+// struct Cli {
+//     #[arg(long, default_value = "0.0.0.0")]
+//     host: String,
+//     #[arg(short, long, default_value = "8080")]
+//     port: u16,
+//     #[arg(short, long, default_value = "remote-user")]
+//     authuser_header: String,
+//     #[arg(long)]
+//     dev_authuser: Option<String>,
+//     #[arg(short, long)]
+//     existdb_uri: String,
+// }
 
 #[derive(Debug, Clone)]
 struct AppState<'a> {
-    cli: Cli,
+    // cli: Cli,
+    appconfig: AppConfig,
     db: ExistDb<'a>,
     views: Views<'a>,
 }
@@ -56,7 +65,7 @@ async fn auth_header<'a>(
     next: Next
 ) -> Result<Response, StatusCode> {
     let userid_opt = req.headers()
-        .get(state.cli.authuser_header)
+        .get(state.appconfig.auth_userheader)
         .and_then(|header| Some(String::from(header.to_str().unwrap())));
 
     let userid = if let Some(userid) = userid_opt {
@@ -89,7 +98,7 @@ async fn query_row_count<'a>(
     Path((start, end)): Path<(u32, u32)>,
     State(state): State<AppState<'a>>,
     Extension(userid): Extension<UserId>,
-) -> String {
+) -> Result<String, StatusCode> {
     // println!("headers: {:#?}\n", headers);
     // println!("app_state: {:#?}\n", state);
     // println!("db: {:#?}\n", state.db);
@@ -110,18 +119,23 @@ async fn query_row_count<'a>(
         ]
     });
 
-    state.db.query_db(
+    let query_result = state.db.query_db(
         &userid.user_id,
         "queryRowCount",
         data
-    ).await
+    ).await;
+
+    match query_result {
+        Ok(s) => Ok(s),
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR)
+    }
 }
 
 async fn query_count<'a>(
     Path((start, end)): Path<(i32, i32)>,
     State(state): State<AppState<'a>>,
     Extension(userid): Extension<UserId>,
-) -> String {
+) -> Result<String, StatusCode> {
     let data = json!({
         "variables": [
             {
@@ -137,20 +151,27 @@ async fn query_count<'a>(
         ]
     });
 
-    state.db.query_db(
+    let query_result = state.db.query_db(
         &userid.user_id,
         "queryCount",
         data
-    ).await
+    ).await;
+
+    match query_result {
+        Ok(s) => Ok(s),
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR)
+    }
 }
 
 #[tokio::main]
 async fn main() {
-    let args = Cli::parse();
+    // let args = Cli::parse();
+    let appconfig = read_appconfig().unwrap();
 
     let app_state = AppState {
-        cli: args.clone(),
-        db: new_existdb(String::from(&args.existdb_uri)),
+        // cli: args.clone(),
+        appconfig: appconfig.clone(),
+        db: new_existdb(String::from(&appconfig.existdb_uri)),
         views: new_views(),
     };
 
@@ -166,7 +187,7 @@ async fn main() {
         // .layer(axum::middleware::from_fn(auth_header))
         .with_state(app_state);
 
-    let bind_address = format!("{}:{}", &args.host, &args.port);
+    let bind_address = format!("{}:{}", &appconfig.host, &appconfig.port);
     let listener = tokio::net::TcpListener::bind(bind_address).await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
