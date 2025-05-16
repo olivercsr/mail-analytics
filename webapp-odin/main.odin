@@ -73,6 +73,7 @@ index :: proc(req: ^http.Request, res: ^http.Response) {
 static :: proc(req: ^http.Request, res: ^http.Response) {
   http.respond_dir(res, "/", "examples/complete/static", req.url_params[0])
 }
+
 post_ping :: proc(req: ^http.Request, res: ^http.Response) {
   http.body(req, len("ping"), res, proc(res: rawptr, body: http.Body, err: http.Body_Error) {
     res := cast(^http.Response)res
