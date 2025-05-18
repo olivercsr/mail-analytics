@@ -82,10 +82,18 @@ async fn auth_header<'a>(
     let userid = req
         .headers()
         .get(state.appconfig.auth_userheader)
-        .ok_or_else(|| { eprintln!("Error: authuser missing"); StatusCode::UNAUTHORIZED })?
+        .ok_or_else(|| { eprintln!("Error: authuser missing from request"); StatusCode::UNAUTHORIZED })?
         .to_str()
-        .map_err(|e| { eprintln!("Error: could not parse authuser: {:?}", e);StatusCode::UNAUTHORIZED })?
+        .map_err(|e| { eprintln!("Error: could not parse authuser: {:?}", e); StatusCode::UNAUTHORIZED })?
         .to_string();
+
+    // let groups = req
+    //     .headers()
+    //     .get("remote-groups")
+    //     .ok_or_else(|| { eprintln!("Error: authgroups missing from request"); StatusCode::UNAUTHORIZED})?
+    //     .to_str()
+    //     .map_err(|e| { eprintln!("Error: could not parse authgroups"); StatusCode::UNAUTHORIZED })?
+    //     .to_string();
 
     req.extensions_mut().insert(UserInfo {
         userid,
