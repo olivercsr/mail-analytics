@@ -87,17 +87,20 @@ async fn auth_header<'a>(
         .map_err(|e| { eprintln!("Error: could not parse authuser: {:?}", e); StatusCode::UNAUTHORIZED })?
         .to_string();
 
-    // let groups = req
-    //     .headers()
-    //     .get("remote-groups")
-    //     .ok_or_else(|| { eprintln!("Error: authgroups missing from request"); StatusCode::UNAUTHORIZED})?
-    //     .to_str()
-    //     .map_err(|e| { eprintln!("Error: could not parse authgroups"); StatusCode::UNAUTHORIZED })?
-    //     .to_string();
+    let groups: Vec<String> = req
+        .headers()
+        .get("remote-groups")
+        .ok_or_else(|| { eprintln!("Error: authgroups missing from request"); StatusCode::UNAUTHORIZED})?
+        .to_str()
+        .map_err(|e| { eprintln!("Error: could not parse authgroups: {:?}", e); StatusCode::UNAUTHORIZED })?
+        .to_string()
+        .split([',', ' ', '\t'])
+        .map(|s| String::from(s))
+        .collect();
 
     req.extensions_mut().insert(UserInfo {
         userid,
-        groups: Vec::new(),
+        groups,
     });
 
     Ok(next.run(req).await)
@@ -105,10 +108,14 @@ async fn auth_header<'a>(
 
 async fn get_foo<'a>(
     State(state): State<AppState<'a>>,
+    Extension(userinfo): Extension<UserInfo>,
 ) -> Result<String, StatusCode> {
     let data = json!({
         "title": "Hello foo!"
     });
+
+    println!("userinfo.userid: {:?}", userinfo.userid);
+    println!("userinfo.groups: {:?}", userinfo.groups);
 
     state.views.render_view("queryResult", data).map_err_to_statuscode(StatusCode::INTERNAL_SERVER_ERROR)
 }
