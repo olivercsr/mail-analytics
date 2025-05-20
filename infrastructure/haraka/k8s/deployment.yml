@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webapp
+  name: haraka
   labels:
-    app: webapp
+    app: haraka
 spec:
   selector:
     matchLabels:
-      app: webapp
+      app: haraka
   replicas: 1
   revisionHistoryLimit: 2
   minReadySeconds: 20
   template:
     metadata:
       labels:
-        app: webapp
+        app: haraka
     spec:
       terminationGracePeriodSeconds: 20
       containers:
-      - name: webapp
-        image: dmarc-webapp:latest
+      - name: haraka
+        image: dmarc-haraka:latest
         #args: {}
         ports:
-        - name: web
-          containerPort: 8081
+        - name: smtp
+          containerPort: 25
         # need to enable this for minikube, if image is just present in minikube registry, but not remotely:
         imagePullPolicy: IfNotPresent
 #        env:
