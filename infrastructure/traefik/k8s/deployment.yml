@@ -36,21 +36,6 @@ spec:
 #            configMapKeyRef:
 #              name: existdb-config
 #              key: POSTGRES_DB
-#        - name: PGDATA
-#          valueFrom:
-#            configMapKeyRef:
-#              name: existdb-config
-#              key: PGDATA
-#        - name: POSTGRES_USER
-#          valueFrom:
-#            secretKeyRef:
-#              name: existdb-secrets
-#              key: POSTGRES_USER
-#        - name: POSTGRES_PASSWORD
-#          valueFrom:
-#            secretKeyRef:
-#              name: existdb-secrets
-#              key: POSTGRES_PASSWORD
         volumeMounts:
         - name: config-files
           mountPath: '/etc/traefik/'
