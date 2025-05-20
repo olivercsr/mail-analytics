@@ -25,7 +25,7 @@ spec:
         - name: web
           containerPort: 8081
         # need to enable this for minikube, if image is just present in minikube registry, but not remotely:
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
 #        env:
 #        - name: POSTGRES_DB
 #          valueFrom:
