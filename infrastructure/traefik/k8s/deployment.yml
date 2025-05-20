@@ -27,6 +27,8 @@ spec:
           containerPort: 80
         - name: websecure
           containerPort: 443
+        - name: smtp
+          containerPort: 25
         - name: dashboard
           containerPort: 8080
         #imagePullPolicy: IfNotPresent

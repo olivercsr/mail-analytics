@@ -21,6 +21,9 @@ data:
       websecure:
         address: ":443"
         asDefault: true
+      smtp:
+        address: ":25"
+        asDefault: false
     
     providers:
       kubernetesCRD:
@@ -33,11 +36,25 @@ data:
         - "traefik"
         - "dmarc-dev"
         labelSelector: 'router=traefik'
-      #file:
-        #filename: '/etc/traefik/file-provider.yml'
+      file:
+        filename: '/etc/traefik/file-provider.yml'
     
     api:
       insecure: true
+
+  file-provider.yml: |
+    tcp:
+      routers:
+        smtp-router:
+          entrypoints:
+          - smtp
+          rule: HostSNI(`*`)
+          service: smtp-service
+      services:
+        smtp-service:
+          loadBalancer:
+            servers:
+            - address: "haraka.dmarc-dev.svc.cluster.local:25"
 
 #  file-provider.yml: |
 #    http:

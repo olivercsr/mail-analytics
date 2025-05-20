@@ -46,4 +46,20 @@ spec:
   - name: traefik-websecure
     port: 443
     targetPort: websecure
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-smtp
+  labels:
+    app: traefik
+spec:
+  type: LoadBalancer
+  #clusterIP: None  # headless service for statefulset
+  selector:
+    app: traefik
+  ports:
+  - name: traefik-smtp
+    port: 25
+    targetPort: smtp
 
