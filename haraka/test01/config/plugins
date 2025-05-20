@@ -68,5 +68,6 @@ rcpt_to.in_host_list
 # ----------
 # queues: discard  qmail-queue  quarantine  smtp_forward  smtp_proxy
 # Queue mail via smtp - see config/smtp_forward.ini for where your mail goes
+queue/quarantine
 #queue/smtp_forward
 queue/rabbitmq
