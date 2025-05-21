@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: haraka
-  labels:
-    app: haraka
 spec:
   selector:
     matchLabels:
