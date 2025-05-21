@@ -47,19 +47,19 @@ spec:
 #            secretKeyRef:
 #              name: existdb-secrets
 #              key: POSTGRES_PASSWORD
-#        volumeMounts:
-#        - name: config-files
-#          mountPath: '/etc/traefik/'
-#          readOnly: true
+        volumeMounts:
+        - name: config-files
+          mountPath: '/app/test01/config/'
+          readOnly: true
         resources:
           requests:
             memory: 16Mi
           limits:
             memory: 256Mi
-#      volumes:
-#      - name: config-files
-#        configMap:
-#          name: traefik-config
+      volumes:
+      - name: config-files
+        configMap:
+          name: haraka-config
 
 #  volumeClaimTemplates:
 #  - metadata:

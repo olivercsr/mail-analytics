@@ -1,8 +1,199 @@
-#apiVersion: v1
-#kind: ConfigMap
-#metadata:
-#  name: webapp-config
-#  labels:
-#    app: webapp
-#data: {}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haraka-config
+  labels:
+    app: haraka
+data:
+  host_list: |
+    haraka
+
+  internalcmd_key: |
+    6a9c33c93e2ab6bcd01b83cd30f5af9a37acd94a778294246f846538019faa91
+
+  log.ini: |
+    [main]
+
+    ; level=data, protocol, debug, info, notice, warn, error, crit, alert, emerg
+    level=info
+
+    ; prepend timestamps to log entries? This setting does NOT affect logs emitted
+    ; by logging plugins (like syslog).
+    timestamps=true
+
+    ;  format=default, logfmt, json
+    format=json
+
+  loglevel: |
+    LOGDEBUG
+
+  me: |
+    haraka
+
+  plugins: |
+    # This file lists plugins that Haraka will run
+    #
+    # Plugin ordering often matters, run 'haraka -o -c /path/to/haraka/config'
+    # to see the order plugins (and their hooks) will run.
+    #
+    # To see a list of installed plugins, run 'haraka -l'
+    #
+    # The plugin registry: https://github.com/haraka/Haraka/blob/master/Plugins.md
+    #
+    # To see the docs for a plugin, run 'haraka -h plugin.name'
+    
+    # status
+    # process_title
+    # syslog
+    # watch
+    
+    # CONNECT
+    # ----------
+    # toobusy
+    # karma
+    # relay
+    # access
+    # p0f
+    # geoip
+    # asn
+    # fcrdns
+    # dns-list
+    
+    # HELO
+    # ----------
+    # early_talker
+    # helo.checks
+    # see 'haraka -h tls' before enabling!
+    # tls
+    #
+    # AUTH plugins require TLS before AUTH is advertised, see
+    #     https://github.com/haraka/Haraka/wiki/Require-SSL-TLS
+    # ----------
+    # auth/flat_file
+    # auth/auth_proxy
+    
+    # MAIL FROM
+    # ----------
+    mail_from.is_resolvable
+    # spf
+    
+    # RCPT TO
+    # ----------
+    # At least one rcpt_to plugin is REQUIRED for inbound email.
+    myplugin
+    rcpt_to.in_host_list
+    # qmail-deliverable
+    # rcpt_to.routes
+    
+    # DATA
+    # ----------
+    # attachment
+    # bounce
+    # clamd
+    # dkim
+    # headers
+    # limit
+    # rspamd
+    # spamassassin
+    # uribl
+    
+    # QUEUE
+    # ----------
+    # queues: discard  qmail-queue  quarantine  smtp_forward  smtp_proxy
+    # Queue mail via smtp - see config/smtp_forward.ini for where your mail goes
+    queue/quarantine
+    #queue/smtp_forward
+    queue/rabbitmq
+
+  quarantine.ini: |
+    connection.notes.quarantine = 'allmails';
+
+  rabbitmq.ini: |
+    [rabbitmq]
+    ; This is name of exchange.
+    exchangeName  = dmarcEmailMessages
+    ; ip and port of the server.
+    server_ip = rabbitmq
+    server_port = 5672
+    ; user and password
+    ;user = guest
+    ;password = guest
+    ; name of the queue which reader will read
+    queueName = dmarcEmails
+    ; This is for making it persistant while publishing message
+    deliveryMode = 2
+    ; If true it will require ack for marking it complete from worker
+    confirm = true
+    ; Again for persistance passed while creating queue
+    durable = true
+    ; if true will delete queue if publisher quits
+    autoDelete = false
+    ; type of the exchange
+    exchangeType = direct
+
+  smtp.ini: |
+    ; address to listen on (default: all IPv6 and IPv4 addresses, port 25)
+    ; use "[::0]:25" to listen on IPv6 and IPv4 (not all OSes)
+    listen=[::0]:2500
+    
+    ; Note you can listen on multiple IPs/ports using commas:
+    ;listen=127.0.0.1:2529,127.0.0.2:2529,127.0.0.3:2530
+    
+    ; public IP address (default: none)
+    ; If your machine is behind a NAT, some plugins (SPF, GeoIP) gain features
+    ; if they know the servers public IP. If 'stun' is installed, Haraka will
+    ; try to figure it out. If that doesn't work, set it here.
+    ;public_ip=N.N.N.N
+    
+    ; Time in seconds to let sockets be idle with no activity
+    ;inactivity_timeout=300
+    
+    ; Drop privileges to this user/group
+    ;user=smtp
+    ;group=smtp
+    
+    ; Don't stop Haraka if plugins fail to compile
+    ;ignore_bad_plugins=0
+    
+    ; Run using cluster to fork multiple backend processes
+    ; Ref: https://github.com/haraka/Haraka/wiki/Performance-Tuning
+    ;nodes=cpus
+    
+    ; Daemonize
+    ;daemonize=true
+    ;daemon_log_file=/var/log/haraka.log
+    ;daemon_pid_file=/var/run/haraka.pid
+    
+    ; Spooling
+    ; Save memory by spooling large messages to disk
+    ;spool_dir=/var/spool/haraka
+    ; Specify -1 to never spool to disk
+    ; Specify 0 to always spool to disk
+    ; Otherwise specify a size in bytes, once reached the
+    ; message will be spooled to disk to save memory.
+    ;spool_after=
+    
+    ; Force Shutdown Timeout
+    ; - Haraka tries to close down gracefully, but if everything is shut down
+    ;   after this time it will hard close. 30s is usually long enough to
+    ;   wait for outbound connections to finish.
+    ;force_shutdown_timeout=30
+    
+    ; SMTP service extensions: https://tools.ietf.org/html/rfc1869
+    ; strict_rfc1869 = false
+    
+    ; Advertise support for SMTPUTF8 (RFC-6531)
+    ;smtputf8=true
+    
+    [headers]
+    ;add_received=true
+    ;clean_auth_results=true
+    
+    ;show_version=true
+    
+    ; replace max_header_lines
+    max_lines=1000
+    
+    ; replace max_received_count
+    max_received=100
 
