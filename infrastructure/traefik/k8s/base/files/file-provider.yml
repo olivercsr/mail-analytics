@@ -1,0 +1,13 @@
+tcp:
+  routers:
+    smtp-router:
+      entrypoints:
+      - smtp
+      rule: HostSNI(`*`)
+      service: smtp-service
+  services:
+    smtp-service:
+      loadBalancer:
+        servers:
+        - address: "haraka.dmarc-dev.svc.cluster.local:25"
+
