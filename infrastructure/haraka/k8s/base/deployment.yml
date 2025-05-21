@@ -21,7 +21,7 @@ spec:
         #args: {}
         ports:
         - name: smtp
-          containerPort: 25
+          containerPort: 2500
         # need to enable this for minikube, if image is just present in minikube registry, but not remotely:
         imagePullPolicy: IfNotPresent
 #        env:
