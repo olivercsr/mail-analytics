@@ -10,6 +10,6 @@ RUN npm ci
 
 COPY --chown=node test01 /app/test01
 
-EXPOSE 8080 8443
+EXPOSE 25
 
 ENTRYPOINT ["npx", "haraka", "-c", "/app/test01"]
