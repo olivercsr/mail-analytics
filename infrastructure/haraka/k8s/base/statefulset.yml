@@ -50,13 +50,15 @@ spec:
           mountPath: '/app/test01/config/'
           readOnly: true
         - name: haraka-mails
-          mountPath: '/var/spool/quarantine'
+          mountPath: '/var/spool/haraka/quarantine'
           readOnly: false
         resources:
           requests:
             memory: 16Mi
           limits:
             memory: 256Mi
+      #securityContext:
+      #  fsGroup: 1000
       volumes:
       - name: config-files
         configMap:
