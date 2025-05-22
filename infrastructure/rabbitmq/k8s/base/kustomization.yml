@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- statefulset.yml
+- service.yml
+
+namespace: dmarc-dev
+
+labels:
+- pairs:
+    app: rabbitmq
+
+#namePrefix: haraka-
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+#configMapGenerator:
+#- name: haraka-config
+#  files:
+#  - files/host_list
+#  - files/internalcmd_key
+#  - files/log.ini
+#  - files/loglevel
+#  - files/me
+#  - files/plugins
+#  - files/quarantine.ini
+#  - files/rabbitmq.ini
+#  - files/smtp.ini
+

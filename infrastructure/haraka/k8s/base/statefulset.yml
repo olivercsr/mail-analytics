@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: haraka
 spec:
@@ -49,6 +49,9 @@ spec:
         - name: config-files
           mountPath: '/app/test01/config/'
           readOnly: true
+        - name: haraka-mails
+          mountPath: '/var/spool/quarantine'
+          readOnly: false
         resources:
           requests:
             memory: 16Mi
@@ -58,13 +61,13 @@ spec:
       - name: config-files
         configMap:
           name: haraka-config
+  volumeClaimTemplates:
+  - metadata:
+      name: haraka-mails
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 128Mi
 
-#  volumeClaimTemplates:
-#  - metadata:
-#      name: rabbitmq-data
-#    spec:
-#      accessModes:
-#      - ReadWriteOnce
-#      resources:
-#        requests:
-#          storage: 128Mi

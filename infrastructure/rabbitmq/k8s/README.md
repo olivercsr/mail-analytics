@@ -1,0 +1,4 @@
+# Notes
+- use `kubectl kustomize` to generate k8s resource files, e.g.
+  `kubectl -n myns apply -f <(kubectl kustomize base/)`
+

@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
 #- configmap.yml
-- deployment.yml
+- statefulset.yml
 - service.yml
 
 namespace: dmarc-dev
