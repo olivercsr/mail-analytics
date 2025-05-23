@@ -8,6 +8,7 @@ resources:
 #- configmap.yml
 - deployment.yml
 - service.yml
+- ingress.yml
 
 namespace: traefik
 

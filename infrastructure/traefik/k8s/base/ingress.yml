@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  # this ingress assumes that it is an ingress to be picked up by nginx-ingress controller. so
+  # the assumed setup here is:
+  #
+  #                          +----------------------------------+
+  #                          |          k8s cluster             |
+  #                          |                                  |
+  # internet -> external lb -> nginx-ingress -> traefik -> apps |
+  #                          |                                  |
+  #                          +----------------------------------+
+  #
+  # refer to https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/
+  # for instructions for how to setup nginx-ingress for that.
+  # (for minikube, you can just install nginx-ingress by `minikube addon enable ingress`)
+  name: nginx-to-traefik
+  #annotations:
+    #traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    #traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-rewrite-path@kubernetescrd,dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
+    #traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
+    #traefik.ingress.kubernetes.io/router.tls: 'true'
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: 'auth.oliver.local'
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: traefik-ingress
+            port:
+              number: 443
+  - host: 'app.oliver.local'
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: traefik-ingress
+            port:
+              number: 443
+
