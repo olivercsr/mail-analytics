@@ -3,7 +3,7 @@
   as it can serve the entire cluster. Which namespaces are actually being served can be configured
   in the "traefik.yml" file in the traefik "configmap.yml".
 - use `kubectl kustomize` to generate k8s resource files, e.g.
-  `kubectl -n myns apply -f <(kubectl kustomize base/)`
+  `kubectl -n myns apply -f <(kubectl kustomize overlays/minikube)`
 - besides the resource files in here, you may also want to install traefik's custom resource
   definitions (CRDs):
   `kubectl apply -f https://raw.githubusercontent.com/traefik/traefik/v3.3/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml`
