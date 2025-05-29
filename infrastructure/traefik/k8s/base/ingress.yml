@@ -13,7 +13,11 @@ metadata:
   #
   # refer to https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/
   # for instructions for how to setup nginx-ingress for that.
-  # (for minikube, you can just install nginx-ingress by `minikube addon enable ingress`)
+  #
+  # for minikube, you can just install nginx-ingress by `minikube addon enable ingress` and
+  # then edit the configmap ingress-nginx/tcp-services, adding the following:
+  # data:
+  #   "25": traefik/traefik-ingress:25
   name: nginx-to-traefik
   #annotations:
     #traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
