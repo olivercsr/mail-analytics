@@ -29,4 +29,7 @@ configMapGenerator:
   - files/quarantine.ini
   - files/rabbitmq.ini
   - files/smtp.ini
+  - files/smtpgreeting
+  - files/ehlo_hello_message
+  - files/connection_close_message
 
