@@ -20,8 +20,13 @@ metadata:
     #traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-rewrite-path@kubernetescrd,dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
     #traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
     #traefik.ingress.kubernetes.io/router.tls: 'true'
+    #cert-manager.io/issuer: "letsencrypt-${LETSENCRYPT_ISSUER}"   # replace this with letsencrypt-prod when sure that everything is working fine
 spec:
   ingressClassName: nginx
+  #tls:
+  #- hosts:
+  #  - ${INGRESS_HOST}
+  #  secretName: ${INGRESS_HOST}-tls
   rules:
   - host: 'auth.oliver.local'
     http:

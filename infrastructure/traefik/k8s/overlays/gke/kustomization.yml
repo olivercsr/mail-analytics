@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 - ../../base
+- letsencrypt-issuer.yml
 
 namespace: traefik
 
@@ -17,37 +18,56 @@ namespace: traefik
 #generatorOptions:
 #  disableNameSuffixHash: true
 
-configMapGenerator:
-- name: traefik-config
-  behavior: merge
-  files:
-  - files/traefik.yml
-  #- files/file-provider.yml
+#configMapGenerator:
+#- name: traefik-config
+#  behavior: merge
+#  files:
+#  #- files/traefik.yml
+#  #- files/file-provider.yml
 
 patches:
 # replace file:
 #- path: ingress.yml
 
 # strategic merge patching:
-#- patch: |-
-#    apiVersion: networking.k8s.io/v1
-#    kind: Ingress
-#    metadata:
-#      name: nginx-to-traefik
-#    spec:
-#      rules:
-#      - host: 'auth.mydmarc.csr-informatik.de'
-#      - host: 'mydmarc.csr-informatik.de'
+- patch: |-
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: nginx-to-traefik
+    spec:
+      tls:
+      - hosts:
+        - auth.mydmarc.csr-informatik.de
+        - dev.mydmarc.csr-informatik.de
+        - mydmarc.csr-informatik.de
+        secretName: mydmarc.csr-informatik.de-tls
 
 # json 6902 patching:
 - target:
     kind: Ingress
     name: nginx-to-traefik
   patch: |-
+    - op: add
+      path: /metadata/annotations/cert-manager.io~1issuer
+      value: letsencrypt-prod
     - op: replace
       path: /spec/rules/0/host
-      value: 'auth.mydmarc.csr-informatik.de'
+      value: auth.mydmarc.csr-informatik.de
     - op: replace
       path: /spec/rules/1/host
-      value: 'mydmarc.csr-informatik.de'
+      value: mydmarc.csr-informatik.de
+    - op: add
+      path: /spec/rules/2
+      value:
+        host: 'dev.mydmarc.csr-informatik.de'
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: traefik-ingress
+                port:
+                  number: 443
 
