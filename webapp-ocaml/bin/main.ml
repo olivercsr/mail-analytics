@@ -146,8 +146,8 @@ let _main loglevel =
   print_endline ("Received body" ^ body);
   *)
 
-  Lwt.return @@
-  Dream.run ~port:8081
+  Lwt.return
+  @@ Dream.run ~port:app_config.port
   @@ Dream.logger
   @@ make_authenticated "remote-user" ~header:"remote-groups"
   @@ count_requests
@@ -210,6 +210,7 @@ let _task n =
   let%lwt _ = Lwt_unix.sleep 10. in
   Printf.printf "[%d] task end\n%!" n;
   Lwt.return ()
+;;
 
 let () =
   (* Lwt_main.run @@ Lwt.join [task (); task ()] *)
