@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
 - ../../base
 
-#namespace: traefik
+namespace: traefik
 
 ##labels:
 ##- pairs:
@@ -12,7 +12,7 @@ resources:
 ##  #includeSelectors: true
 ##  #includeTemplates: true
 #
-##namePrefix: haraka-
+##namePrefix: traefik-
 #
 #generatorOptions:
 #  disableNameSuffixHash: true
