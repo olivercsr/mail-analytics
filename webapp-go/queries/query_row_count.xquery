@@ -7,12 +7,12 @@ for $row in collection('/dmarc')/feedback/record/row
     let $avgCount := $totalCount div $rowCount
     order by $ip
     return
-        <item>
+        <result>
             <ip>{$ip}</ip>
             <rows>{$rowCount}</rows>
             <count>{$totalCount}</count>
             <avgCount>{$avgCount}</avgCount>
-        </item>
+        </result>
 
 {{ template "footer" . }}
 

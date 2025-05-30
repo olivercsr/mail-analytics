@@ -27,7 +27,7 @@ for $day in 0 to $wantedDays
         group by $dayBeginTS, $dayEndTS
         order by $dayBeginTS, $dayEndTS
         return
-            <item>
+            <result>
                 <wanted>{$dayDiff} = {$wantedDays} = {$day} = {$divisor}</wanted>
                 <begin>{$dayBeginTS} = {$dayBeginDT}</begin>
                 <end>{$dayEndTS} = {$dayEndDT}</end>
@@ -35,7 +35,7 @@ for $day in 0 to $wantedDays
                 <rowend>{$rowEndTS}</rowend>
                 <rowcount>{sum($row/count)}</rowcount>
                 <dividedrowcount>{sum($dividedRowCount)}</dividedrowcount>
-            </item>
+            </result>
 
 {{ template "footer" . }}
 

@@ -13,12 +13,21 @@ import (
 
 type existDb struct {
   uri string
+  resultTag string
+}
+
+func (db existDb) init() existDb {
+  db.resultTag = "result"
+
+  return db
 }
 
 func NewExistDb(appcfg appConfig) existDb {
-	return existDb {
-		uri: appcfg.existdbUri,
-	}
+	db := existDb{}.init()
+
+	db.uri = appcfg.existdbUri
+
+	return db
 }
 
 func renderXquery(name string, variables []map[string]any) (string, error) {
@@ -37,7 +46,7 @@ func renderXquery(name string, variables []map[string]any) (string, error) {
   return buf.String(), nil
 }
 
-func parseXml(xmlData string) {
+func (db existDb) parseXml(xmlStr string) {
   // time.Sleep(5 * time.Second)
 
   /*
@@ -53,8 +62,8 @@ func parseXml(xmlData string) {
     album.ID, album.Title, album.Artist, album.Price)
   */
 
-  root, err := xmlquery.Parse(strings.NewReader(xmlData))
-  queryResults, err := xmlquery.QueryAll(root, "//rowcount")
+  root, err := xmlquery.Parse(strings.NewReader(xmlStr))
+  queryResults, err := xmlquery.QueryAll(root, fmt.Sprintf("//%s", db.resultTag))
   if err != nil {
     fmt.Fprintf(os.Stderr, "Error querying album xml: %v\n", err)
   } else {
@@ -93,7 +102,7 @@ func (db existDb) query(name string, variables []map[string]any) ([]any, error) 
 		return []any{}, err
 	}
 
-	parseXml(xmlStr)
+	db.parseXml(xmlStr)
 
 	return []any{}, nil // TODO: implement
 }
