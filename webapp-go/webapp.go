@@ -110,7 +110,7 @@ func (app webApp) queryCount(c *gin.Context) {
   // c.IndentedJSON(http.StatusOK, gin.H{"start": start, "end": end})
   // c.Header("Content-type", "text/html; charset=utf-8")
   // c.String(http.StatusOK, html)
-  c.HTML(http.StatusOK, "queryResult.tmpl", gin.H{
+  c.HTML(http.StatusOK, "queryCountResult.tmpl", gin.H{
     "title": "thetitle3",
     "start": start,
     "end": end,
@@ -142,7 +142,7 @@ func (app webApp) queryRowCount(c *gin.Context) {
   // c.IndentedJSON(http.StatusOK, gin.H{"start": start, "end": end})
   // c.Header("Content-type", "text/html; charset=utf-8")
   // c.String(http.StatusOK, html)
-  c.HTML(http.StatusOK, "queryResult.tmpl", gin.H{
+  c.HTML(http.StatusOK, "queryRowCountResult.tmpl", gin.H{
     "title": "thetitle3",
     "start": start,
     "end": end,

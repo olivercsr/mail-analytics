@@ -1,26 +1,26 @@
 package main
 
 import (
-  "bytes"
-  "os"
-  "io"
+  // "bytes"
+  // "os"
+  // "io"
   // "flag"
-  "fmt"
-  "strings"
+  // "fmt"
+  // "strings"
   // "time"
   // "regexp"
-  "net/http"
-  "text/template"
+  // "net/http"
+  // "text/template"
   // "encoding/xml"
   // "github.com/gin-gonic/gin"
-  "github.com/antchfx/xmlquery"
+  // "github.com/antchfx/xmlquery"
   // "github.com/cbroglie/mustache"
 )
 
-type cliArgs struct {
-  authuserHeader string
-  devAuthuser string
-}
+// type cliArgs struct {
+//   authuserHeader string
+//   devAuthuser string
+// }
 
 // type album struct {
 //   XMLName xml.Name `xml:"album"`
@@ -29,10 +29,6 @@ type cliArgs struct {
 //   Artist string `json:"artist" xml:"artist"`
 //   Price float64 `json:"price" xml:"price"`
 // }
-
-type existDb struct {
-  uri string
-}
 
 // var xmlData = `
 // <album>
@@ -93,77 +89,6 @@ func (renderer viewRenderer) render(viewName string, data map[string]string) str
 }
 */
 
-func renderXquery() string {
-  tmpl := template.Must(template.ParseGlob("queries/**"))
-
-  data := map[string][]map[string]any{
-    "variables": {
-      {
-        "key": "wantedBegin",
-        "type": "integer",
-        "value": 1715689600,
-      },
-      {
-        "key": "wantedEnd",
-        "type": "integer",
-        "value": 1742974400,
-      },
-    },
-  }
-
-  buf := new(bytes.Buffer)
-  err := tmpl.ExecuteTemplate(buf, "query_count.xquery", data)
-  if err != nil {
-    panic(err)
-  }
-
-  return buf.String()
-}
-
-func parseXml(xmlData string) {
-  // time.Sleep(5 * time.Second)
-
-  /*
-  var album album
-  err := xml.Unmarshal([]byte(xmlData), &album)
-  if err != nil {
-    fmt.Fprintf(os.Stderr, "Error unmarshalling XML: %v\n", err)
-    return
-  }
-
-  fmt.Println("--- Processed via Unmarshalling ---")
-  fmt.Printf("ID: %s, Title: %s, Artist: %s, Price: %.2f\n",
-    album.ID, album.Title, album.Artist, album.Price)
-  */
-
-  root, err := xmlquery.Parse(strings.NewReader(xmlData))
-  queryResults, err := xmlquery.QueryAll(root, "//rowcount")
-  if err != nil {
-    fmt.Fprintf(os.Stderr, "Error querying album xml: %v\n", err)
-  } else {
-    fmt.Printf("Xpath result: ")
-    for _, node := range queryResults {
-      fmt.Println(node.InnerText())
-    }
-  }
-}
-
-func (db existDb) queryDb(query string) (string, error) {
-  buf := strings.NewReader(query)
-  resp, err := http.Post(db.uri, "text/xml", buf)
-  if err != nil {
-    panic(err)
-  }
-  defer resp.Body.Close()
-
-  body, err := io.ReadAll(resp.Body)
-  if err != nil {
-    panic(err)
-  }
-
-  return string(body), nil
-}
-
 // func getAlbums(c *gin.Context) {
 //   c.IndentedJSON(http.StatusOK, albums)
 // }
@@ -193,6 +118,7 @@ func (db existDb) queryDb(query string) (string, error) {
 
 func main() {
   //args := parseCliArgs()
+
   appcfg, err := ReadAppConfig()
   if err != nil {
 		panic(err)
