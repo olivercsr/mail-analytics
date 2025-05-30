@@ -84,7 +84,20 @@ func (app webApp) queryCount(c *gin.Context) {
 
   // parseXml(xmlData)
 
-  query, err := renderXquery("query_count")
+  variables := []map[string]any{
+    {
+      "key": "wantedBegin",
+      "type": "integer",
+      "value": 1715689600,
+    },
+    {
+      "key": "wantedEnd",
+      "type": "integer",
+      "value": 1742974400,
+    },
+  }
+
+  query, err := renderXquery("query_count", variables)
   if err != nil {
     panic(err)
   }
@@ -119,7 +132,20 @@ func (app webApp) queryRowCount(c *gin.Context) {
 
   // parseXml(xmlData)
 
-  query, err := renderXquery("query_row_count")
+  variables := []map[string]any{
+    {
+      "key": "wantedBegin",
+      "type": "integer",
+      "value": 1715689600,
+    },
+    {
+      "key": "wantedEnd",
+      "type": "integer",
+      "value": 1742974400,
+    },
+  }
+
+  query, err := renderXquery("query_row_count", variables)
   if err != nil {
     panic(err)
   }

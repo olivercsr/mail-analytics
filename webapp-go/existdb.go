@@ -21,22 +21,11 @@ func NewExistDb(appcfg appConfig) existDb {
 	}
 }
 
-func renderXquery(name string) (string, error) {
+func renderXquery(name string, variables []map[string]any) (string, error) {
   tmpl := template.Must(template.ParseGlob("queries/**"))
 
   data := map[string][]map[string]any{
-    "variables": {
-      {
-        "key": "wantedBegin",
-        "type": "integer",
-        "value": 1715689600,
-      },
-      {
-        "key": "wantedEnd",
-        "type": "integer",
-        "value": 1742974400,
-      },
-    },
+  	"variables": variables,
   }
 
   buf := new(bytes.Buffer)
