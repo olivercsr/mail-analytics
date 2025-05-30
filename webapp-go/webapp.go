@@ -90,7 +90,10 @@ func (app webApp) queryCount(c *gin.Context) {
 
   // parseXml(xmlData)
 
-  query := renderXquery()
+  query, err := renderXquery("query_count")
+  if err != nil {
+    panic(err)
+  }
   result, err := app.db.queryDb(query)
   if err != nil {
     panic(err)
@@ -122,7 +125,10 @@ func (app webApp) queryRowCount(c *gin.Context) {
 
   // parseXml(xmlData)
 
-  query := renderXquery()
+  query, err := renderXquery("query_row_count")
+  if err != nil {
+    panic(err)
+  }
   result, err := app.db.queryDb(query)
   if err != nil {
     panic(err)

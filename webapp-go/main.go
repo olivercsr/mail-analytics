@@ -124,9 +124,7 @@ func main() {
 		panic(err)
   }
 
-  db := existDb{
-    uri: appcfg.existdbUri,
-  }
+  db := NewExistDb(appcfg)
 
   webapp := NewWebapp(appcfg, db)
 	webapp.StartWebapp(appcfg)

@@ -21,7 +21,7 @@ func NewExistDb(appcfg appConfig) existDb {
 	}
 }
 
-func renderXquery() string {
+func renderXquery(name string) (string, error) {
   tmpl := template.Must(template.ParseGlob("queries/**"))
 
   data := map[string][]map[string]any{
@@ -40,12 +40,12 @@ func renderXquery() string {
   }
 
   buf := new(bytes.Buffer)
-  err := tmpl.ExecuteTemplate(buf, "query_count.xquery", data)
+  err := tmpl.ExecuteTemplate(buf, fmt.Sprintf("%s.xquery", name), data)
   if err != nil {
-    panic(err)
+    return "", err
   }
 
-  return buf.String()
+  return buf.String(), nil
 }
 
 func parseXml(xmlData string) {
