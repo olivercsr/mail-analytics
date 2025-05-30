@@ -4,7 +4,7 @@ import (
   "bytes"
   "os"
   "io"
-  "flag"
+  // "flag"
   "fmt"
   "strings"
   // "time"
@@ -34,10 +34,6 @@ type existDb struct {
   uri string
 }
 
-type webApp struct {
-  db existDb
-}
-
 var xmlData = `
 <album>
   <id>123</id>
@@ -53,6 +49,7 @@ var albums = []album{
   {ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 }
 
+/*
 func parseCliArgs() cliArgs {
   authheader := flag.String("authuser-header", "remote-user", "HTTP header that contains the authenticated users' name.")
   authuser := flag.String("dev-authuser", "", "Set authuser to this value (useful for dev/debugging).")
@@ -68,6 +65,7 @@ func parseCliArgs() cliArgs {
 
   return args
 }
+*/
 
 /*
 type viewRenderer struct {
@@ -193,38 +191,6 @@ func getAlbumById(c *gin.Context) {
   c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
-func (app webApp) queryCount(c *gin.Context) {
-  start, end := c.Param("start"), c.Param("end")
-
-  // parseXml(xmlData)
-
-  query := renderXquery()
-  result, err := app.db.queryDb(query)
-  if err != nil {
-    panic(err)
-  }
-  fmt.Printf("==================================== %s\n", result)
-  parseXml(result)
-
-  /*
-  viewRenderer := newViewRenderer("views")
-  data := make(map[string]string)
-  data["title"] = "thetitle2"
-  data["start"] = start
-  data["end"] = end
-  html := viewRenderer.render("queryResult", data)
-  */
-
-  // c.IndentedJSON(http.StatusOK, gin.H{"start": start, "end": end})
-  // c.Header("Content-type", "text/html; charset=utf-8")
-  // c.String(http.StatusOK, html)
-  c.HTML(http.StatusOK, "queryResult.tmpl", gin.H{
-    "title": "thetitle3",
-    "start": start,
-    "end": end,
-  })
-}
-
 func makeIsUserIdFormatIsOk() func(string) bool {
   re, err := regexp.Compile("^[[:alnum:]]*[\\w]+[[:alnum:]]$")
   if err != nil {
@@ -236,15 +202,15 @@ func makeIsUserIdFormatIsOk() func(string) bool {
   }
 }
 
-func make_authenticate(header string, devUser string) func(*gin.Context) {
+func make_authenticate(header string, devUser *string) func(*gin.Context) {
   isUserIdFormatOk := makeIsUserIdFormatIsOk()
 
   return func (c *gin.Context) {
     headers := c.Request.Header
 
     userid := headers.Get(header)
-    if userid == "" {
-      userid = devUser
+    if userid == "" && devUser != nil {
+      userid = *devUser
     }
 
     fmt.Printf("Userid: %s - Headers: %s\n", userid, headers)
@@ -258,17 +224,25 @@ func make_authenticate(header string, devUser string) func(*gin.Context) {
 }
 
 func main() {
-  args := parseCliArgs()
+  //args := parseCliArgs()
+  appcfg, err := ReadAppConfig()
+  if err != nil {
+		panic(err)
+  }
 
   app := webApp{
     db: existDb{
-      uri: "http://localhost:8080/exist/rest/dmarc",
+      uri: appcfg.existdbUri,
     },
   }
 
   router := gin.Default()
 
-  router.Use(make_authenticate(args.authuserHeader, args.devAuthuser))
+  //router.Use(make_authenticate(args.authuserHeader, args.devAuthuser))
+  router.Use(make_authenticate(
+		appcfg.authUserHeader,
+		appcfg.devAuthuser,
+		))
 
   router.LoadHTMLGlob("views/**")
 
@@ -276,6 +250,7 @@ func main() {
   router.GET("/albums", getAlbums)
   router.POST("/albums", postAlbums)
   router.GET("/query/count/:start/:end", app.queryCount)
+  router.GET("/query/rowcount/:start/:end", app.queryRowCount)
 
   router.Run("localhost:8081")
 }
