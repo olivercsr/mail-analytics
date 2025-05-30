@@ -65,7 +65,7 @@ func parseXml(xmlData string) {
   }
 }
 
-func (db existDb) queryDb(query string) (string, error) {
+func (db existDb) doQuery(query string) (string, error) {
   buf := strings.NewReader(query)
 
   resp, err := http.Post(db.uri, "text/xml", buf)
@@ -80,5 +80,21 @@ func (db existDb) queryDb(query string) (string, error) {
   }
 
   return string(body), nil
+}
+
+func (db existDb) query(name string, variables []map[string]any) ([]any, error) {
+	q, err := renderXquery(name, variables)
+	if err != nil {
+		return []any{}, err
+	}
+
+	xmlStr, err := db.doQuery(q)
+	if err != nil {
+		return []any{}, err
+	}
+
+	parseXml(xmlStr)
+
+	return []any{}, nil // TODO: implement
 }
 

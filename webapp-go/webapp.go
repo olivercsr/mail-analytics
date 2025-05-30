@@ -97,16 +97,12 @@ func (app webApp) queryCount(c *gin.Context) {
     },
   }
 
-  query, err := renderXquery("query_count", variables)
+  results, err := app.db.query("query_count", variables)
   if err != nil {
     panic(err)
   }
-  result, err := app.db.queryDb(query)
-  if err != nil {
-    panic(err)
-  }
-  fmt.Printf("==================================== %s\n", result)
-  parseXml(result)
+
+  fmt.Printf("==================================== %s\n", results)
 
   /*
   viewRenderer := newViewRenderer("views")
@@ -145,16 +141,12 @@ func (app webApp) queryRowCount(c *gin.Context) {
     },
   }
 
-  query, err := renderXquery("query_row_count", variables)
+  results, err := app.db.query("query_row_count", variables)
   if err != nil {
     panic(err)
   }
-  result, err := app.db.queryDb(query)
-  if err != nil {
-    panic(err)
-  }
-  fmt.Printf("==================================== %s\n", result)
-  parseXml(result)
+
+  fmt.Printf("==================================== %s\n", results)
 
   /*
   viewRenderer := newViewRenderer("views")
