@@ -74,10 +74,12 @@ func (db existDb) parseXml(xmlStr string) {
   }
 }
 
-func (db existDb) doQuery(query string) (string, error) {
+func (db existDb) doQuery(tenant string, query string) (string, error) {
   buf := strings.NewReader(query)
 
-  resp, err := http.Post(db.uri, "text/xml", buf)
+	uri := fmt.Sprintf("%s/%s", db.uri, tenant)
+
+  resp, err := http.Post(uri, "text/xml", buf)
   if err != nil {
     panic(err)
   }
@@ -91,13 +93,13 @@ func (db existDb) doQuery(query string) (string, error) {
   return string(body), nil
 }
 
-func (db existDb) query(name string, variables []map[string]any) ([]any, error) {
+func (db existDb) query(tenant string, name string, variables []map[string]any) ([]any, error) {
 	q, err := renderXquery(name, variables)
 	if err != nil {
 		return []any{}, err
 	}
 
-	xmlStr, err := db.doQuery(q)
+	xmlStr, err := db.doQuery(tenant, q)
 	if err != nil {
 		return []any{}, err
 	}

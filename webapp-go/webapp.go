@@ -79,7 +79,20 @@ func make_authenticate(header string, devUser *string) func(*gin.Context) {
   }
 }
 
+func getUserId(c *gin.Context) (string, bool) {
+  if userid, exists := c.Get("userid"); exists {
+    return userid.(string), true
+  } else {
+    return "", false
+  }
+}
+
 func (app webApp) queryCount(c *gin.Context) {
+  userid, exists := getUserId(c)
+  if !exists {
+    panic("userid missing in handler context")
+  }
+
   start, end := c.Param("start"), c.Param("end")
 
   // parseXml(xmlData)
@@ -97,7 +110,7 @@ func (app webApp) queryCount(c *gin.Context) {
     },
   }
 
-  results, err := app.db.query("query_count", variables)
+  results, err := app.db.query(userid, "query_count", variables)
   if err != nil {
     panic(err)
   }
@@ -124,6 +137,10 @@ func (app webApp) queryCount(c *gin.Context) {
 }
 
 func (app webApp) queryRowCount(c *gin.Context) {
+  userid, exists := getUserId(c)
+  if !exists {
+    panic("userid missing in handler context")
+  }
   start, end := c.Param("start"), c.Param("end")
 
   // parseXml(xmlData)
@@ -141,7 +158,7 @@ func (app webApp) queryRowCount(c *gin.Context) {
     },
   }
 
-  results, err := app.db.query("query_row_count", variables)
+  results, err := app.db.query(userid, "query_row_count", variables)
   if err != nil {
     panic(err)
   }
