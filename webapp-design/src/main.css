@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@source "../../app/";
+@source "../../webapp-go/views/";
 @plugin "daisyui" {
   themes: light --default, dark --prefersdark, garden;
 }
