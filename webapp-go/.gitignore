@@ -1,2 +1,4 @@
 /webapp
+/static/*
+!/static/.gitkeep
 
