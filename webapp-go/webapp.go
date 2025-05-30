@@ -18,7 +18,6 @@ func NewWebapp(appcfg appConfig, db existDb) webApp {
     router: gin.Default(),
   }
 
-  //app.router.Use(make_authenticate(args.authuserHeader, args.devAuthuser))
   app.router.Use(make_authenticate(
 		appcfg.authUserHeader,
 		appcfg.devAuthuser,
@@ -28,13 +27,8 @@ func NewWebapp(appcfg appConfig, db existDb) webApp {
 
   app.router.LoadHTMLGlob("views/**")
 
-  // router.GET("/albums/:id", getAlbumById)
-  // router.GET("/albums", getAlbums)
-  // router.POST("/albums", postAlbums)
   app.router.GET("/query/count/:start/:end", app.queryCount)
   app.router.GET("/query/rowcount/:start/:end", app.queryRowCount)
-
-  // router.Run("localhost:8081")
 
   return app
 }
