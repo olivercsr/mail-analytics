@@ -24,6 +24,8 @@ func NewWebapp(appcfg appConfig, db existDb) webApp {
 		appcfg.devAuthuser,
 		))
 
+  app.router.Static("/static", "./static")
+
   app.router.LoadHTMLGlob("views/**")
 
   // router.GET("/albums/:id", getAlbumById)
