@@ -123,7 +123,7 @@ func (app webApp) queryCount(c *gin.Context) {
     },
   }
 
-  results, err := app.db.query(userid, "query_count", variables)
+  results, err := query[countResultItem](app.db, userid, "query_count", variables)
   if err != nil {
     panic(err)
   }
@@ -185,7 +185,7 @@ func (app webApp) queryRowCount(c *gin.Context) {
     },
   }
 
-  results, err := app.db.query(userid, "query_row_count", variables)
+  results, err := query[rowCountResultItem](app.db, userid, "query_row_count", variables)
   if err != nil {
     panic(err)
   }

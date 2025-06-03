@@ -52,11 +52,11 @@ type existdbResult[T any] struct {
   Items []T `xml:"result"`
 }
 
-type existdbCountResultSet struct {
-  // XMLName xml.Name `xml:"exist:result"`
-  // XMLName xml.Name `xml:"existResult"`
-  Items []countResultItem `xml:"result"`
-}
+// type existdbCountResultSet struct {
+//   // XMLName xml.Name `xml:"exist:result"`
+//   // XMLName xml.Name `xml:"existResult"`
+//   Items []countResultItem `xml:"result"`
+// }
 
 // var xmlData = `
 // <existResult>
@@ -73,12 +73,12 @@ type existdbCountResultSet struct {
 // </existResult>
 // `
 
-func (db existDb) parseXml(xmlStr string) {
+func parseXml[T any](xmlStr string) ([]T, error) {
   fmt.Println("======================================" + xmlStr)
 
-  var results existdbResult[countResultItem]
+  var results existdbResult[T]
   if err := xml.Unmarshal([]byte(xmlStr), &results); err != nil {
-    panic(err)
+    return []T{}, err
   }
 
   // var results countResultItem
@@ -88,6 +88,8 @@ func (db existDb) parseXml(xmlStr string) {
   // for _, item := range results.Items {
   //   fmt.Printf("item: %+v\n\n", item)
   // }
+
+  return results.Items, nil
 }
 
 /*
@@ -152,7 +154,7 @@ func (db existDb) parseXml(xmlStr string) {
 }
 */
 
-func (db existDb) doQuery(tenant string, query string) (string, error) {
+func doQuery(db existDb, tenant string, query string) (string, error) {
   buf := strings.NewReader(query)
 
 	uri := fmt.Sprintf("%s/%s", db.uri, tenant)
@@ -171,19 +173,22 @@ func (db existDb) doQuery(tenant string, query string) (string, error) {
   return string(body), nil
 }
 
-func (db existDb) query(tenant string, name string, variables []map[string]any) ([]any, error) {
+func query[T any](db existDb, tenant string, name string, variables []map[string]any) ([]T, error) {
 	q, err := renderXquery(name, variables)
 	if err != nil {
-		return []any{}, err
+		return []T{}, err
 	}
 
-	xmlStr, err := db.doQuery(tenant, q)
+	xmlStr, err := doQuery(db, tenant, q)
 	if err != nil {
-		return []any{}, err
+		return []T{}, err
 	}
 
-	db.parseXml(xmlStr)
+	results, err := parseXml[T](xmlStr)
+	if err != nil {
+		return []T{}, err
+	}
 
-	return []any{}, nil // TODO: implement
+	return results, nil
 }
 
