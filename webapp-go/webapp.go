@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
   "regexp"
   "net/http"
   "github.com/gin-gonic/gin"
@@ -27,8 +28,8 @@ func NewWebapp(appcfg appConfig, db existDb) webApp {
 
   app.router.LoadHTMLGlob("views/**")
 
-  app.router.GET("/query/count/:start/:end", app.queryCount)
-  app.router.GET("/query/rowcount/:start/:end", app.queryRowCount)
+  app.router.GET("/query/count/from/:start/until/:end", app.queryCount)
+  app.router.GET("/query/rowcount/from/:start/until/:end", app.queryRowCount)
 
   return app
 }
@@ -93,7 +94,17 @@ func (app webApp) queryCount(c *gin.Context) {
     panic("userid missing in handler context")
   }
 
-  start, end := c.Param("start"), c.Param("end")
+  var start, end uint
+  if s, err := strconv.Atoi(c.Param("start")); err == nil {
+    start = uint(s)
+  } else {
+    panic(err)
+  }
+  if e, err := strconv.Atoi(c.Param("end")); err == nil {
+    end = uint(e)
+  } else {
+    panic(err)
+  }
 
   // parseXml(xmlData)
 
@@ -101,12 +112,14 @@ func (app webApp) queryCount(c *gin.Context) {
     {
       "key": "wantedBegin",
       "type": "integer",
-      "value": 1715689600,
+      // "value": 1715689600,
+      "value": start,
     },
     {
       "key": "wantedEnd",
       "type": "integer",
-      "value": 1742974400,
+      // "value": 1742974400,
+      "value": end,
     },
   }
 
@@ -115,7 +128,7 @@ func (app webApp) queryCount(c *gin.Context) {
     panic(err)
   }
 
-  fmt.Printf("==================================== %s\n", results)
+  // fmt.Printf("==================================== %s\n", results)
 
   /*
   viewRenderer := newViewRenderer("views")
@@ -133,6 +146,7 @@ func (app webApp) queryCount(c *gin.Context) {
     "title": "thetitle3",
     "start": start,
     "end": end,
+    "data": results,
   })
 }
 
@@ -141,7 +155,18 @@ func (app webApp) queryRowCount(c *gin.Context) {
   if !exists {
     panic("userid missing in handler context")
   }
-  start, end := c.Param("start"), c.Param("end")
+
+  var start, end uint
+  if s, err := strconv.Atoi(c.Param("start")); err == nil {
+    start = uint(s)
+  } else {
+    panic(err)
+  }
+  if e, err := strconv.Atoi(c.Param("end")); err == nil {
+    end = uint(e)
+  } else {
+    panic(err)
+  }
 
   // parseXml(xmlData)
 
@@ -149,12 +174,14 @@ func (app webApp) queryRowCount(c *gin.Context) {
     {
       "key": "wantedBegin",
       "type": "integer",
-      "value": 1715689600,
+      // "value": 1715689600,
+      "value": start,
     },
     {
       "key": "wantedEnd",
       "type": "integer",
-      "value": 1742974400,
+      // "value": 1742974400,
+      "value": end,
     },
   }
 
@@ -163,7 +190,7 @@ func (app webApp) queryRowCount(c *gin.Context) {
     panic(err)
   }
 
-  fmt.Printf("==================================== %s\n", results)
+  // fmt.Printf("==================================== %s\n", results)
 
   /*
   viewRenderer := newViewRenderer("views")
@@ -181,5 +208,6 @@ func (app webApp) queryRowCount(c *gin.Context) {
     "title": "thetitle3",
     "start": start,
     "end": end,
+    "data": results,
   })
 }
