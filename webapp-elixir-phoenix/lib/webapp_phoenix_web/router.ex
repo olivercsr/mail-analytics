@@ -18,6 +18,7 @@ defmodule WebappPhoenixWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/query/count/from/:start/until/:end", QueryController, :count
   end
 
   # Other scopes may use custom stacks.
