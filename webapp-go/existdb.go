@@ -2,13 +2,15 @@ package main
 
 import (
   "bytes"
-  "os"
+  // "os"
   "io"
   "fmt"
   "strings"
+  "encoding/xml"
+  // "strconv"
 	"net/http"
   "text/template"
-  "github.com/antchfx/xmlquery"
+  // "github.com/antchfx/xmlquery"
 )
 
 type existDb struct {
@@ -46,21 +48,64 @@ func renderXquery(name string, variables []map[string]any) (string, error) {
   return buf.String(), nil
 }
 
+type existdbResult[T any] struct {
+  Items []T `xml:"result"`
+}
+
+type existdbCountResultSet struct {
+  // XMLName xml.Name `xml:"exist:result"`
+  // XMLName xml.Name `xml:"existResult"`
+  Items []countResultItem `xml:"result"`
+}
+
+// var xmlData = `
+// <existResult>
+//   <result>
+//     <rowbegin>11</rowbegin>
+//     <rowend>22</rowend>
+//     <rowcount>33</rowcount>
+//   </result>
+//   <result>
+//     <rowbegin>12</rowbegin>
+//     <rowend>23</rowend>
+//     <rowcount>34</rowcount>
+//   </result>
+// </existResult>
+// `
+
+func (db existDb) parseXml(xmlStr string) {
+  fmt.Println("======================================" + xmlStr)
+
+  var results existdbResult[countResultItem]
+  if err := xml.Unmarshal([]byte(xmlStr), &results); err != nil {
+    panic(err)
+  }
+
+  // var results countResultItem
+  // xml.Unmarshal([]byte(xmlData), &results)
+  fmt.Printf("parseXml result: %+v\n", results)
+
+  // for _, item := range results.Items {
+  //   fmt.Printf("item: %+v\n\n", item)
+  // }
+}
+
+/*
 func (db existDb) parseXml(xmlStr string) {
   // time.Sleep(5 * time.Second)
 
-  /*
-  var album album
-  err := xml.Unmarshal([]byte(xmlData), &album)
-  if err != nil {
-    fmt.Fprintf(os.Stderr, "Error unmarshalling XML: %v\n", err)
-    return
-  }
+  fmt.Println("======================================" + xmlStr)
 
-  fmt.Println("--- Processed via Unmarshalling ---")
-  fmt.Printf("ID: %s, Title: %s, Artist: %s, Price: %.2f\n",
-    album.ID, album.Title, album.Artist, album.Price)
-  */
+  // var album album
+  // err := xml.Unmarshal([]byte(xmlData), &album)
+  // if err != nil {
+  //   fmt.Fprintf(os.Stderr, "Error unmarshalling XML: %v\n", err)
+  //   return
+  // }
+  //
+  // fmt.Println("--- Processed via Unmarshalling ---")
+  // fmt.Printf("ID: %s, Title: %s, Artist: %s, Price: %.2f\n",
+  //   album.ID, album.Title, album.Artist, album.Price)
 
   root, err := xmlquery.Parse(strings.NewReader(xmlStr))
   queryResults, err := xmlquery.QueryAll(root, fmt.Sprintf("//%s", db.resultTag))
@@ -69,10 +114,43 @@ func (db existDb) parseXml(xmlStr string) {
   } else {
     fmt.Printf("Xpath result: ")
     for _, node := range queryResults {
-      fmt.Println(node.InnerText())
+      fmt.Println("Level: " + strconv.Itoa(node.Level()))
+      fmt.Println("Data: " + node.Data)
+      fmt.Println("InnerText: " + node.InnerText())
+
+      resultItem := countResultItem{}
+      if rowbegin, err := strconv.Atoi(node.SelectElement("rowbegin").InnerText()); err == nil {
+        resultItem.rowbegin = uint(rowbegin)
+      // } else {
+      //   panic(err)
+      }
+      if rowend, err := strconv.Atoi(node.SelectElement("rowend").InnerText()); err == nil {
+        resultItem.rowend = uint(rowend)
+      // } else {
+      //   panic(err)
+      }
+      if rowcount, err := strconv.Atoi(node.SelectElement("rowcount").InnerText()); err == nil {
+        resultItem.rowend = uint(rowcount)
+      // } else {
+      //   panic(err)
+      }
+      fmt.Printf("resultItem: %+v\n", resultItem)
+
+      // childnode := node.FirstChild
+      // for eof := (childnode == nil); !eof; eof = (childnode == nil) {
+      //   if childnode.Type == xmlquery.ElementNode {
+      //     fmt.Println("Child Level: " + strconv.Itoa(childnode.Level()))
+      //     fmt.Println("Child Data: " + childnode.Data)
+      //     fmt.Println("Child InnerText: " + childnode.InnerText())
+      //     fmt.Println("Child Xml: " + childnode.OutputXML(true))
+      //   }
+      //
+      //   childnode = childnode.NextSibling
+      // }
     }
   }
 }
+*/
 
 func (db existDb) doQuery(tenant string, query string) (string, error) {
   buf := strings.NewReader(query)
