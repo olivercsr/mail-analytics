@@ -1,0 +1,6 @@
+xx template "pageHeader" xx
+xx template "navHeader" xx
+  <h1><%= query_name %></h1>
+xx template "navFooter" xx
+xx template "pageFooter" xx
+
