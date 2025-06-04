@@ -1,6 +1,4 @@
-xx template "header" xx
-
-<%= query_name %>
+xquery version "3.1";
 
 declare variable $wantedBegin external;
 declare variable $wantedEnd external;
@@ -38,6 +36,4 @@ for $day in 0 to $wantedDays
                 <rowcount>{sum($row/count)}</rowcount>
                 <dividedrowcount>{sum($dividedRowCount)}</dividedrowcount>
             </result>
-
-xx template "footer" xx
 

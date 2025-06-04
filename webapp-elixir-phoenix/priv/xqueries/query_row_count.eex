@@ -1,4 +1,4 @@
-{{ template "header" . }}
+xquery version "3.1";
 
 for $row in collection('/dmarc')/feedback/record/row
     group by $ip := $row/source_ip/text()
@@ -13,6 +13,4 @@ for $row in collection('/dmarc')/feedback/record/row
             <count>{$totalCount}</count>
             <avgCount>{$avgCount}</avgCount>
         </result>
-
-{{ template "footer" . }}
 
