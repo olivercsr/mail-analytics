@@ -10,13 +10,17 @@ defmodule WebappPhoenix.ExistDb do
       [key: "wantedBegin", type: "integer", value: 123]
     ]])
 
-    data = Req.get!("http://localhost:8080/exist/rest/dmarc").body |> xpath(~x"/")
-    IO.inspect(data)
-
     Logger.info(EEx.eval_string("query_name: <%= query_name %>", [query_name: query_name]))
     Logger.info("query: #{xml_query}")
 
-    1234
+    case Req.get("http://localhost:8080/exist/rest/dmarc") do
+      {:ok, result} when result.status >= 200 and result.status < 300 -> 
+        {:ok, result.body |> xpath(~x"/")}
+      {:ok, result} ->
+        {:error, "unsuccessful http response code: #{result.status}"}
+      {:error, exception} ->
+        {:error, exception}
+    end
   end
 end
 
