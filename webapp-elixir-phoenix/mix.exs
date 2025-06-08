@@ -19,7 +19,7 @@ defmodule WebappPhoenix.MixProject do
   def application do
     [
       mod: {WebappPhoenix.Application, []},
-      extra_applications: [:logger, :runtime_tools, :os_mon]
+      extra_applications: [:logger, :runtime_tools, :os_mon, :observer, :wx, :runtime_tools]
     ]
   end
 
