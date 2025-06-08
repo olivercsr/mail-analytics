@@ -5,12 +5,22 @@ defmodule WebappPhoenix.ExistDb do
   require Req
   import SweetXml
 
-  def query(query_name) do
+  def _type_of_value(value) do
+    IO.inspect(value)
+    cond do
+      is_integer(value) -> "integer"
+      is_binary(value) -> "string"
+    end
+  end
+
+  def query(query_name, variables) do
     query = EEx.eval_file("priv/xqueries/#{query_name}.eex", [query_name: query_name])
-    xml_query = EEx.eval_file("priv/xqueries/container.eex", [query: query, variables: [
-      [key: "wantedBegin", type: "integer", value: 1715689600],
-      [key: "wantedEnd", type: "integer", value: 1742974400]
-    ]])
+    variables = Enum.map(variables, fn {k, v} -> [key: k, type: _type_of_value(v), value: v] end)
+    xml_query = EEx.eval_file("priv/xqueries/container.eex", [query: query, variables: variables])
+    # [
+    #   [key: "wantedBegin", type: "integer", value: 1715689600],
+    #   [key: "wantedEnd", type: "integer", value: 1742974400]
+    # ]
 
     Logger.info(EEx.eval_string("query_name: <%= query_name %>", [query_name: query_name]))
     Logger.info("query: #{xml_query}")

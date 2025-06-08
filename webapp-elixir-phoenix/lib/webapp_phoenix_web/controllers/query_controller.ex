@@ -15,7 +15,10 @@ defmodule WebappPhoenixWeb.QueryController do
     #results = WebappPhoenix.ExistDb.query("query_count")
     #IO.puts("results: #{results}")
 
-    case WebappPhoenix.ExistDb.query("query_count") do
+    # TODO: handle parsing errors?
+    {startts_int, ""} = Integer.parse(startts)
+    {endts_int, ""} = Integer.parse(endts)
+    case WebappPhoenix.ExistDb.query("query_count", %{wantedBegin: startts_int, wantedEnd: endts_int}) do
       {:ok, result} -> IO.inspect(result)
       {:error, error} -> IO.inspect(error)
     end
