@@ -6,7 +6,7 @@ defmodule WebappPhoenix.ExistDb do
   import SweetXml
 
   def _type_of_value(value) do
-    IO.inspect(value)
+    # IO.inspect(value)
     cond do
       is_integer(value) -> "integer"
       is_binary(value) -> "string"
