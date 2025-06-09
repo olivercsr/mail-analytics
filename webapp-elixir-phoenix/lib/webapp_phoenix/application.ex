@@ -16,7 +16,8 @@ defmodule WebappPhoenix.Application do
       # Start a worker by calling: WebappPhoenix.Worker.start_link(arg)
       # {WebappPhoenix.Worker, arg},
       # Start to serve requests, typically the last entry
-      WebappPhoenixWeb.Endpoint
+      WebappPhoenixWeb.Endpoint,
+      {FileCollector, path: "/foo/bar"},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
