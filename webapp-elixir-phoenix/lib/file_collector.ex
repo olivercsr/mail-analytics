@@ -1,6 +1,9 @@
 defmodule FileCollector do
   use GenServer
 
+  require Path
+  require File
+
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts)
   end
@@ -23,8 +26,16 @@ defmodule FileCollector do
 
   @impl true
   def handle_info(:work, state) do
-    IO.puts("working with path: #{state.opts[:path]}")
+    wd = File.cwd!()
+    path = "#{wd}/#{state.opts[:path]}"
+
+    IO.puts("working with path: #{path}")
     IO.inspect(state)
+
+    files = Path.wildcard("./lib/**/*")
+    # files = File.ls!(path)
+    IO.inspect(files)
+    Enum.map(files, fn f -> IO.puts(f); File.stat!(f).mtime |> IO.inspect() end)
 
     schedule_work()
     {:noreply, state}

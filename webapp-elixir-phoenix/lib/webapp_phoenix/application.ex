@@ -17,7 +17,7 @@ defmodule WebappPhoenix.Application do
       # {WebappPhoenix.Worker, arg},
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
-      {FileCollector, path: "/foo/bar"},
+      {FileCollector, path: "."},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
