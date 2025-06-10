@@ -24,6 +24,15 @@ defmodule FileCollector do
     {:noreply, state}
   end
 
+  defp file_processable?(filepath) do
+    with {:ok, filestat} <- File.stat(filepath, time: :posix),
+      {:ok, mtime} <- DateTime.from_unix(filestat.mtime),
+      {:ok, now} <- DateTime.now("Etc/UTC"),
+      threshold_time = DateTime.add(now, -5, :minute) do
+      {:ok, DateTime.before?(mtime, threshold_time)}
+    end
+  end
+
   @impl true
   def handle_info(:work, state) do
     wd = File.cwd!()
@@ -34,8 +43,13 @@ defmodule FileCollector do
 
     files = Path.wildcard("./lib/**/*")
     # files = File.ls!(path)
-    IO.inspect(files)
-    Enum.map(files, fn f -> IO.puts(f); File.stat!(f).mtime |> IO.inspect() end)
+    # IO.inspect(files)
+    Enum.map(files, fn file ->
+      case file_processable?(file) do
+        {:ok, true} -> IO.puts("yes: #{file}")
+        {:ok, false} -> IO.puts("no:  #{file}")
+      end
+    end)
 
     schedule_work()
     {:noreply, state}
