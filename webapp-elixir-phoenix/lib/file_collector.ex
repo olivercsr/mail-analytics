@@ -28,20 +28,21 @@ defmodule FileCollector do
     with {:ok, filestat} <- File.stat(filepath, time: :posix),
       {:ok, mtime} <- DateTime.from_unix(filestat.mtime),
       {:ok, now} <- DateTime.now("Etc/UTC"),
-      threshold_time = DateTime.add(now, -5, :minute) do
+      threshold_time <- DateTime.add(now, -5, :minute) do
       {:ok, DateTime.before?(mtime, threshold_time)}
     end
   end
 
   @impl true
   def handle_info(:work, state) do
-    wd = File.cwd!()
-    path = "#{wd}/#{state.opts[:path]}"
+    # wd = File.cwd!()
+    srcpath = state.opts[:srcpath]
+    destpath = state.opts[:destpath]
 
-    IO.puts("working with path: #{path}")
-    IO.inspect(state)
+    IO.puts("working with srcpath:#{srcpath} and destpath:#{destpath}")
+    # IO.inspect(state)
 
-    files = Path.wildcard("./lib/**/*")
+    files = Path.wildcard("#{srcpath}/**/*")
     # files = File.ls!(path)
     # IO.inspect(files)
     Enum.map(files, fn file ->
