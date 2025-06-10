@@ -1,6 +1,7 @@
 defmodule FileCollector do
   use GenServer
 
+  require Logger
   require Path
   require File
 
@@ -33,13 +34,18 @@ defmodule FileCollector do
     end
   end
 
+  defp move_file(_srcpath, destpath, filepath) do
+    File.rename(filepath, "#{destpath}/#{Path.basename(filepath)}")
+  end
+
   @impl true
   def handle_info(:work, state) do
     # wd = File.cwd!()
     srcpath = state.opts[:srcpath]
     destpath = state.opts[:destpath]
+    file_action = state.opts[:action] || fn _file -> nil end
 
-    IO.puts("working with srcpath:#{srcpath} and destpath:#{destpath}")
+    Logger.debug([message: "running file collector", state: state])
     # IO.inspect(state)
 
     files = Path.wildcard("#{srcpath}/**/*")
@@ -47,8 +53,9 @@ defmodule FileCollector do
     # IO.inspect(files)
     Enum.map(files, fn file ->
       case file_processable?(file) do
-        {:ok, true} -> IO.puts("yes: #{file}")
-        {:ok, false} -> IO.puts("no:  #{file}")
+        {:ok, true} -> file_action.(file); move_file(srcpath, destpath, file)
+        {:ok, false} -> nil
+        {:error, reason} -> Logger.warning([message: "error during file_processable?", reason: reason])
       end
     end)
 

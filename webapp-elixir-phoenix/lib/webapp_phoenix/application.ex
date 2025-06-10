@@ -17,7 +17,7 @@ defmodule WebappPhoenix.Application do
       # {WebappPhoenix.Worker, arg},
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
-      {FileCollector, srcpath: "./mails/new", destpath: "./mails/pending"},
+      {FileCollector, srcpath: "./mails/new", destpath: "./mails/pending", action: fn file -> IO.puts("processing file: #{file}") end},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
