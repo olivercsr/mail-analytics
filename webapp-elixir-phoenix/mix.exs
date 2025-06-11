@@ -57,8 +57,10 @@ defmodule WebappPhoenix.MixProject do
       {:bandit, "~> 1.5"},
       {:req, "~> 0.5.0"},
       {:sweet_xml, "~> 0.7.5"},
-      # {:mime, "~> 2.0"},
-      {:mail, "~> 0.4"}
+      {:mime, "~> 2.0"},
+      {:mail, "~> 0.4"},
+      {:stream_gzip, "~>0.4"},
+      {:zstream, "~> 0.6"}
     ]
   end
 
