@@ -17,12 +17,12 @@ defmodule WebappPhoenix.Application do
       # {WebappPhoenix.Worker, arg},
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
-      {FileCollector,
+      {Ingress.FileCollector,
         interval_seconds: 10,
         srcpath: "./mails/new",
         tmppath: "./mails/pending",
         destpath: "./mails/done",
-        action: &EmailFetcher.action/1
+        action: &Ingress.EmailFetcher.action/1
       },
     ]
 

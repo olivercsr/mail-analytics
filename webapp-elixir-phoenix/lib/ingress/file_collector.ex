@@ -1,4 +1,4 @@
-defmodule FileCollector do
+defmodule Ingress.FileCollector do
   use GenServer
 
   require Logger

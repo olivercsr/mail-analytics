@@ -1,4 +1,4 @@
-defmodule EmailFetcher do
+defmodule Ingress.EmailFetcher do
   require File
   require Mail
 
