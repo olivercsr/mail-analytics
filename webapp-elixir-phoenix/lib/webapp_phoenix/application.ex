@@ -18,7 +18,7 @@ defmodule WebappPhoenix.Application do
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
       {Ingress.FileCollector,
-        interval_seconds: 10,
+        interval_seconds: 100,
         srcpath: "./mails/new",
         tmppath: "./mails/pending",
         destpath: "./mails/done",
