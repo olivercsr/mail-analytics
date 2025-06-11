@@ -56,7 +56,8 @@ defmodule WebappPhoenix.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:req, "~> 0.5.0"},
-      {:sweet_xml, "~> 0.7.5"}
+      {:sweet_xml, "~> 0.7.5"},
+      {:mime, "~> 2.0.7"}
     ]
   end
 
