@@ -20,8 +20,7 @@ defmodule WebappPhoenix.Application do
       {Ingress.FileCollector,
         interval_seconds: 100,
         srcpath: "./mails/new",
-        tmppath: "./mails/pending",
-        destpath: "./mails/done",
+        destpath: "./mails/pending",
         action: &Ingress.EmailFetcher.action/1
       },
     ]

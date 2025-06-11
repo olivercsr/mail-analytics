@@ -43,24 +43,21 @@ defmodule Ingress.FileCollector do
     dest
   end
 
-  defp process_file(srcpath, tmppath, destpath, file, action) do
+  defp process_file(srcpath, destpath, file, action) do
     case file_processable?(file) do
       {:ok, true} ->
-        tmpfile = move_file(srcpath, tmppath, file)
-        {:tmpfile, tmpfile, action
-          && action.(tmpfile)
-          || :ignore}
+        destfile = move_file(srcpath, destpath, file)
+        action
+          && action.(destfile)
+          || :ignore
       {:ok, false} -> :ignore
       any -> any
     end |> case do
-      {:tmpfile, tmpfile, {:ok, result}} ->
+      {:ok, result} ->
         Logger.debug([message: "action successful", file: file])
-        move_file(tmppath, destpath, tmpfile)
         result
-      {:tmpfile, tmpfile, {:error, reason}} ->
+      {:error, reason} ->
         Logger.warning([message: "action failed", reason: reason])
-        File.touch!(tmpfile)
-        move_file(tmppath, srcpath, tmpfile)
       :ignore -> nil
       any -> any
     end
@@ -70,7 +67,6 @@ defmodule Ingress.FileCollector do
   def handle_info(:work, state) do
     # wd = File.cwd!()
     srcpath = state.opts[:srcpath]
-    tmppath = state.opts[:tmppath]
     destpath = state.opts[:destpath]
     file_action = state.opts[:action]
     interval = state.opts[:interval_seconds] || default_interval()
@@ -83,7 +79,7 @@ defmodule Ingress.FileCollector do
     # IO.inspect(files)
     results = Enum.map(files, fn file ->
       try do
-        process_file(srcpath, tmppath, destpath, file, file_action)
+        process_file(srcpath, destpath, file, file_action)
       rescue
         e -> {:error, e}
       end
