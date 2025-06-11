@@ -17,7 +17,13 @@ defmodule WebappPhoenix.Application do
       # {WebappPhoenix.Worker, arg},
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
-      {FileCollector, srcpath: "./mails/new", destpath: "./mails/pending", action: &EmailFetcher.action/1},
+      {FileCollector,
+        interval_seconds: 10,
+        srcpath: "./mails/new",
+        tmppath: "./mails/pending",
+        destpath: "./mails/done",
+        action: &EmailFetcher.action/1
+      },
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
