@@ -1,5 +1,5 @@
 defmodule Util.BinaryStream do
-  defp next_fn(<<head::binary-size(4), rest::binary>>) do
+  defp next_fn(<<head::binary-size(128), rest::binary>>) do
     IO.puts("next_fn2 #{inspect head}")
     {:binary.bin_to_list(head), rest}
   end
