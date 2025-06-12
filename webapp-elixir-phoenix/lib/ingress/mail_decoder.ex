@@ -1,7 +1,21 @@
-defmodule Ingress.EmailFetcher do
+defmodule Ingress.MailDecoder do
+  use GenServer
+
   require Logger
   require File
   require Mail
+
+  # Client
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts, name: opts[:name])
+  end
+
+  def decode(pid, mail) do
+    GenServer.cast(pid, {:decode, mail})
+  end
+
+  # Server
 
   defmodule Attachment do
     defstruct [:filename, :transfer_encoding, :content_type, :content_charset, :data]
@@ -71,18 +85,31 @@ defmodule Ingress.EmailFetcher do
     |> Enum.reduce([], &search_msg/2)
   end
 
-  def action(file) do
-    IO.puts("EmailFetcher: #{file}")
+  @impl true
+  def init(opts) do
+    {:ok, %{opts: opts}}
+  end
+
+  @impl true
+  def handle_cast({:decode, file}, state) do
+    IO.puts("MailDecoder: #{file}")
 
     with {:ok, file_contents} <- File.read(file),
       mail_msg <- Mail.parse(file_contents) do
-      submit_states = find_attachments([mail_msg])
+      attachments = find_attachments([mail_msg])
         |> Enum.map(&convert/1)
-        |> Enum.map(&Ingress.AttachmentProcessor.process(AttachmentProcessor, &1))
-      case Enum.all?(submit_states, fn state -> state == :ok end) do
-        true -> :ok
-        false -> :error
-      end
+        # |> Enum.map(&Ingress.AttachmentProcessor.process(AttachmentProcessor, &1))
+      # case Enum.all?(submit_states, fn state -> state == :ok end) do
+      #   true -> :ok
+      #   false -> :error
+      # end
+      IO.inspect(attachments)
+
+      # TODO: save attachments as files
+
     end
+
+    {:noreply, state}
   end
 end
+

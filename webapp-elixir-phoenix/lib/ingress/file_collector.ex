@@ -51,25 +51,28 @@ defmodule Ingress.FileCollector do
           && action.(destfile)
           || :ignore
       {:ok, false} -> :ignore
-      any -> any
     end |> case do
+      :ok ->
+        Logger.debug([message: "action successful", file: file])
+        {file, {:ok, nil}}
       {:ok, result} ->
         Logger.debug([message: "action successful", file: file])
-        result
+        {file, {:ok, result}}
       {:error, reason} ->
-        Logger.warning([message: "action failed", reason: reason])
-      :ignore -> nil
-      any -> any
+        Logger.warning([message: "action failed", file: file, reason: reason])
+        {file, {:error, reason}}
+      any -> {file, any}
     end
   end
 
   @impl true
   def handle_info(:work, state) do
     # wd = File.cwd!()
-    srcpath = state.opts[:srcpath]
-    destpath = state.opts[:destpath]
-    file_action = state.opts[:action]
     interval = state.opts[:interval_seconds] || default_interval()
+    basepath = state.opts[:basepath]
+    srcpath = "#{basepath}/#{state.opts[:srcpath]}"
+    destpath = "#{basepath}/#{state.opts[:destpath]}"
+    file_action = state.opts[:action]
 
     Logger.debug([message: "running file collector", state: state])
     # IO.inspect(state)
@@ -77,16 +80,17 @@ defmodule Ingress.FileCollector do
     files = Path.wildcard("#{srcpath}/**/*")
     # files = File.ls!(path)
     # IO.inspect(files)
-    results = Enum.map(files, fn file ->
+    action_results = Enum.map(files, fn file ->
       try do
         process_file(srcpath, destpath, file, file_action)
       rescue
         e -> {:error, e}
       end
     end)
-      |> Enum.filter(fn item -> item != nil end)
+      |> Enum.filter(fn item -> item != :ignore end)
+      |> Enum.reduce(%{}, fn {file, result}, acc -> Map.put(acc, file, result) end)
 
-    IO.inspect(results)
+    IO.inspect(action_results)
 
     schedule_work(interval)
 

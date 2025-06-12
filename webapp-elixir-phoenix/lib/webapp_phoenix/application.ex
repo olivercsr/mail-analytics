@@ -17,14 +17,19 @@ defmodule WebappPhoenix.Application do
       # {WebappPhoenix.Worker, arg},
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
+      {Ingress.MailDecoder,
+        name: MailDecoder,
+        basepath: "./mails",
+        attachmentspath: "attachments/new",
+      },
       {Ingress.FileCollector,
         name: FileCollector,
-        interval_seconds: 100,
-        srcpath: "./mails/new",
-        destpath: "./mails/pending",
-        action: &Ingress.EmailFetcher.action/1
-      },
-      {Ingress.AttachmentProcessor, name: AttachmentProcessor}
+        interval_seconds: 10,
+        basepath: "./mails",
+        srcpath: "new",
+        destpath: "pending",
+        action: &Ingress.MailDecoder.decode(MailDecoder, &1)
+      }
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
