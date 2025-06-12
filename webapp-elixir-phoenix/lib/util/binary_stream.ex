@@ -14,7 +14,7 @@ defmodule Util.BinaryStream do
     {:halt, <<>>}
   end
 
-  def new(binary_data) do
+  def from_binary(binary_data) do
     Stream.resource(
       fn -> binary_data end,
       &next_fn/1,

@@ -61,7 +61,7 @@ defmodule Ingress.EmailFetcher do
         transfer_encoding: transfer_encoding,
         content_type: content_type,
         content_charset: content_charset,
-        data: data
+        data: Util.BinaryStream.from_binary(data)
       }
     end
   end
