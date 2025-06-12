@@ -8,7 +8,7 @@ defmodule Ingress.FileCollector do
   def default_interval, do: 10
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts)
+    GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
   @impl true

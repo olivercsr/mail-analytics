@@ -75,10 +75,14 @@ defmodule Ingress.EmailFetcher do
     IO.puts("EmailFetcher: #{file}")
 
     with {:ok, file_contents} <- File.read(file),
-      mail_msg <- Mail.parse(file_contents),
-      attachments <- find_attachments([mail_msg])
-        |> Enum.map(&convert/1) do
-      {:ok, attachments}
+      mail_msg <- Mail.parse(file_contents) do
+      submit_states = find_attachments([mail_msg])
+        |> Enum.map(&convert/1)
+        |> Enum.map(&Ingress.AttachmentProcessor.process(AttachmentProcessor, &1))
+      case Enum.all?(submit_states, fn state -> state == :ok end) do
+        true -> :ok
+        false -> :error
+      end
     end
   end
 end

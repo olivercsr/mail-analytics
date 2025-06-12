@@ -18,11 +18,13 @@ defmodule WebappPhoenix.Application do
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
       {Ingress.FileCollector,
+        name: FileCollector,
         interval_seconds: 100,
         srcpath: "./mails/new",
         destpath: "./mails/pending",
         action: &Ingress.EmailFetcher.action/1
       },
+      {Ingress.AttachmentProcessor, name: AttachmentProcessor}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
