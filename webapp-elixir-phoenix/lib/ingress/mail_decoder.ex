@@ -49,7 +49,7 @@ defmodule Ingress.MailDecoder do
     "defaultfilename"
   end
 
-  defp convert(mail_msg) do
+  defp to_attachment(mail_msg) do
     with headers <- get_in(mail_msg.headers),
       disposition_header <- get_in(headers["content-disposition"]) || [],
       filename <- get_value_from_param_header(
@@ -68,10 +68,11 @@ defmodule Ingress.MailDecoder do
       data <- get_in(mail_msg.body) do
       %Attachment{
         filename: filename,
-        transfer_encoding: transfer_encoding,
-        content_type: content_type,
-        content_charset: content_charset,
-        data: Util.BinaryStream.from_binary(data)
+        transfer_encoding: String.to_atom(transfer_encoding),
+        content_type: String.to_atom(content_type),
+        content_charset: String.to_atom(content_charset),
+        # data: Util.BinaryStream.from_binary(data)
+        data: data
       }
     end
   end
@@ -104,13 +105,15 @@ defmodule Ingress.MailDecoder do
     with {:ok, file_contents} <- File.read(file),
       mail_msg <- Mail.parse(file_contents) do
       attachments = find_attachments([mail_msg])
-        |> Enum.map(&convert/1)
+        |> Enum.map(&to_attachment/1)
         # |> Enum.map(&Ingress.AttachmentProcessor.process(AttachmentProcessor, &1))
       # case Enum.all?(submit_states, fn state -> state == :ok end) do
       #   true -> :ok
       #   false -> :error
       # end
       IO.inspect(attachments)
+
+      Enum.map(attachments, &Ingress.AttachmentDecoder.decode(AttachmentDecoder, &1))
 
       # move_file()
       # TODO: move mail file to done-folder

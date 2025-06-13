@@ -17,6 +17,9 @@ defmodule WebappPhoenix.Application do
       # {WebappPhoenix.Worker, arg},
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
+      {Ingress.AttachmentDecoder,
+        name: AttachmentDecoder,
+      },
       {Ingress.MailDecoder,
         name: MailDecoder,
         # basepath: "./mails",
