@@ -17,10 +17,6 @@ defmodule Ingress.MailDecoder do
 
   # Server
 
-  defmodule Attachment do
-    defstruct [:filename, :transfer_encoding, :content_type, :content_charset, :data]
-  end
-
   defp search_msg(mail_msg, attachments) do
     with dispositions <- get_in(mail_msg.headers["content-disposition"]) || [],
       disposition <- Enum.at(dispositions, 0, "")
@@ -85,6 +81,13 @@ defmodule Ingress.MailDecoder do
     |> Enum.reduce([], &search_msg/2)
   end
 
+  # defp move_file(basepath, srcpath, destpath) do
+  #   src = "#{basepath}/#{srcpath}"
+  #   dest = "#{basepath}/#{destpath}"
+  #   File.rename(src, dest)
+  #   dest
+  # end
+
   @impl true
   def init(opts) do
     {:ok, %{opts: opts}}
@@ -92,7 +95,11 @@ defmodule Ingress.MailDecoder do
 
   @impl true
   def handle_cast({:decode, file}, state) do
-    IO.puts("MailDecoder: #{file}")
+    # basepath = state.opts[:basepath]
+    # maildestpath = "#{basepath}/#{state.opts[:maildestpath]}"
+    # attachmentspath = "#{basepath}/#{state.opts[:attachmentspath]}"
+
+    IO.puts("MailDecoder: #{inspect file}")
 
     with {:ok, file_contents} <- File.read(file),
       mail_msg <- Mail.parse(file_contents) do
@@ -105,6 +112,8 @@ defmodule Ingress.MailDecoder do
       # end
       IO.inspect(attachments)
 
+      # move_file()
+      # TODO: move mail file to done-folder
       # TODO: save attachments as files
 
     end

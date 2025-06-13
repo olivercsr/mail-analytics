@@ -19,15 +19,16 @@ defmodule WebappPhoenix.Application do
       WebappPhoenixWeb.Endpoint,
       {Ingress.MailDecoder,
         name: MailDecoder,
-        basepath: "./mails",
-        attachmentspath: "attachments/new",
+        # basepath: "./mails",
+        # maildestpath: "mails/done",
+        # attachmentspath: "attachments/pending",
       },
       {Ingress.FileCollector,
         name: FileCollector,
         interval_seconds: 10,
         basepath: "./mails",
         srcpath: "new",
-        destpath: "pending",
+        destpath: "done",
         action: &Ingress.MailDecoder.decode(MailDecoder, &1)
       }
     ]

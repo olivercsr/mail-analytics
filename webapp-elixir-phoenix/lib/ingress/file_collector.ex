@@ -38,15 +38,18 @@ defmodule Ingress.FileCollector do
   end
 
   defp move_file(_srcpath, destpath, filepath) do
-    dest = "#{destpath}/#{Path.basename(filepath)}"
-    File.rename(filepath, dest)
-    dest
+    with dest <- "#{destpath}/#{Path.basename(filepath)}",
+      :ok <- File.mkdir_p(destpath),
+      :ok <- File.rename(filepath, dest) do
+      {:ok, dest}
+    end
   end
 
   defp process_file(srcpath, destpath, file, action) do
+    IO.puts("process_file #{file}")
     case file_processable?(file) do
       {:ok, true} ->
-        destfile = move_file(srcpath, destpath, file)
+        {:ok, destfile} = move_file(srcpath, destpath, file)
         action
           && action.(destfile)
           || :ignore
@@ -84,7 +87,7 @@ defmodule Ingress.FileCollector do
       try do
         process_file(srcpath, destpath, file, file_action)
       rescue
-        e -> {:error, e}
+        e -> {file, {:error, e}}
       end
     end)
       |> Enum.filter(fn item -> item != :ignore end)
