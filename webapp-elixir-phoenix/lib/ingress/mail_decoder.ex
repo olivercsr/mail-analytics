@@ -11,28 +11,28 @@ defmodule Ingress.MailDecoder do
     GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
-  def decode(pid, mail) do
-    GenServer.cast(pid, {:decode, mail})
+  def decode(pid, filepath, successfilepath) do
+    GenServer.cast(pid, {:decode, filepath, successfilepath})
   end
 
   # Server
 
-  defp search_msg(mail_msg, attachments) do
-    with dispositions <- get_in(mail_msg.headers["content-disposition"]) || [],
-      disposition <- Enum.at(dispositions, 0, "")
-        |> String.downcase() do
-      case {mail_msg, disposition} do
-        {%{multipart: false}, "attachment"} ->
-          [mail_msg | attachments]
-        {%{multipart: false}, _} ->
-          attachments
-        {%{multipart: true}, _} ->
-          find_attachments(mail_msg.parts || [])
-        _ -> Logger.warning([message: "unexpected mail message structure", mail_msg: mail_msg])
-          attachments
-      end
-    end
-  end
+  # defp search_msg(mail_msg, attachments) do
+  #   with dispositions <- get_in(mail_msg.headers["content-disposition"]) || [],
+  #     disposition <- Enum.at(dispositions, 0, "")
+  #       |> String.downcase() do
+  #     case {mail_msg, disposition} do
+  #       {%{multipart: false}, "attachment"} ->
+  #         [mail_msg | attachments]
+  #       {%{multipart: false}, _} ->
+  #         attachments
+  #       {%{multipart: true}, _} ->
+  #         find_attachments(mail_msg.parts || [])
+  #       _ -> Logger.warning([message: "unexpected mail message structure", mail_msg: mail_msg])
+  #         attachments
+  #     end
+  #   end
+  # end
 
   defp get_value_from_param_header(header, key, default) do
     header
@@ -77,10 +77,10 @@ defmodule Ingress.MailDecoder do
     end
   end
 
-  defp find_attachments(mail_msgs) do
-    mail_msgs
-    |> Enum.reduce([], &search_msg/2)
-  end
+  # defp find_attachments(mail_msgs) do
+  #   mail_msgs
+  #   |> Enum.reduce([], &search_msg/2)
+  # end
 
   # defp move_file(basepath, srcpath, destpath) do
   #   src = "#{basepath}/#{srcpath}"
@@ -95,25 +95,25 @@ defmodule Ingress.MailDecoder do
   end
 
   @impl true
-  def handle_cast({:decode, file}, state) do
+  def handle_cast({:decode, filepath, successfilepath}, state) do
     # basepath = state.opts[:basepath]
     # maildestpath = "#{basepath}/#{state.opts[:maildestpath]}"
     # attachmentspath = "#{basepath}/#{state.opts[:attachmentspath]}"
 
-    IO.puts("MailDecoder: #{inspect file}")
+    IO.puts("MailDecoder: #{inspect filepath}")
 
-    with {:ok, file_contents} <- File.read(file),
+    with {:ok, file_contents} <- File.read(filepath),
       mail_msg <- Mail.parse(file_contents) do
-      attachments = find_attachments([mail_msg])
-        |> Enum.map(&to_attachment/1)
+      # attachments = find_attachments([mail_msg])
+      #   |> Enum.map(&to_attachment/1)
         # |> Enum.map(&Ingress.AttachmentProcessor.process(AttachmentProcessor, &1))
       # case Enum.all?(submit_states, fn state -> state == :ok end) do
       #   true -> :ok
       #   false -> :error
       # end
-      IO.inspect(attachments)
+      # IO.inspect(attachments)
 
-      Enum.map(attachments, &Ingress.AttachmentDecoder.decode(AttachmentDecoder, &1))
+      # Enum.map(attachments, &Ingress.AttachmentDecoder.decode(AttachmentDecoder, &1))
 
       # move_file()
       # TODO: move mail file to done-folder

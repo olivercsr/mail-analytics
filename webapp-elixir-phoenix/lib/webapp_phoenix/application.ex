@@ -27,12 +27,13 @@ defmodule WebappPhoenix.Application do
         # attachmentspath: "attachments/pending",
       },
       {Ingress.FileCollector,
-        name: FileCollector,
+        name: MailFileCollector,
         interval_seconds: 10,
         basepath: "./mails",
-        srcpath: "new",
-        destpath: "done",
-        action: &Ingress.MailDecoder.decode(MailDecoder, &1)
+        newpath: "mails/new",
+        pendingpath: "mails/pending",
+        donepath: "mails/done",
+        action: &Ingress.MailDecoder.decode(MailDecoder, &1, &2)
       }
     ]
 

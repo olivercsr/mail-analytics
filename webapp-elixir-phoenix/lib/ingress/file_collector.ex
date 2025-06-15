@@ -37,34 +37,32 @@ defmodule Ingress.FileCollector do
     end
   end
 
-  defp move_file(_srcpath, destpath, filepath) do
-    with dest <- "#{destpath}/#{Path.basename(filepath)}",
-      :ok <- File.mkdir_p(destpath),
-      :ok <- File.rename(filepath, dest) do
-      {:ok, dest}
-    end
-  end
+  # defp move_file(srcpath, pendingpath) do
+  #   with :ok <- File.rename(srcpath, pendingpath) do
+  #     {:ok, pendingpath}
+  #   end
+  # end
 
-  defp process_file(srcpath, destpath, file, action) do
-    IO.puts("process_file #{file}")
-    case file_processable?(file) do
+  defp process_file(filepath, successfilepath, action) do
+    IO.puts("process_file #{filepath}")
+    case file_processable?(filepath) do
       {:ok, true} ->
-        {:ok, destfile} = move_file(srcpath, destpath, file)
+        # {:ok, destfile} = move_file(srcpath, destpath, file)
         action
-          && action.(destfile)
+          && action.(filepath, successfilepath)
           || :ignore
       {:ok, false} -> :ignore
     end |> case do
       :ok ->
-        Logger.debug([message: "action successful", file: file])
-        {file, {:ok, nil}}
+        Logger.debug([message: "action successful", file: filepath])
+        {filepath, {:ok, nil}}
       {:ok, result} ->
-        Logger.debug([message: "action successful", file: file])
-        {file, {:ok, result}}
+        Logger.debug([message: "action successful", file: filepath])
+        {filepath, {:ok, result}}
       {:error, reason} ->
-        Logger.warning([message: "action failed", file: file, reason: reason])
-        {file, {:error, reason}}
-      any -> {file, any}
+        Logger.warning([message: "action failed", file: filepath, reason: reason])
+        {filepath, {:error, reason}}
+      any -> {filepath, any}
     end
   end
 
@@ -73,19 +71,34 @@ defmodule Ingress.FileCollector do
     # wd = File.cwd!()
     interval = state.opts[:interval_seconds] || default_interval()
     basepath = state.opts[:basepath]
-    srcpath = "#{basepath}/#{state.opts[:srcpath]}"
-    destpath = "#{basepath}/#{state.opts[:destpath]}"
+    newpath = "#{basepath}/#{state.opts[:srcpath]}"
+    newpathlen = String.length(newpath)
+    pendingpath = "#{basepath}/#{state.opts[:pendingpath]}"
+    donepath = "#{basepath}/#{state.opts[:donepath]}"
     file_action = state.opts[:action]
 
-    Logger.debug([message: "running file collector", state: state])
+    Logger.debug([message: "running file collector", name: state.opts[:name], state: state])
     # IO.inspect(state)
 
-    files = Path.wildcard("#{srcpath}/**/*")
+    files = Path.wildcard("#{newpath}/**/*")
     # files = File.ls!(path)
     # IO.inspect(files)
     action_results = Enum.map(files, fn file ->
       try do
-        process_file(srcpath, destpath, file, file_action)
+        with filelen <- String.length(file),
+          filepath = file
+            |> String.slice(filelen - newpathlen, filelen),
+          filedir = Path.dirname(filepath),
+          # filename = Path.basename(filepath),
+          pendingfiledir = "#{pendingpath}/#{filedir}",
+          pendingfilepath = "#{pendingpath}/#{filepath}",
+          donefiledir = "#{donepath}/#{filedir}",
+          donefilepath = "#{donepath}/#{filepath}" do
+          :ok = File.mkdir_p(pendingfiledir)
+          :ok = File.rename(file, pendingfilepath)
+          :ok = File.mkdir_p(donefiledir)
+          process_file(pendingfilepath, donefilepath, file_action)
+        end
       rescue
         e -> {file, {:error, e}}
       end
