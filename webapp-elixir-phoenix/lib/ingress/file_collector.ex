@@ -28,26 +28,18 @@ defmodule Ingress.FileCollector do
     {:noreply, state}
   end
 
-  defp file_processable?(filepath) do
-    with {:ok, filestat} <- File.stat(filepath, time: :posix),
-      {:ok, mtime} <- DateTime.from_unix(filestat.mtime),
+  defp file_processable?(filestat) do
+    with {:ok, mtime} <- DateTime.from_unix(filestat.mtime),
       {:ok, now} <- DateTime.now("Etc/UTC"),
       threshold_time <- DateTime.add(now, -5, :minute) do
       {:ok, DateTime.before?(mtime, threshold_time)}
     end
   end
 
-  # defp move_file(srcpath, pendingpath) do
-  #   with :ok <- File.rename(srcpath, pendingpath) do
-  #     {:ok, pendingpath}
-  #   end
-  # end
-
-  defp process_file(filepath, successfilepath, action) do
+  defp process_file(filepath, filestat, successfilepath, action) do
     IO.puts("process_file #{filepath}")
-    case file_processable?(filepath) do
+    case file_processable?(filestat) do
       {:ok, true} ->
-        # {:ok, destfile} = move_file(srcpath, destpath, file)
         action
           && action.(filepath, successfilepath)
           || :ignore
@@ -70,39 +62,56 @@ defmodule Ingress.FileCollector do
   def handle_info(:work, state) do
     # wd = File.cwd!()
     interval = state.opts[:interval_seconds] || default_interval()
-    basepath = state.opts[:basepath]
-    newpath = "#{basepath}/#{state.opts[:srcpath]}"
+    basepath = Path.absname(state.opts[:basepath])
+    newpath = Path.absname("#{basepath}/#{state.opts[:newpath]}")
     newpathlen = String.length(newpath)
-    pendingpath = "#{basepath}/#{state.opts[:pendingpath]}"
-    donepath = "#{basepath}/#{state.opts[:donepath]}"
+    pendingpath = Path.absname("#{basepath}/#{state.opts[:pendingpath]}")
+    donepath = Path.absname("#{basepath}/#{state.opts[:donepath]}")
     file_action = state.opts[:action]
 
     Logger.debug([message: "running file collector", name: state.opts[:name], state: state])
-    # IO.inspect(state)
 
-    files = Path.wildcard("#{newpath}/**/*")
-    # files = File.ls!(path)
-    # IO.inspect(files)
-    action_results = Enum.map(files, fn file ->
-      try do
-        with filelen <- String.length(file),
-          filepath = file
-            |> String.slice(filelen - newpathlen, filelen),
-          filedir = Path.dirname(filepath),
-          # filename = Path.basename(filepath),
-          pendingfiledir = "#{pendingpath}/#{filedir}",
-          pendingfilepath = "#{pendingpath}/#{filepath}",
-          donefiledir = "#{donepath}/#{filedir}",
-          donefilepath = "#{donepath}/#{filepath}" do
-          :ok = File.mkdir_p(pendingfiledir)
-          :ok = File.rename(file, pendingfilepath)
-          :ok = File.mkdir_p(donefiledir)
-          process_file(pendingfilepath, donefilepath, file_action)
+    action_results = Path.wildcard("#{newpath}/**/*")
+      |> Enum.map(fn file ->
+        try do
+          {:ok, filestat} = File.stat(file)
+          {:ok, file, filestat}
+        rescue
+          e -> {:error, file, e}
         end
-      rescue
-        e -> {file, {:error, e}}
-      end
-    end)
+      end)
+      |> Enum.filter(fn info ->
+        case info do
+          {:ok, _file, filestat} -> filestat.type == :regular
+          {:error, _file, _error} = info -> info
+        end
+      end)
+      |> Enum.map(fn info ->
+        case info do
+          {:ok, file, filestat} ->
+            try do
+              with filelen <- String.length(file),
+                filepath = file
+                  |> String.slice(newpathlen - filelen + 1, filelen),
+                filedir = Path.dirname(filepath),
+                # filename = Path.basename(filepath),
+                pendingfiledir = Path.absname("#{pendingpath}/#{filedir}"),
+                pendingfilepath = Path.absname("#{pendingpath}/#{filepath}"),
+                donefiledir = Path.absname("#{donepath}/#{filedir}"),
+                donefilepath = Path.absname("#{donepath}/#{filepath}") do
+                # IO.inspect({file, filepath, filedir, pendingfiledir, pendingfilepath, donefiledir, donefilepath})
+                :ok = File.mkdir_p(pendingfiledir)
+                :ok = File.rename(file, pendingfilepath)
+                :ok = File.mkdir_p(donefiledir)
+                process_file(pendingfilepath, filestat, donefilepath, file_action)
+                :ignore
+              end
+            rescue
+              e -> {file, {:error, e}}
+            end
+          {:error, _file, _error} = info -> info
+        end
+      end)
       |> Enum.filter(fn item -> item != :ignore end)
       |> Enum.reduce(%{}, fn {file, result}, acc -> Map.put(acc, file, result) end)
 

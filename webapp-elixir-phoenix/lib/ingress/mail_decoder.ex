@@ -104,6 +104,7 @@ defmodule Ingress.MailDecoder do
 
     with {:ok, file_contents} <- File.read(filepath),
       mail_msg <- Mail.parse(file_contents) do
+      attachments = Mail.get_attachments(mail_msg, :attachment)
       # attachments = find_attachments([mail_msg])
       #   |> Enum.map(&to_attachment/1)
         # |> Enum.map(&Ingress.AttachmentProcessor.process(AttachmentProcessor, &1))
