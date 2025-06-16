@@ -36,12 +36,12 @@ defmodule Ingress.FileCollector do
     end
   end
 
-  defp process_file(filepath, filestat, successfilepath, action) do
-    Logger.debug([module: __MODULE__, message: "process_file start", file: filepath])
+  defp process_file(filepath, filestat, donefilepath, action) do
+    Logger.debug([module: __MODULE__, message: "process_file start", file: filepath, donefilepath: donefilepath])
     case file_processable?(filestat) do
       {:ok, true} ->
         action
-          && action.(filepath, successfilepath)
+          && action.(filepath, donefilepath)
           || :ignore
       {:ok, false} -> :ignore
     end |> case do
@@ -74,7 +74,7 @@ defmodule Ingress.FileCollector do
     action_results = Path.wildcard("#{newpath}/**/*")
       |> Enum.map(fn file ->
         try do
-          {:ok, filestat} = File.stat(file)
+          {:ok, filestat} = File.stat(file, time: :posix)
           {:ok, file, filestat}
         rescue
           e -> {:error, file, e}

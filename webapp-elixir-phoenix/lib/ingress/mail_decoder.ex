@@ -34,48 +34,48 @@ defmodule Ingress.MailDecoder do
   #   end
   # end
 
-  defp get_value_from_param_header(header, key, default) do
-    header
-      |> Enum.at(1, {})
-      |> Tuple.to_list()
-      |> Enum.chunk_every(2)
-      |> Enum.filter(fn [k, _] -> String.downcase(k || "") == key end)
-      |> Enum.map(fn [_, v] -> v end)
-      |> Enum.at(0, default)
-  end
-
-  defp default_filename() do
-    # TODO: implement
-    "defaultfilename"
-  end
-
-  defp to_attachment(mail_msg) do
-    with headers <- get_in(mail_msg.headers),
-      disposition_header <- get_in(headers["content-disposition"]) || [],
-      filename <- get_value_from_param_header(
-        disposition_header,
-        "filename",
-        default_filename()
-      ),
-      transfer_encoding <- get_in(headers["transfer-encoding"]) || "base64",
-      content_type_header <- get_in(headers["content-type"]),
-      content_type <- Enum.at(content_type_header, 0),
-      content_charset <- get_value_from_param_header(
-        content_type_header,
-        "charset",
-        "utf8"
-      ),
-      data <- get_in(mail_msg.body) do
-      %Attachment{
-        filename: filename,
-        transfer_encoding: String.to_atom(transfer_encoding),
-        content_type: String.to_atom(content_type),
-        content_charset: String.to_atom(content_charset),
-        # data: Util.BinaryStream.from_binary(data)
-        data: data
-      }
-    end
-  end
+  # defp get_value_from_param_header(header, key, default) do
+  #   header
+  #     |> Enum.at(1, {})
+  #     |> Tuple.to_list()
+  #     |> Enum.chunk_every(2)
+  #     |> Enum.filter(fn [k, _] -> String.downcase(k || "") == key end)
+  #     |> Enum.map(fn [_, v] -> v end)
+  #     |> Enum.at(0, default)
+  # end
+  #
+  # defp default_filename() do
+  #   # TODO: implement
+  #   "defaultfilename"
+  # end
+  #
+  # defp to_attachment(mail_msg) do
+  #   with headers <- get_in(mail_msg.headers),
+  #     disposition_header <- get_in(headers["content-disposition"]) || [],
+  #     filename <- get_value_from_param_header(
+  #       disposition_header,
+  #       "filename",
+  #       default_filename()
+  #     ),
+  #     transfer_encoding <- get_in(headers["transfer-encoding"]) || "base64",
+  #     content_type_header <- get_in(headers["content-type"]),
+  #     content_type <- Enum.at(content_type_header, 0),
+  #     content_charset <- get_value_from_param_header(
+  #       content_type_header,
+  #       "charset",
+  #       "utf8"
+  #     ),
+  #     data <- get_in(mail_msg.body) do
+  #     %Attachment{
+  #       filename: filename,
+  #       transfer_encoding: String.to_atom(transfer_encoding),
+  #       content_type: String.to_atom(content_type),
+  #       content_charset: String.to_atom(content_charset),
+  #       # data: Util.BinaryStream.from_binary(data)
+  #       data: data
+  #     }
+  #   end
+  # end
 
   # defp find_attachments(mail_msgs) do
   #   mail_msgs
@@ -95,16 +95,24 @@ defmodule Ingress.MailDecoder do
   end
 
   @impl true
-  def handle_cast({:decode, filepath, successfilepath}, state) do
-    # basepath = state.opts[:basepath]
-    # maildestpath = "#{basepath}/#{state.opts[:maildestpath]}"
-    # attachmentspath = "#{basepath}/#{state.opts[:attachmentspath]}"
+  def handle_cast({:decode, mailfilepath, maildonefilepath}, state) do
+    Logger.debug([module: __MODULE__, message: "MailDecoder.decode start", mailfilepath: mailfilepath, maildonefilepath: maildonefilepath])
 
-    IO.puts("MailDecoder: #{inspect filepath}")
+    basepath = Path.absname(state.opts[:basepath])
+    attachmentpath = Path.absname("#{basepath}/#{state.opts[:attachmentspath]}")
 
-    with {:ok, file_contents} <- File.read(filepath),
+    with {:ok, file_contents} <- File.read(mailfilepath),
       mail_msg <- Mail.parse(file_contents) do
-      attachments = Mail.get_attachments(mail_msg, :attachment)
+      results = Mail.get_attachments(mail_msg, :attachment)
+        |> Enum.map(fn {attachmentfilename, attachmentdata} ->
+          try do
+            attachmentpath = Path.absname("#{attachmentpath}/#{attachmentfilename}")
+            :ok = File.write(attachmentpath, attachmentdata, [:write])
+            {:ok, attachmentfilename}
+          rescue
+            e -> {:error, attachmentfilename, e}
+          end
+        end)
       # attachments = find_attachments([mail_msg])
       #   |> Enum.map(&to_attachment/1)
         # |> Enum.map(&Ingress.AttachmentProcessor.process(AttachmentProcessor, &1))
@@ -116,10 +124,9 @@ defmodule Ingress.MailDecoder do
 
       # Enum.map(attachments, &Ingress.AttachmentDecoder.decode(AttachmentDecoder, &1))
 
-      # move_file()
-      # TODO: move mail file to done-folder
-      # TODO: save attachments as files
+      Logger.debug([module: __MODULE__, message: "MailDecoder.decode done", results: results])
 
+      File.rename(mailfilepath, maildonefilepath)
     end
 
     {:noreply, state}
