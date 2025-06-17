@@ -103,11 +103,14 @@ defmodule Ingress.MailDecoder do
 
     with {:ok, file_contents} <- File.read(mailfilepath),
       mail_msg <- Mail.parse(file_contents) do
+      [recipient | _] = Mail.get_to(mail_msg)
       results = Mail.get_attachments(mail_msg, :attachment)
         |> Enum.map(fn {attachmentfilename, attachmentdata} ->
           try do
-            attachmentpath = Path.absname("#{attachmentpath}/#{attachmentfilename}")
-            :ok = File.write(attachmentpath, attachmentdata, [:write])
+            attachmentdir = Path.absname("#{attachmentpath}/#{recipient}")
+            :ok = File.mkdir_p(attachmentdir)
+            attachmentfilepath = Path.absname("#{attachmentdir}/#{attachmentfilename}")
+            :ok = File.write(attachmentfilepath, attachmentdata, [:write])
             {:ok, attachmentfilename}
           rescue
             e -> {:error, attachmentfilename, e}
