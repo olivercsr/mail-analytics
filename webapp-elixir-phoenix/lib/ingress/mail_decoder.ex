@@ -11,8 +11,8 @@ defmodule Ingress.MailDecoder do
     GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
-  def decode(pid, filepath, successfilepath) do
-    GenServer.cast(pid, {:decode, filepath, successfilepath})
+  def decode(pid, filepath, donefilepath) do
+    GenServer.cast(pid, {:decode, filepath, donefilepath})
   end
 
   # Server

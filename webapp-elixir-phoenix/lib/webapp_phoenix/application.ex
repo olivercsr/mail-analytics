@@ -17,23 +17,36 @@ defmodule WebappPhoenix.Application do
       # {WebappPhoenix.Worker, arg},
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
+
       {Ingress.AttachmentDecoder,
         name: AttachmentDecoder,
+        # basepath: "./mails",
+        # attachmentspath: "attachments/new",
       },
+      Supervisor.child_spec({Ingress.FileCollector,
+        name: AttachmentFileCollector,
+        interval_seconds: 13,
+        basepath: "./mails",
+        newpath: "attachments/new",
+        pendingpath: "attachments/pending",
+        donepath: "attachments/done",
+        action: &Ingress.AttachmentDecoder.decode(AttachmentDecoder, &1, &2)
+      }, id: :attachment_file_collector),
+
       {Ingress.MailDecoder,
         name: MailDecoder,
         basepath: "./mails",
         attachmentspath: "attachments/new",
       },
-      {Ingress.FileCollector,
+      Supervisor.child_spec({Ingress.FileCollector,
         name: MailFileCollector,
-        interval_seconds: 10,
+        interval_seconds: 11,
         basepath: "./mails",
         newpath: "mails/new",
         pendingpath: "mails/pending",
         donepath: "mails/done",
         action: &Ingress.MailDecoder.decode(MailDecoder, &1, &2)
-      }
+      }, id: :mail_file_collector),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

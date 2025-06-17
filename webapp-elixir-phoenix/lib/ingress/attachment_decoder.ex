@@ -1,14 +1,16 @@
 defmodule Ingress.AttachmentDecoder do
   use GenServer
 
+  require MIME
+
   # Client
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
-  def decode(pid, attachment) do
-    GenServer.cast(pid, {:decode, attachment})
+  def decode(pid, filepath, donefilepath) do
+    GenServer.cast(pid, {:decode, filepath, donefilepath})
   end
 
   # Server
@@ -40,9 +42,8 @@ defmodule Ingress.AttachmentDecoder do
   end
 
   @impl true
-  def handle_cast({:decode, attachment}, state) do
-    # TODO: deocde attachment
-    # {:ok, decoded} = decode_transfer(attachment.transfer_encoding, attachment.data)
+  def handle_cast({:decode, attachmentfilepath, attachmentdonefilepath}, state) do
+    MIME.from_path(attachmentfilepath)
 
     # IO.inspect(decoded)
 
