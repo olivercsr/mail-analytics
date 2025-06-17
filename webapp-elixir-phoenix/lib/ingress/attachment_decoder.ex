@@ -2,6 +2,7 @@ defmodule Ingress.AttachmentDecoder do
   use GenServer
 
   require MIME
+  require StreamGzip
 
   # Client
 
@@ -28,11 +29,14 @@ defmodule Ingress.AttachmentDecoder do
   #   res
   # end
 
-  defp decode_content(data, "application/gzip") do
+  defp decode_content(stream, "application/gzip") do
     IO.puts("============================================ gzip")
-    # TODO: uncompress data
-    
-    {:ok, <<>>}
+
+    decoded = stream
+      |> StreamGzip.gunzip()
+      # |> :binary.list_to_bin()
+
+    {:ok, decoded}
   end
 
   # defp decode_charset(data, :"us-ascii") do
@@ -47,10 +51,15 @@ defmodule Ingress.AttachmentDecoder do
   @impl true
   def handle_cast({:decode, attachmentfilepath, attachmentdonefilepath}, state) do
     mime_type = MIME.from_path(attachmentfilepath)
-    {:ok, filecontents} = File.read(attachmentfilepath)
-    {:ok, decoded} = filecontents |> decode_content(mime_type)
-
-    # IO.inspect(decoded)
+    filestream = File.stream!(attachmentfilepath)
+    {:ok, decoded} = filestream |> decode_content(mime_type)
+    destdir = Path.dirname(attachmentdonefilepath)
+    destfile = Path.basename(attachmentdonefilepath, Path.extname(attachmentdonefilepath))
+    destpath = Path.absname("#{destdir}/#{destfile}")
+    decoded
+    |> Stream.into(File.stream!(destpath))
+    |> Stream.run()
+    :ok = File.rm(attachmentfilepath)
 
     {:noreply, state}
   end
