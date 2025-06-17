@@ -69,7 +69,7 @@ defmodule Ingress.FileCollector do
     donepath = Path.absname("#{basepath}/#{state.opts[:donepath]}")
     file_action = state.opts[:action]
 
-    Logger.debug([message: "running file collector", name: state.opts[:name], state: state])
+    Logger.debug([module: __MODULE__, message: "running file collector", name: state.opts[:name], state: state])
 
     action_results = Path.wildcard("#{newpath}/**/*")
       |> Enum.map(fn file ->
