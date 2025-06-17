@@ -28,13 +28,16 @@ defmodule Ingress.AttachmentDecoder do
   #   res
   # end
 
-  defp decode_content(:"application/gzip", data) do
+  defp decode_content(data, "application/gzip") do
+    IO.puts("============================================ gzip")
     # TODO: uncompress data
+    
+    {:ok, <<>>}
   end
 
-  defp decode_charset(:"us-ascii", data) do
-    # TODO: convert to utf8
-  end
+  # defp decode_charset(data, :"us-ascii") do
+  #   # TODO: convert to utf8
+  # end
 
   @impl true
   def init(opts) do
@@ -43,7 +46,9 @@ defmodule Ingress.AttachmentDecoder do
 
   @impl true
   def handle_cast({:decode, attachmentfilepath, attachmentdonefilepath}, state) do
-    MIME.from_path(attachmentfilepath)
+    mime_type = MIME.from_path(attachmentfilepath)
+    {:ok, filecontents} = File.read(attachmentfilepath)
+    {:ok, decoded} = filecontents |> decode_content(mime_type)
 
     # IO.inspect(decoded)
 

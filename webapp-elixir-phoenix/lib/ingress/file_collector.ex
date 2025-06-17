@@ -31,17 +31,20 @@ defmodule Ingress.FileCollector do
   defp file_processable?(filestat) do
     with {:ok, mtime} <- DateTime.from_unix(filestat.mtime),
       {:ok, now} <- DateTime.now("Etc/UTC"),
-      threshold_time <- DateTime.add(now, -5, :minute) do
+      threshold_time <- DateTime.add(now, -1, :minute) do
       {:ok, DateTime.before?(mtime, threshold_time)}
     end
   end
 
-  defp process_file(filepath, filestat, donefilepath, action) do
-    Logger.debug([module: __MODULE__, message: "process_file start", file: filepath, donefilepath: donefilepath])
+  defp process_file(filepath, filestat, pendingfiledir, pendingfilepath, donefiledir, donefilepath, action) do
+    Logger.debug([module: __MODULE__, message: "process_file start", file: filepath, pendingfilepath: pendingfilepath, donefilepath: donefilepath])
     case file_processable?(filestat) do
       {:ok, true} ->
+        :ok = File.mkdir_p(pendingfiledir)
+        :ok = File.mkdir_p(donefiledir)
+        :ok = File.rename(filepath, pendingfilepath)
         action
-          && action.(filepath, donefilepath)
+          && action.(pendingfilepath, donefilepath)
           || :ignore
       {:ok, false} -> :ignore
     end |> case do
@@ -100,10 +103,7 @@ defmodule Ingress.FileCollector do
                 donefiledir = Path.absname("#{donepath}/#{filedir}"),
                 donefilepath = Path.absname("#{donepath}/#{filepath}") do
                 # IO.inspect({file, filepath, filedir, pendingfiledir, pendingfilepath, donefiledir, donefilepath})
-                :ok = File.mkdir_p(pendingfiledir)
-                :ok = File.rename(file, pendingfilepath)
-                :ok = File.mkdir_p(donefiledir)
-                process_file(pendingfilepath, filestat, donefilepath, file_action)
+                process_file(file, filestat, pendingfiledir, pendingfilepath, donefiledir, donefilepath, file_action)
               end
             rescue
               e -> {file, {:error, e}}
