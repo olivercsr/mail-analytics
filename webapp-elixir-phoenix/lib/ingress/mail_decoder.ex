@@ -11,8 +11,8 @@ defmodule Ingress.MailDecoder do
     GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
-  def decode(pid, filepath, donefilepath) do
-    GenServer.cast(pid, {:decode, filepath, donefilepath})
+  def decode(pid, filepath, donefilepath, filesubdir) do
+    GenServer.cast(pid, {:decode, filepath, donefilepath, filesubdir})
   end
 
   # Server
@@ -95,7 +95,7 @@ defmodule Ingress.MailDecoder do
   end
 
   @impl true
-  def handle_cast({:decode, mailfilepath, maildonefilepath}, state) do
+  def handle_cast({:decode, mailfilepath, maildonefilepath, _filesubdir}, state) do
     Logger.debug([module: __MODULE__, message: "MailDecoder.decode start", mailfilepath: mailfilepath, maildonefilepath: maildonefilepath])
 
     basepath = Path.absname(state.opts[:basepath])

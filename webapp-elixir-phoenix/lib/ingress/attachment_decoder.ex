@@ -12,8 +12,8 @@ defmodule Ingress.AttachmentDecoder do
     GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
-  def decode(pid, filepath, donefilepath) do
-    GenServer.cast(pid, {:decode, filepath, donefilepath})
+  def decode(pid, filepath, donefilepath, filesubdir) do
+    GenServer.cast(pid, {:decode, filepath, donefilepath, filesubdir})
   end
 
   # Server
@@ -57,15 +57,16 @@ defmodule Ingress.AttachmentDecoder do
   end
 
   @impl true
-  def handle_cast({:decode, filepath, donefilepath}, state) do
+  def handle_cast({:decode, filepath, donefilepath, filesubdir}, state) do
     Logger.debug([module: __MODULE__, message: "AttachmentsDecoder.decode start", filepath: filepath, donefilepath: donefilepath])
 
     basepath = Path.absname(state.opts[:basepath])
-    reportsdir = Path.absname("#{basepath}/#{state.opts[:dmarcreportsdir]}")
+    reportsdir = Path.absname("#{basepath}/#{state.opts[:dmarcreportsdir]}/#{filesubdir}")
 
     mime_type = MIME.from_path(filepath)
       |> String.to_atom()
 
+    :ok = File.mkdir_p(reportsdir)
     :ok = decode_attachment(filepath, reportsdir, mime_type)
 
     :ok = File.rename(filepath, donefilepath)

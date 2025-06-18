@@ -30,7 +30,7 @@ defmodule WebappPhoenix.Application do
         newpath: "attachments/new",
         pendingpath: "attachments/pending",
         donepath: "attachments/done",
-        action: &Ingress.AttachmentDecoder.decode(AttachmentDecoder, &1, &2)
+        action: &Ingress.AttachmentDecoder.decode(AttachmentDecoder, &1, &2, &3)
       }, id: :attachment_file_collector),
 
       {Ingress.MailDecoder,
@@ -45,7 +45,7 @@ defmodule WebappPhoenix.Application do
         newpath: "mails/new",
         pendingpath: "mails/pending",
         donepath: "mails/done",
-        action: &Ingress.MailDecoder.decode(MailDecoder, &1, &2)
+        action: &Ingress.MailDecoder.decode(MailDecoder, &1, &2, &3)
       }, id: :mail_file_collector),
     ]
 
