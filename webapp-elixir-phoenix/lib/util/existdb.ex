@@ -1,4 +1,4 @@
-defmodule WebappPhoenix.ExistDb do
+defmodule Util.ExistDb do
 
   require Logger
   require Finch
