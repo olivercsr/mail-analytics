@@ -95,11 +95,12 @@ defmodule Ingress.MailDecoder do
   end
 
   @impl true
-  def handle_cast({:decode, mailfilepath, maildonefilepath}, state) do
-    Logger.debug([module: __MODULE__, message: "MailDecoder.decode start", mailfilepath: mailfilepath, maildonefilepath: maildonefilepath])
+  def handle_cast({:decode, mailfilepath, maildonefiledir}, state) do
+    Logger.debug([module: __MODULE__, message: "MailDecoder.decode start", mailfilepath: mailfilepath, maildonefiledir: maildonefiledir])
 
     basepath = Path.absname(state.opts[:basepath])
     attachmentpath = Path.absname("#{basepath}/#{state.opts[:attachmentspath]}")
+    maildonefilepath = "#{maildonefiledir}/#{Path.basename(mailfilepath)}"
 
     with {:ok, file_contents} <- File.read(mailfilepath),
       mail_msg <- Mail.parse(file_contents) do
@@ -116,16 +117,6 @@ defmodule Ingress.MailDecoder do
             e -> {:error, attachmentfilename, e}
           end
         end)
-      # attachments = find_attachments([mail_msg])
-      #   |> Enum.map(&to_attachment/1)
-        # |> Enum.map(&Ingress.AttachmentProcessor.process(AttachmentProcessor, &1))
-      # case Enum.all?(submit_states, fn state -> state == :ok end) do
-      #   true -> :ok
-      #   false -> :error
-      # end
-      # IO.inspect(attachments)
-
-      # Enum.map(attachments, &Ingress.AttachmentDecoder.decode(AttachmentDecoder, &1))
 
       Logger.debug([module: __MODULE__, message: "MailDecoder.decode done", results: results])
 
