@@ -36,7 +36,7 @@ defmodule Ingress.FileCollector do
     end
   end
 
-  defp process_file(filepath, filestat, pendingfiledir, pendingfilepath, donefiledir, action) do
+  defp process_file(filepath, filestat, pendingfiledir, pendingfilepath, donefiledir, donefilepath, action) do
     Logger.debug([module: __MODULE__, message: "process_file start", file: filepath, pendingfilepath: pendingfilepath])
     case file_processable?(filestat) do
       {:ok, true} ->
@@ -44,7 +44,7 @@ defmodule Ingress.FileCollector do
         :ok = File.mkdir_p(donefiledir)
         :ok = File.rename(filepath, pendingfilepath)
         action
-          && action.(pendingfilepath, donefiledir)
+          && action.(pendingfilepath, donefilepath)
           || :ignore
       {:ok, false} -> :ignore
     end |> case do
@@ -100,8 +100,9 @@ defmodule Ingress.FileCollector do
                 # filename = Path.basename(filepath),
                 pendingfiledir = Path.absname("#{pendingpath}/#{filedir}"),
                 pendingfilepath = Path.absname("#{pendingpath}/#{filepath}"),
-                donefiledir = Path.absname("#{donepath}/#{filedir}") do
-                process_file(file, filestat, pendingfiledir, pendingfilepath, donefiledir, file_action)
+                donefiledir = Path.absname("#{donepath}/#{filedir}"),
+                donefilepath = Path.absname("#{donepath}/#{filepath}") do
+                process_file(file, filestat, pendingfiledir, pendingfilepath, donefiledir, donefilepath, file_action)
               end
             rescue
               e -> {file, {:error, e}}

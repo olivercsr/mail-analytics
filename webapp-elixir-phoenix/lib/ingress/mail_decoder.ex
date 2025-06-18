@@ -95,12 +95,11 @@ defmodule Ingress.MailDecoder do
   end
 
   @impl true
-  def handle_cast({:decode, mailfilepath, maildonefiledir}, state) do
-    Logger.debug([module: __MODULE__, message: "MailDecoder.decode start", mailfilepath: mailfilepath, maildonefiledir: maildonefiledir])
+  def handle_cast({:decode, mailfilepath, maildonefilepath}, state) do
+    Logger.debug([module: __MODULE__, message: "MailDecoder.decode start", mailfilepath: mailfilepath, maildonefilepath: maildonefilepath])
 
     basepath = Path.absname(state.opts[:basepath])
-    attachmentpath = Path.absname("#{basepath}/#{state.opts[:attachmentspath]}")
-    maildonefilepath = "#{maildonefiledir}/#{Path.basename(mailfilepath)}"
+    attachmentsdir = Path.absname("#{basepath}/#{state.opts[:attachmentsdir]}")
 
     with {:ok, file_contents} <- File.read(mailfilepath),
       mail_msg <- Mail.parse(file_contents) do
@@ -108,9 +107,9 @@ defmodule Ingress.MailDecoder do
       results = Mail.get_attachments(mail_msg, :attachment)
         |> Enum.map(fn {attachmentfilename, attachmentdata} ->
           try do
-            attachmentdir = Path.absname("#{attachmentpath}/#{recipient}")
-            :ok = File.mkdir_p(attachmentdir)
-            attachmentfilepath = Path.absname("#{attachmentdir}/#{attachmentfilename}")
+            destdir = Path.absname("#{attachmentsdir}/#{recipient}")
+            :ok = File.mkdir_p(destdir)
+            attachmentfilepath = Path.absname("#{destdir}/#{attachmentfilename}")
             :ok = File.write(attachmentfilepath, attachmentdata, [:write])
             {:ok, attachmentfilename}
           rescue
@@ -118,9 +117,9 @@ defmodule Ingress.MailDecoder do
           end
         end)
 
-      Logger.debug([module: __MODULE__, message: "MailDecoder.decode done", results: results])
+      :ok = File.rename(mailfilepath, maildonefilepath)
 
-      File.rename(mailfilepath, maildonefilepath)
+      Logger.debug([module: __MODULE__, message: "MailDecoder.decode done", results: results])
     end
 
     {:noreply, state}

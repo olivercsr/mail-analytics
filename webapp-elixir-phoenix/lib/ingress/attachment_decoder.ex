@@ -1,6 +1,7 @@
 defmodule Ingress.AttachmentDecoder do
   use GenServer
 
+  require Logger
   require MIME
   require StreamGzip
   require Zstream
@@ -17,26 +18,26 @@ defmodule Ingress.AttachmentDecoder do
 
   # Server
 
-  defp decode_attachment(filepath, donefiledir, :"application/gzip") do
+  defp decode_attachment(filepath, reportsdir, :"application/gzip") do
     donefilename = Path.basename(filepath, Path.extname(filepath))
-    donefilepath = Path.absname("#{donefiledir}/#{donefilename}")
+    reportpath = Path.absname("#{reportsdir}/#{donefilename}")
 
     :ok = File.stream!(filepath)
       |> StreamGzip.gunzip()
-      |> Stream.into(File.stream!(donefilepath))
+      |> Stream.into(File.stream!(reportpath))
       |> Stream.run()
 
     :ok
   end
 
-  defp decode_attachment(filepath, donefiledir, :"application/zip") do
+  defp decode_attachment(filepath, reportsdir, :"application/zip") do
     %{} = File.stream!(filepath)
       |> Zstream.unzip()
       |> Enum.reduce(%{}, fn
         {:entry, %Zstream.Entry{name: filename}}, state ->
-          donefilepath = Path.absname("#{donefiledir}/#{filename}")
+          reportpath = Path.absname("#{reportsdir}/#{filename}")
           # IO.puts("entry #{filename} #{donefilepath}")
-          Map.merge(state, %{filename: filename, stream: File.stream!(donefilepath)})
+          Map.merge(state, %{filename: filename, stream: File.stream!(reportpath)})
         {:data, :eof}, %{:stream => stream} ->
           # IO.puts("eof")
           Stream.run(stream)
@@ -56,13 +57,20 @@ defmodule Ingress.AttachmentDecoder do
   end
 
   @impl true
-  def handle_cast({:decode, filepath, donefiledir}, state) do
+  def handle_cast({:decode, filepath, donefilepath}, state) do
+    Logger.debug([module: __MODULE__, message: "AttachmentsDecoder.decode start", filepath: filepath, donefilepath: donefilepath])
+
+    basepath = Path.absname(state.opts[:basepath])
+    reportsdir = Path.absname("#{basepath}/#{state.opts[:dmarcreportsdir]}")
+
     mime_type = MIME.from_path(filepath)
       |> String.to_atom()
 
-    :ok = decode_attachment(filepath, donefiledir, mime_type)
+    :ok = decode_attachment(filepath, reportsdir, mime_type)
 
-    :ok = File.rm(filepath)
+    :ok = File.rename(filepath, donefilepath)
+
+    Logger.debug([module: __MODULE__, message: "AttachmentsDecoder.decode done"])
 
     {:noreply, state}
   end
