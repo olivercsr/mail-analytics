@@ -25,7 +25,11 @@ defmodule Util.ExistDb do
     Logger.info(EEx.eval_string("query_name: <%= query_name %>", [query_name: query_name]))
     Logger.info("query: #{xml_query}")
 
-    req = Req.new(url: "http://localhost:8080/exist/rest/dmarc", headers: %{"content-type" => ["text/xml"]}, body: xml_query)
+    req = Req.new(
+      url: "http://localhost:8080/exist/rest/dmarc",
+      headers: %{"content-type" => ["application/xml"]},
+      body: xml_query
+    )
     # IO.inspect(req)
 
     case Req.post(req, finch: DmarcFinchPool) do
@@ -38,8 +42,19 @@ defmodule Util.ExistDb do
     end
   end
 
-  def store() do
-    # Req.put()
+  def store(filename, report_stream) do
+    # TODO: make this entire request-making logic generic:
+    req = Req.new(
+      # TODO: url-encode filename?
+      url: "http://localhost:8080/exist/rest/dmarc/#{filename}",
+      auth: {:basic, %{user: "admin", password: ""}},
+      headers: %{"content-type" => ["application/xml"]},
+      body: report_stream
+    )
+    case Req.put(req, finch: DmarcFinchPool) do
+      {:ok, result} when result.status >= 200 and result.status < 300 ->
+        {:ok, result.body}
+    end
   end
 end
 
