@@ -5,7 +5,7 @@ defmodule Util.ExistDb do
   require Req
   import SweetXml
 
-  def _type_of_value(value) do
+  defp type_of_value(value) do
     # IO.inspect(value)
     cond do
       is_integer(value) -> "integer"
@@ -15,7 +15,7 @@ defmodule Util.ExistDb do
 
   def query(query_name, variables) do
     query = EEx.eval_file("priv/xqueries/#{query_name}.eex", [query_name: query_name])
-    variables = Enum.map(variables, fn {k, v} -> [key: k, type: _type_of_value(v), value: v] end)
+    variables = Enum.map(variables, fn {k, v} -> [key: k, type: type_of_value(v), value: v] end)
     xml_query = EEx.eval_file("priv/xqueries/container.eex", [query: query, variables: variables])
     # [
     #   [key: "wantedBegin", type: "integer", value: 1715689600],
