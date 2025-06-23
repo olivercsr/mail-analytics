@@ -53,6 +53,18 @@ defmodule WebappPhoenix.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: WebappPhoenix.Supervisor]
     Supervisor.start_link(children, opts)
+
+    # Finch http connection pool setup:
+    Finch.start_link(
+      name: DmarcFinchPool,
+      pools: %{
+        default: [
+          size: 100,
+          count: 10,
+          pool_max_idle_time: 60_000
+        ]
+      }
+    )
   end
 
   # Tell Phoenix to update the endpoint configuration

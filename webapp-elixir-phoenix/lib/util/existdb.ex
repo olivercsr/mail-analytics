@@ -28,17 +28,7 @@ defmodule Util.ExistDb do
     req = Req.new(url: "http://localhost:8080/exist/rest/dmarc", headers: %{"content-type" => ["text/xml"]}, body: xml_query)
     # IO.inspect(req)
 
-    Finch.start_link(
-      name: MyFinch,
-      pools: %{
-        default: [
-          size: 100,
-          count: 10,
-          pool_max_idle_time: 60_000
-        ]
-      }
-    )
-    case Req.post(req, finch: MyFinch) do
+    case Req.post(req, finch: DmarcFinchPool) do
       {:ok, result} when result.status >= 200 and result.status < 300 -> 
         {:ok, result.body |> xpath(~x"/")}
       {:ok, result} ->
@@ -46,6 +36,10 @@ defmodule Util.ExistDb do
       {:error, exception} ->
         {:error, exception}
     end
+  end
+
+  def store() do
+    # Req.put()
   end
 end
 
