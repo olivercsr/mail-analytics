@@ -5,6 +5,10 @@ defmodule Util.ExistDb do
   require Req
   import SweetXml
 
+  defmodule Config do
+    defstruct [:base_url, :user, :password]
+  end
+
   defp type_of_value(value) do
     # IO.inspect(value)
     cond do
@@ -13,7 +17,7 @@ defmodule Util.ExistDb do
     end
   end
 
-  def query(query_name, variables) do
+  def query(cfg, tenant, query_name, variables) do
     query = EEx.eval_file("priv/xqueries/#{query_name}.eex", [query_name: query_name])
     variables = Enum.map(variables, fn {k, v} -> [key: k, type: type_of_value(v), value: v] end)
     xml_query = EEx.eval_file("priv/xqueries/container.eex", [query: query, variables: variables])
@@ -26,7 +30,7 @@ defmodule Util.ExistDb do
     Logger.info("query: #{xml_query}")
 
     req = Req.new(
-      url: "http://localhost:8080/exist/rest/dmarc",
+      url: "#{cfg[:base_url]}/#{tenant}",
       headers: %{"content-type" => ["application/xml"]},
       body: xml_query
     )
@@ -42,12 +46,12 @@ defmodule Util.ExistDb do
     end
   end
 
-  def store(filename, report_stream) do
+  def store(cfg, tenant, filename, report_stream) do
     # TODO: make this entire request-making logic generic:
     req = Req.new(
       # TODO: url-encode filename?
-      url: "http://localhost:8080/exist/rest/dmarc/#{filename}",
-      auth: {:basic, %{user: "admin", password: ""}},
+      url: "#{cfg[:base_url]}/#{tenant}/#{filename}",
+      auth: {:basic, %{user: cfg[:user], password: cfg[:password]}},
       headers: %{"content-type" => ["application/xml"]},
       body: report_stream
     )

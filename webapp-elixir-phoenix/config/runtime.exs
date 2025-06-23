@@ -100,3 +100,9 @@ if config_env() == :prod do
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end
+
+config :webapp_phoenix, Util.ExistDb,
+  base_url: System.get_env("EXISTDB_URL"),
+  user: System.get_env("EXISTDB_USER"),
+  password: System.get_env("EXISTDB_PASSWORD")
+
