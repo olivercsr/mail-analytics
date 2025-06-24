@@ -58,7 +58,7 @@ defmodule Ingress.AttachmentDecoder do
 
   @impl true
   def handle_cast({:decode, filepath, donefilepath, filesubdir}, state) do
-    Logger.debug([module: __MODULE__, message: "AttachmentsDecoder.decode start", filepath: filepath, donefilepath: donefilepath])
+    Logger.debug([module: __MODULE__, message: "AttachmentsDecoder.decode start", filepath: filepath, donefilepath: donefilepath, filesubdir: filesubdir])
 
     basepath = Path.absname(state.opts[:basepath])
     reportsdir = Path.absname("#{basepath}/#{state.opts[:dmarcreportsdir]}/#{filesubdir}")

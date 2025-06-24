@@ -23,6 +23,19 @@ defmodule WebappPhoenix.Application do
         config: Application.get_env(:webapp_phoenix, Db.ExistDb.Config)
       },
 
+      {Ingress.DmarcImporter,
+        name: DmarcImporter,
+      },
+      Supervisor.child_spec({Ingress.FileCollector,
+        name: DmarcFileCollector,
+        interval_seconds: 17,
+        basepath: "./mails",
+        newpath: "dmarc/new",
+        pendingpath: "dmarc/pending",
+        donepath: "dmarc/done",
+        action: &Ingress.DmarcImporter.import_file(DmarcImporter, &1, &2, &3)
+      }, id: :dmarc_importer),
+
       {Ingress.AttachmentDecoder,
         name: AttachmentDecoder,
         basepath: "./mails",
