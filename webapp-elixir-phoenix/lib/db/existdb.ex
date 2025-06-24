@@ -1,4 +1,4 @@
-defmodule Util.ExistDb do
+defmodule Db.ExistDb do
 
   require Logger
   require Finch
