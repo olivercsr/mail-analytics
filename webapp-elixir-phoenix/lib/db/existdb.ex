@@ -44,7 +44,8 @@ defmodule Db.ExistDb do
   end
 
   @impl true
-  def handle_call({:query, tenant, query_name, variables}, _from, %{:config => config} = state) do
+  def handle_call({:query, tenant, query_name, variables}, _from, %{:config => config} = state)
+    when is_binary(tenant) and tenant != "" and tenant != nil do
     query = EEx.eval_file("priv/xqueries/#{query_name}.eex", [query_name: query_name])
     variables = Enum.map(variables, fn {k, v} -> [key: k, type: type_of_value(v), value: v] end)
     xml_query = EEx.eval_file("priv/xqueries/container.eex", [query: query, variables: variables])
@@ -73,7 +74,8 @@ defmodule Db.ExistDb do
     end
   end
 
-  def handle_cast({:store, tenant, filename, data_stream}, _from, %{:config => config} = state) do
+  def handle_cast({:store, tenant, filename, data_stream}, _from, %{:config => config} = state)
+    when is_binary(tenant) and tenant != "" and tenant != nil do
     # TODO: make this entire request-making logic generic:
     req = Req.new(
       # TODO: url-encode filename?
