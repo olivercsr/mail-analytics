@@ -18,8 +18,8 @@ defmodule WebappPhoenixWeb.QueryController do
     # TODO: handle parsing errors?
     {startts_int, ""} = Integer.parse(startts)
     {endts_int, ""} = Integer.parse(endts)
-    existdb_config = Application.get_env(:webapp_phoenix, Db.ExistDb)
-    case Db.ExistDb.query(existdb_config, "user123", "query_count", %{wantedBegin: startts_int, wantedEnd: endts_int}) do
+    # existdb_config = Application.get_env(:webapp_phoenix, Db.ExistDb)
+    case Db.ExistDb.query(Db.ExistDb, "user123", "query_count", %{wantedBegin: startts_int, wantedEnd: endts_int}) do
       {:ok, result} -> IO.inspect(result)
       {:error, error} -> IO.inspect(error)
     end

@@ -18,6 +18,11 @@ defmodule WebappPhoenix.Application do
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
 
+      {Db.ExistDb,
+        name: Db.ExistDb,
+        config: Application.get_env(:webapp_phoenix, Db.ExistDb.Config)
+      },
+
       {Ingress.AttachmentDecoder,
         name: AttachmentDecoder,
         basepath: "./mails",

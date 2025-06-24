@@ -1,4 +1,5 @@
 defmodule Db.ExistDb do
+  use GenServer
 
   require Logger
   require Finch
@@ -9,6 +10,31 @@ defmodule Db.ExistDb do
     defstruct [:base_url, :user, :password]
   end
 
+  # Client
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts, name: opts[:name])
+  end
+
+  def query(pid, tenant, query_name, variables) do
+    GenServer.call(pid, {:query, tenant, query_name, variables})
+  end
+
+  def store(pid, tenant, filename, data_stream) do
+    GenServer.call(pid, {:query, tenant, filename, data_stream})
+  end
+
+  # Server
+
+  @impl true
+  def init(opts) do
+    initial_state = %{config: opts[:config]}
+
+    Logger.info([module: __MODULE__, message: "ExistDb init", initial_state: initial_state])
+
+    {:ok, initial_state}
+  end
+
   defp type_of_value(value) do
     # IO.inspect(value)
     cond do
@@ -17,7 +43,8 @@ defmodule Db.ExistDb do
     end
   end
 
-  def query(cfg, tenant, query_name, variables) do
+  @impl true
+  def handle_call({:query, tenant, query_name, variables}, _from, %{:config => config} = state) do
     query = EEx.eval_file("priv/xqueries/#{query_name}.eex", [query_name: query_name])
     variables = Enum.map(variables, fn {k, v} -> [key: k, type: type_of_value(v), value: v] end)
     xml_query = EEx.eval_file("priv/xqueries/container.eex", [query: query, variables: variables])
@@ -26,11 +53,11 @@ defmodule Db.ExistDb do
     #   [key: "wantedEnd", type: "integer", value: 1742974400]
     # ]
 
-    Logger.info(EEx.eval_string("query_name: <%= query_name %>", [query_name: query_name]))
-    Logger.info("query: #{xml_query}")
+    # Logger.info(EEx.eval_string("query_name: <%= query_name %>", [query_name: query_name]))
+    # Logger.info("query: #{xml_query}")
 
     req = Req.new(
-      url: "#{cfg[:base_url]}/#{tenant}",
+      url: "#{config.base_url}/#{tenant}",
       headers: %{"content-type" => ["application/xml"]},
       body: xml_query
     )
@@ -38,26 +65,26 @@ defmodule Db.ExistDb do
 
     case Req.post(req, finch: DmarcFinchPool) do
       {:ok, result} when result.status >= 200 and result.status < 300 -> 
-        {:ok, result.body |> xpath(~x"/")}
+        {:reply, {:ok, result.body |> xpath(~x"/")}, state}
       {:ok, result} ->
-        {:error, "unsuccessful http response code: #{result.status} - #{result.body}"}
+        {:reply, {:error, "unsuccessful http response code: #{result.status} - #{result.body}"}, state}
       {:error, exception} ->
-        {:error, exception}
+        {:reply, {:error, exception}, state}
     end
   end
 
-  def store(cfg, tenant, filename, report_stream) do
+  def handle_cast({:store, tenant, filename, data_stream}, _from, %{:config => config} = state) do
     # TODO: make this entire request-making logic generic:
     req = Req.new(
       # TODO: url-encode filename?
-      url: "#{cfg[:base_url]}/#{tenant}/#{filename}",
-      auth: {:basic, %{user: cfg[:user], password: cfg[:password]}},
+      url: "#{config.base_url}/#{tenant}/#{filename}",
+      auth: {:basic, %{user: config.user, password: config.password}},
       headers: %{"content-type" => ["application/xml"]},
-      body: report_stream
+      body: data_stream
     )
     case Req.put(req, finch: DmarcFinchPool) do
       {:ok, result} when result.status >= 200 and result.status < 300 ->
-        {:ok, result.body}
+        {:reply, result.body, state}
     end
   end
 end
