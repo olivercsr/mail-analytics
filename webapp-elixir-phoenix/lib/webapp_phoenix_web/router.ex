@@ -15,8 +15,12 @@ defmodule WebappPhoenixWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated do
+    plug WebappPhoenixWeb.Plugs.Auth, "remote-user"
+  end
+
   scope "/", WebappPhoenixWeb do
-    pipe_through :browser
+    pipe_through [:browser, :authenticated]
 
     get "/", PageController, :home
     get "/query/count/from/:start/until/:end", QueryController, :count

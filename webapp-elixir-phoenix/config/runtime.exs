@@ -101,6 +101,8 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end
 
+config :webapp_phoenix, :env, config_env()
+
 config :webapp_phoenix, Db.ExistDb.Config, %Db.ExistDb.Config{
   base_url: System.get_env("EXISTDB_URL"),
   user: System.get_env("EXISTDB_USER"),

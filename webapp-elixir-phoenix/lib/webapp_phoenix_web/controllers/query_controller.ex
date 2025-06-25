@@ -19,7 +19,9 @@ defmodule WebappPhoenixWeb.QueryController do
     {startts_int, ""} = Integer.parse(startts)
     {endts_int, ""} = Integer.parse(endts)
     # existdb_config = Application.get_env(:webapp_phoenix, Db.ExistDb)
-    [tenant] = Plug.Conn.get_req_header(conn, "remote-user") |> Enum.map(&String.trim/1)
+    # [tenant] = Plug.Conn.get_req_header(conn, "remote-user") # TODO: lookup mail addresses
+    #   |> Enum.map(&String.trim/1)
+    tenant = conn.assigns.authuser
     case Db.ExistDb.query(Db.ExistDb, tenant, "query_count", %{wantedBegin: startts_int, wantedEnd: endts_int}) do
       {:ok, result} -> IO.inspect(result)
       {:error, error} -> IO.inspect(error)
