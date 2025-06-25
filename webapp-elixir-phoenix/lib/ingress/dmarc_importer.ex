@@ -21,10 +21,14 @@ defmodule Ingress.DmarcImporter do
   end
 
   @impl true
-  def handle_cast({:import, filepath, donefilepath, _filesubdir}, state) do
+  def handle_cast({:import, filepath, donefilepath, filesubdir}, state) do
     Logger.debug([module: __MODULE__, message: "DmarcImporter.import start", filepath: filepath, donefilepath: donefilepath])
 
-    # TODO: implement
+    filename = Path.basename(filepath)
+    stream = File.stream!(filepath)
+    {:ok, _} = Db.ExistDb.store(Db.ExistDb, filesubdir, filename, stream)
+
+    :ok = File.rename(filepath, donefilepath)
 
     Logger.debug([module: __MODULE__, message: "DmarcImporter.import done"])
 
