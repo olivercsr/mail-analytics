@@ -22,12 +22,14 @@ defmodule WebappPhoenixWeb.QueryController do
     # [tenant] = Plug.Conn.get_req_header(conn, "remote-user") # TODO: lookup mail addresses
     #   |> Enum.map(&String.trim/1)
     tenant = conn.assigns.authuser
-    case Db.ExistDb.query(Db.ExistDb, tenant, "query_count", %{wantedBegin: startts_int, wantedEnd: endts_int}) do
-      {:ok, result} -> IO.inspect(result)
-      {:error, error} -> IO.inspect(error)
-    end
+    {:ok, results} = Db.ExistDb.query(Db.ExistDb,
+      tenant,
+      "query_count",
+      %{wantedBegin: startts_int, wantedEnd: endts_int}
+    )
 
-    render(conn, :count, startts: startts, endts: endts)
+    conn
+      |> render(:count, startts: startts, endts: endts, results: results)
   end
 end
 
