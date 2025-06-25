@@ -29,12 +29,23 @@ defmodule WebappPhoenix.Application do
       Supervisor.child_spec({Ingress.FileCollector,
         name: DmarcFileCollector,
         interval_seconds: 17,
+        minfileage: 1,
         basepath: "./mails",
         newpath: "dmarc/new",
         pendingpath: "dmarc/pending",
         donepath: "dmarc/done",
         action: &Ingress.DmarcImporter.import_file(DmarcImporter, &1, &2, &3)
       }, id: :dmarc_importer),
+      Supervisor.child_spec({Ingress.FileCollector,
+        name: DmarcFilePendingChecker,
+        interval_seconds: 51,
+        minfileage: 5,
+        basepath: "./mails",
+        newpath: "dmarc/pending",
+        pendingpath: "dmarc/new",
+        donepath: "dmarc/new",
+        action: fn _ -> :ok end
+      }, id: :dmarc_file_pending_checker),
 
       {Ingress.AttachmentDecoder,
         name: AttachmentDecoder,
@@ -44,12 +55,23 @@ defmodule WebappPhoenix.Application do
       Supervisor.child_spec({Ingress.FileCollector,
         name: AttachmentFileCollector,
         interval_seconds: 13,
+        minfileage: 1,
         basepath: "./mails",
         newpath: "attachments/new",
         pendingpath: "attachments/pending",
         donepath: "attachments/done",
         action: &Ingress.AttachmentDecoder.decode(AttachmentDecoder, &1, &2, &3)
       }, id: :attachment_file_collector),
+      Supervisor.child_spec({Ingress.FileCollector,
+        name: AttachmentFilePendingChecker,
+        interval_seconds: 53,
+        minfileage: 5,
+        basepath: "./mails",
+        newpath: "attachments/pending",
+        pendingpath: "attachments/new",
+        donepath: "attachments/new",
+        action: fn _ -> :ok end
+      }, id: :attachment_file_pending_checker),
 
       {Ingress.MailDecoder,
         name: MailDecoder,
@@ -59,12 +81,23 @@ defmodule WebappPhoenix.Application do
       Supervisor.child_spec({Ingress.FileCollector,
         name: MailFileCollector,
         interval_seconds: 11,
+        minfileage: 1,
         basepath: "./mails",
         newpath: "mails/new",
         pendingpath: "mails/pending",
         donepath: "mails/done",
         action: &Ingress.MailDecoder.decode(MailDecoder, &1, &2, &3)
       }, id: :mail_file_collector),
+      Supervisor.child_spec({Ingress.FileCollector,
+        name: MailFilePendingChecker,
+        interval_seconds: 57,
+        minfileage: 5,
+        basepath: "./mails",
+        newpath: "mails/pending",
+        pendingpath: "mails/new",
+        donepath: "mails/new",
+        action: fn _ -> :ok end
+      }, id: :mail_file_pending_checker),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -6,6 +6,7 @@ defmodule Ingress.FileCollector do
   require File
 
   def default_interval, do: 10
+  def default_minfileage, do: 1
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: opts[:name])
@@ -28,17 +29,17 @@ defmodule Ingress.FileCollector do
     {:noreply, state}
   end
 
-  defp file_processable?(filestat) do
+  defp file_processable?(filestat, minfileage) do
     with {:ok, mtime} <- DateTime.from_unix(filestat.mtime),
       {:ok, now} <- DateTime.now("Etc/UTC"),
-      threshold_time <- DateTime.add(now, -1, :minute) do
+      threshold_time <- DateTime.add(now, -minfileage, :minute) do
       {:ok, DateTime.before?(mtime, threshold_time)}
     end
   end
 
-  defp process_file(filedir, filepath, filestat, pendingfiledir, pendingfilepath, donefiledir, donefilepath, action) do
+  defp process_file(filedir, filepath, filestat, pendingfiledir, pendingfilepath, donefiledir, donefilepath, minfileage, action) do
     Logger.debug([module: __MODULE__, message: "process_file start", filedir: filedir, file: filepath, pendingfilepath: pendingfilepath])
-    case file_processable?(filestat) do
+    case file_processable?(filestat, minfileage) do
       {:ok, true} ->
         :ok = File.mkdir_p(pendingfiledir)
         :ok = File.mkdir_p(donefiledir)
@@ -65,6 +66,7 @@ defmodule Ingress.FileCollector do
   def handle_info(:work, state) do
     # wd = File.cwd!()
     interval = state.opts[:interval_seconds] || default_interval()
+    minfileage = state.opts[:minfileage] || default_minfileage()
     basepath = Path.absname(state.opts[:basepath])
     newpath = Path.absname("#{basepath}/#{state.opts[:newpath]}")
     newpathlen = String.length(newpath)
@@ -102,7 +104,7 @@ defmodule Ingress.FileCollector do
                 pendingfilepath = Path.absname("#{pendingpath}/#{filepath}"),
                 donefiledir = Path.absname("#{donepath}/#{filedir}"),
                 donefilepath = Path.absname("#{donepath}/#{filepath}") do
-                process_file(filedir, file, filestat, pendingfiledir, pendingfilepath, donefiledir, donefilepath, file_action)
+                process_file(filedir, file, filestat, pendingfiledir, pendingfilepath, donefiledir, donefilepath, minfileage, file_action)
               end
             rescue
               e -> {file, {:error, e}}
