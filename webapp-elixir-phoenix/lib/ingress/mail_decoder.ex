@@ -89,18 +89,18 @@ defmodule Ingress.MailDecoder do
   #   dest
   # end
 
-  defp get_tenant_from_recipient(recipient, state) do
-    re = state.recipient_regex
-    [_all, tenant] = Regex.run(re, recipient)
-    case tenant |> String.trim() do
-      tenant when is_binary(tenant) and tenant != "" and tenant != nil -> tenant
-    end
-  end
+  # defp get_tenant_from_recipient(recipient, state) do
+  #   re = state.recipient_regex
+  #   [_all, tenant] = Regex.run(re, recipient)
+  #   case tenant |> String.trim() do
+  #     tenant when is_binary(tenant) and tenant != "" and tenant != nil -> tenant
+  #   end
+  # end
 
   @impl true
   def init(opts) do
     {:ok, %{
-      recipient_regex: ~r"^([^@\s]+)@.+$",
+      # recipient_regex: ~r"^([^@\s]+)@.+$",
       opts: opts
     }}
   end
@@ -114,9 +114,9 @@ defmodule Ingress.MailDecoder do
 
     with {:ok, file_contents} <- File.read(mailfilepath),
       mail_msg <- Mail.parse(file_contents) do
-      tenant = Mail.get_to(mail_msg)
-        |> Enum.at(0)
-        |> get_tenant_from_recipient(state)
+      [tenant] = Mail.get_to(mail_msg) # TODO: allow for multiple recipients and then search for the one that belongs to us
+        # |> Enum.at(0)
+        # |> get_tenant_from_recipient(state)
       results = Mail.get_attachments(mail_msg, :attachment)
         |> Enum.map(fn {attachmentfilename, attachmentdata} ->
           try do
