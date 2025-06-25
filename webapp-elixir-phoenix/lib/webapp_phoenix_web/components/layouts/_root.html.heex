@@ -7,12 +7,11 @@
     <.live_title default="WebappPhoenix" suffix=" · Phoenix Framework">
       {assigns[:page_title]}
     </.live_title>
-    <link href="/assets/styles.css" rel="stylesheet">
-    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"}/>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body>
+  <body class="bg-white">
     {@inner_content}
   </body>
 </html>
