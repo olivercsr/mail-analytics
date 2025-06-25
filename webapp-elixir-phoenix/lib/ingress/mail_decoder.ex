@@ -89,9 +89,18 @@ defmodule Ingress.MailDecoder do
   #   dest
   # end
 
+  defp get_tenant_from_recipient(recipient, state) do
+    re = state.recipient_regex
+    [_all, tenant] = Regex.run(re, recipient)
+    tenant
+  end
+
   @impl true
   def init(opts) do
-    {:ok, %{opts: opts}}
+    {:ok, %{
+      recipient_regex: ~r"^([^@\s]+)@.+$",
+      opts: opts
+    }}
   end
 
   @impl true
@@ -103,11 +112,13 @@ defmodule Ingress.MailDecoder do
 
     with {:ok, file_contents} <- File.read(mailfilepath),
       mail_msg <- Mail.parse(file_contents) do
-      [recipient | _] = Mail.get_to(mail_msg)
+      tenant = Mail.get_to(mail_msg)
+        |> Enum.at(0)
+        |> get_tenant_from_recipient(state)
       results = Mail.get_attachments(mail_msg, :attachment)
         |> Enum.map(fn {attachmentfilename, attachmentdata} ->
           try do
-            destdir = Path.absname("#{attachmentsdir}/#{recipient}")
+            destdir = Path.absname("#{attachmentsdir}/#{tenant}")
             :ok = File.mkdir_p(destdir)
             attachmentfilepath = Path.absname("#{destdir}/#{attachmentfilename}")
             :ok = File.write(attachmentfilepath, attachmentdata, [:write])
