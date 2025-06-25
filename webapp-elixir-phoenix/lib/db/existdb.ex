@@ -21,7 +21,7 @@ defmodule Db.ExistDb do
   end
 
   def store(pid, tenant, filename, data_stream) do
-    GenServer.call(pid, {:query, tenant, filename, data_stream})
+    GenServer.call(pid, {:store, tenant, filename, data_stream})
   end
 
   # Server
@@ -74,19 +74,19 @@ defmodule Db.ExistDb do
     end
   end
 
-  def handle_cast({:store, tenant, filename, data_stream}, _from, %{:config => config} = state)
+  def handle_call({:store, tenant, filename, data_stream}, _from, %{:config => config} = state)
     when is_binary(tenant) and tenant != "" and tenant != nil do
     # TODO: make this entire request-making logic generic:
     req = Req.new(
       # TODO: url-encode filename?
       url: "#{config.base_url}/#{tenant}/#{filename}",
-      auth: {:basic, %{user: config.user, password: config.password}},
+      auth: {:basic, "#{config.user}:#{config.password}"},
       headers: %{"content-type" => ["application/xml"]},
       body: data_stream
     )
     case Req.put(req, finch: DmarcFinchPool) do
       {:ok, result} when result.status >= 200 and result.status < 300 ->
-        {:reply, result.body, state}
+        {:reply, {:ok, result.body}, state}
     end
   end
 end
