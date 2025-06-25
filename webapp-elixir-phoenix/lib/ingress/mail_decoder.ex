@@ -92,7 +92,9 @@ defmodule Ingress.MailDecoder do
   defp get_tenant_from_recipient(recipient, state) do
     re = state.recipient_regex
     [_all, tenant] = Regex.run(re, recipient)
-    tenant
+    case tenant |> String.trim() do
+      tenant when is_binary(tenant) and tenant != "" and tenant != nil -> tenant
+    end
   end
 
   @impl true
