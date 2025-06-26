@@ -73,7 +73,8 @@ defmodule WebappPhoenix.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "npm.install": ["cmd cd assets && npm install"],
+      "assets.setup": ["npm.install", "tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind webapp_phoenix", "esbuild webapp_phoenix"],
       "assets.deploy": [
         "tailwind webapp_phoenix --minify",
