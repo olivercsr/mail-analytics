@@ -47,8 +47,12 @@ defmodule Db.ExistDb do
   def handle_call({:query, tenant, query_name, variables}, _from, %{:config => config} = state)
     when is_binary(tenant) and tenant != "" and tenant != nil do
     query = EEx.eval_file("priv/xqueries/#{query_name}.eex", [query_name: query_name])
-    variables = Enum.map(variables, fn {k, v} -> [key: k, type: type_of_value(v), value: v] end)
+    variables = Enum.map(
+      Map.put(variables, :tenant, tenant),
+      fn {k, v} -> [key: k, type: type_of_value(v), value: v] end
+    )
     xml_query = EEx.eval_file("priv/xqueries/container.eex", [query: query, variables: variables])
+    # IO.puts(xml_query)
     # [
     #   [key: "wantedBegin", type: "integer", value: 1715689600],
     #   [key: "wantedEnd", type: "integer", value: 1742974400]
