@@ -1,6 +1,8 @@
 defmodule WebappPhoenixWeb.QueryController do
   use WebappPhoenixWeb, :controller
 
+  import SweetXml
+
   # require Req
   # import SweetXml
 
@@ -22,11 +24,24 @@ defmodule WebappPhoenixWeb.QueryController do
     # [tenant] = Plug.Conn.get_req_header(conn, "remote-user") # TODO: lookup mail addresses
     #   |> Enum.map(&String.trim/1)
     tenant = conn.assigns.authuser
-    {:ok, results} = Db.ExistDb.query(Db.ExistDb,
+    {:ok, result_stream} = Db.ExistDb.query(Db.ExistDb,
       tenant,
       "query_count",
       %{wantedBegin: startts_int, wantedEnd: endts_int}
     )
+    results = result_stream
+      |> Stream.map(fn {:item, xml} ->
+        xml |> xpath(
+          ~x"/item",
+          begin: ~x"./begin/text()"s,
+          end: ~x"./end/text()"s,
+          reportscount: ~x"./reportscount/text()"i,
+          sum: ~x"./proportionalrowcountsum/text()"i,
+          spf: ~x"./spf/text()"s,
+          dkim: ~x"./dkim/text()"s
+        )
+      end)
+      |> Enum.to_list()
 
     conn
       |> render(:count, tenant: tenant, startts: startts, endts: endts, results: results)

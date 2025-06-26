@@ -70,20 +70,7 @@ defmodule Db.ExistDb do
 
     case Req.post(req, finch: DmarcFinchPool) do
       {:ok, result} when result.status >= 200 and result.status < 300 -> 
-        data = result.body
-          |> stream_tags(:item)
-          |> Stream.map(fn {:item, xml} ->
-            xml |> xpath(
-              ~x"/item",
-              begin: ~x"./begin/text()"s,
-              end: ~x"./end/text()"s,
-              reportscount: ~x"./reportscount/text()"i,
-              sum: ~x"./proportionalrowcountsum/text()"i,
-              spf: ~x"./spf/text()"s,
-              dkim: ~x"./dkim/text()"s
-            )
-          end)
-          |> Enum.to_list()
+        data = result.body |> stream_tags(:item)
         {:reply, {:ok, data}, state}
       {:ok, result} ->
         {:reply, {:error, "unsuccessful http response code: #{result.status} - #{result.body}"}, state}
