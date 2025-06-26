@@ -24,6 +24,7 @@ defmodule WebappPhoenixWeb.QueryController do
     # [tenant] = Plug.Conn.get_req_header(conn, "remote-user") # TODO: lookup mail addresses
     #   |> Enum.map(&String.trim/1)
     tenant = conn.assigns.authuser
+
     {:ok, result_stream} = Db.ExistDb.query(Db.ExistDb,
       tenant,
       "query_count",
