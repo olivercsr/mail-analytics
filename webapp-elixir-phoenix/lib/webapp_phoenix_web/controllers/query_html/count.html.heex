@@ -3,6 +3,15 @@
   <p>Tenant: {@tenant}</p>
   <p>Start: {@startts}</p>
   <p>End: {@endts}</p>
-  <p>{inspect @results}</p>
+  <%= for item <- @results do %>
+    <p>
+      <span>begin:<%= item[:begin] %></span>
+      <span>end:<%= item[:end] %></span>
+      <span>reportscount:<%= item[:reportscount] %></span>
+      <span>sum:<%= item[:sum] %></span>
+      <span>spf:<%= item[:spf] %></span>
+      <span>dkim:<%= item[:dkim] %></span>
+    </p>
+  <% end %>
 </div>
 
