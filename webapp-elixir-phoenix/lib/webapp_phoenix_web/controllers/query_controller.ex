@@ -29,7 +29,7 @@ defmodule WebappPhoenixWeb.QueryController do
     )
 
     conn
-      |> render(:count, startts: startts, endts: endts, results: results)
+      |> render(:count, tenant: tenant, startts: startts, endts: endts, results: results)
   end
 end
 
