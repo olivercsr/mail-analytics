@@ -7,5 +7,10 @@
 
 /* This file is for your main application CSS */
 
+/* .nav-item { */
+/*   @apply rounded-lg shadow-xl; */
+/* } */
+
 @import "./charts.min.css";
 /* @import "./styles.css"; */
+
