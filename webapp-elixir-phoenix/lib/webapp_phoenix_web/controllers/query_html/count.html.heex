@@ -1,17 +1,35 @@
 <.flash_group flash={@flash} />
-<div>
-  <p>Tenant: {@tenant}</p>
-  <p>Start: {@startts}</p>
-  <p>End: {@endts}</p>
-  <%= for item <- @results do %>
-    <p>
-      <span>begin:<%= item[:begin] %></span>
-      <span>end:<%= item[:end] %></span>
-      <span>reportscount:<%= item[:reportscount] %></span>
-      <span>sum:<%= item[:sum] %></span>
-      <span>spf:<%= item[:spf] %></span>
-      <span>dkim:<%= item[:dkim] %></span>
-    </p>
-  <% end %>
+<div class="flex gap-4 m-4">
+  <div class="flex-none bg-blue-950 shadow-sm">
+    <p>Tenant: {@tenant}</p>
+    <p>Start: {@startts}</p>
+    <p>End: {@endts}</p>
+  </div>
+  <div class="flex-1 bg-blue-950">
+    <div class="overflow-x-auto">
+      <table class="table table-xs table-zebra">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Reports</th>
+            <th>Sum</th>
+            <th>Spf</th>
+            <th>Dkim</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= for item <- @results do %>
+            <tr>
+          <th><%= item[:begin] %> - <%= item[:end] %></th>
+          <td><%= item[:reportscount] %></td>
+          <td><%= item[:sum] %></td>
+          <td><%= item[:spf] %></td>
+          <td><%= item[:dkim] %></td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
