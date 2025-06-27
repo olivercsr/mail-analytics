@@ -7,9 +7,11 @@
 
 /* This file is for your main application CSS */
 
-/* .nav-item { */
-/*   @apply rounded-lg shadow-xl; */
-/* } */
+.nav-item {
+  /* @apply bg-blue-500; */
+  /* @apply rounded-lg; */
+  /* background-color: red; */
+}
 
 @import "./charts.min.css";
 /* @import "./styles.css"; */
