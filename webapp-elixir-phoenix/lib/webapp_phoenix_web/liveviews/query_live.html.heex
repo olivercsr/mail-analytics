@@ -1,16 +1,19 @@
 <.flash_group flash={@flash} />
-<h1>{@myrnd}</h1>
-<button phx-click="newrnd">newrnd</button>
-<.form for={@form} phx-change="change_date">
-  <.date_input type="date" field={@form[:start]} />
-  <.date_input type="date" field={@form[:end]} />
-</.form>
 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 m-4">
-  <div class="data-item bg-blue-950 minx-h-[20px]">
-    <p>Tenant: {@tenant}</p>
-    <p>Start: {@startts}</p>
-    <p>End: {@endts}</p>
+  <div class="data-item bg-yellow-950 min-h-[20px]">
+    <.form for={@form} phx-change="change_date">
+      <fieldset class="fieldset bg-base-200 border-base-300 roundedx-box w-xs borderx p-4">
+        <legend class="fieldset-legend">Parameters</legend>
+        <.date_input type="date" field={@form[:start]} />
+        <.date_input type="date" field={@form[:end]} />
+      </fieldset>
+    </.form>
   </div>
+  <%!-- <div class="data-item bg-blue-950 min-h-[20px]"> --%>
+  <%!--   <p>Tenant: {@tenant}</p> --%>
+  <%!--   <p>Start: {@startdate}</p> --%>
+  <%!--   <p>End: {@enddate}</p> --%>
+  <%!-- </div> --%>
   <div class="data-item bg-red-950 min-h-[20px] col-span-3">
     <div class="overflow-x-auto">
       <table class="table table-xs table-zebra">
@@ -25,7 +28,7 @@
         </thead>
         <tbody>
           <%= for item <- @results do %>
-            <tr>
+          <tr>
           <th><%= item[:begin] %> - <%= item[:end] %></th>
           <td><%= item[:reportscount] %></td>
           <td><%= item[:sum] %></td>
