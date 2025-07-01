@@ -34,7 +34,8 @@ defmodule WebappPhoenixWeb.Plugs.Auth do
 
     Logger.info([module: __MODULE__, message: "authuser", authuser: authuser])
 
-    assign(conn, :authuser, authuser)
+    put_session(conn, "authuser", authuser)
+    # assign(conn, :authuser, authuser)
   end
 end
 

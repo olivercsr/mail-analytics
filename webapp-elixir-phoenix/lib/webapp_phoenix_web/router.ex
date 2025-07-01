@@ -23,7 +23,7 @@ defmodule WebappPhoenixWeb.Router do
 
     get "/", PageController, :home
     # get "/query/count/from/:start/until/:end", QueryController, :count
-    live "/query/count/from/:start/until/:end", QueryLive, :count
+    live "/query/count/from/:start/until/:end", QueryLive
   end
 
   # Other scopes may use custom stacks.

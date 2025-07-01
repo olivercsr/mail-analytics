@@ -31,7 +31,9 @@ defmodule WebappPhoenixWeb.QueryLive do
     # [tenant] = Plug.Conn.get_req_header(conn, "remote-user") # TODO: lookup mail addresses
     #   |> Enum.map(&String.trim/1)
     # tenant = conn.assigns.authuser
-    tenant = "dmarc@csr-informatik.de"
+    # tenant = "dmarc@csr-informatik.de"
+    # tenant = Plug.Conn.get_session(session, :authuser)
+    tenant = Map.fetch!(session, "authuser")
 
     {:ok, result_stream} = Db.ExistDb.query(Db.ExistDb,
       tenant,
