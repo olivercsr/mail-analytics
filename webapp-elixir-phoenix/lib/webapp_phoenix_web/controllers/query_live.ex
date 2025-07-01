@@ -11,6 +11,12 @@ defmodule WebappPhoenixWeb.QueryLive do
 
   # embed_templates "query_html/*"
 
+  def date_input(assigns) do
+    ~H"""
+    <input type="date" name={@field.name} id={@field.id} value={@field.value} />
+    """
+  end
+
   def mount(%{"start" => startts, "end" => endts} = params, session, socket) do
     IO.puts("MOUNT")
     IO.inspect(params)
@@ -46,13 +52,26 @@ defmodule WebappPhoenixWeb.QueryLive do
       end)
       |> Enum.to_list()
 
-    {:ok, assign(socket, tenant: tenant, startts: startts, endts: endts, results: results, myrnd: 0)}
+    {:ok, assign(socket,
+      tenant: tenant,
+      form: to_form(%{"start" => startts, "end" => endts}),
+      startts: startts,
+      endts: endts,
+      results: results,
+      myrnd: 0
+    )}
   end
 
   def handle_event("newrnd", params, socket) do
-    IO.puts("HANDLE_EVENT")
+    IO.puts("HANDLE_EVENT NEWRND")
     IO.inspect(params)
     {:noreply, update(socket, :myrnd, fn _ -> IO.puts("update"); :rand.uniform(1000) end)}
+  end
+
+  def handle_event("change_date", params, socket) do
+    IO.puts("HANDLE_EVENT CHANGE_DATE")
+    IO.inspect(params)
+    {:noreply, assign(socket, myrnd: :rand.uniform(1000))}
   end
 end
 

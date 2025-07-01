@@ -1,6 +1,10 @@
 <.flash_group flash={@flash} />
 <h1>{@myrnd}</h1>
 <button phx-click="newrnd">newrnd</button>
+<.form for={@form} phx-change="change_date">
+  <.date_input type="date" field={@form[:start]} />
+  <.date_input type="date" field={@form[:end]} />
+</.form>
 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 m-4">
   <div class="data-item bg-blue-950 minx-h-[20px]">
     <p>Tenant: {@tenant}</p>
