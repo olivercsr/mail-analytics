@@ -7,6 +7,7 @@ defmodule WebappPhoenixWeb.QueryLive do
   # use WebappPhoenixWeb, :html
   use WebappPhoenixWeb, :live_view
 
+  require Logger
   import SweetXml
 
   # embed_templates "query_html/*"
@@ -65,9 +66,9 @@ defmodule WebappPhoenixWeb.QueryLive do
   end
 
   def mount(params, session, socket) do
-    IO.puts("MOUNT")
-    IO.inspect(params)
-    IO.inspect(session)
+    Logger.debug([module: __MODULE__, message: "MOUNT"])
+    # IO.inspect(params)
+    # IO.inspect(session)
 
     # TODO: add ui controls to adjust start & end, which will then in turn trigger re-query
 
@@ -91,19 +92,45 @@ defmodule WebappPhoenixWeb.QueryLive do
       form: to_form(%{"start" => startdate, "end" => enddate}),
       startdate: startdate,
       enddate: enddate,
-      results: results
+      results: results,
+      query_tref: nil
     )}
   end
 
   def handle_event("change_date", params, socket) do
-    IO.puts("HANDLE_EVENT CHANGE_DATE")
-    IO.inspect(params)
-    IO.inspect(socket)
+    Logger.debug([module: __MODULE__, message: "HANDLE_EVENT CHANGE_DATE"])
+    # IO.inspect(params)
+    # IO.inspect(socket)
     {:ok, startdate} = Date.from_iso8601(params["start"])
     {:ok, enddate} = Date.from_iso8601(params["end"])
+    # tenant = socket.assigns[:tenant]
+    # results = query(tenant, startdate, enddate)
+
+    # start_async(socket, :query, fn -> :foobar end)
+    prev_tref = socket.assigns[:query_tref]
+    if prev_tref != nil do
+      :timer.cancel(prev_tref)
+    end
+    pid = self()
+    {:ok, tref} = :timer.apply_after(
+      :timer.seconds(2),
+      fn -> GenServer.cast(pid, :query) end
+    )
+
+    {:noreply, assign(socket, startdate: startdate, enddate: enddate, query_tref: tref)}
+  end
+
+  def handle_cast(:query, socket) do
+    Logger.debug([module: __MODULE__, message: "HANDLE_CAST QUERY"])
+    # IO.inspect(params)
+    # IO.inspect(socket)
+
+    startdate = socket.assigns[:startdate]
+    enddate = socket.assigns[:enddate]
     tenant = socket.assigns[:tenant]
     results = query(tenant, startdate, enddate)
-    {:noreply, assign(socket, results: results)}
+
+    {:noreply, assign(socket, results: results, query_tref: nil)}
   end
 end
 
