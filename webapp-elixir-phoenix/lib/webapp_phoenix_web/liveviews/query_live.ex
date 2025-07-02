@@ -60,6 +60,10 @@ defmodule WebappPhoenixWeb.QueryLive do
     end
   end
 
+  defp param_to_date(param) when is_nil(param) do
+    :error
+  end
+
   def mount(params, session, socket) do
     IO.puts("MOUNT")
     IO.inspect(params)

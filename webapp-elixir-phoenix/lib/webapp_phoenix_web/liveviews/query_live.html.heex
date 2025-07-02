@@ -2,7 +2,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 m-4">
   <div class="data-item bg-yellow-950 min-h-[20px]">
     <.form for={@form} phx-change="change_date">
-      <fieldset class="fieldset bg-base-200 border-base-300 roundedx-box w-xs borderx p-4">
+      <fieldset class="fieldset bgx-base-200 border-base-300 roundedx-box w-xs borderx p-4">
         <legend class="fieldset-legend">Parameters</legend>
         <.date_input type="date" field={@form[:start]} />
         <.date_input type="date" field={@form[:end]} />
