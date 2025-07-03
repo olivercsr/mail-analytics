@@ -25,6 +25,7 @@ defmodule WebappPhoenixWeb.Router do
     # get "/query/count/from/:start/until/:end", QueryController, :count
     live "/query/count/from/:start/until/:end", QueryLive
     live "/query/count", QueryLive
+    live "/query/ips", QueryIps
   end
 
   # Other scopes may use custom stacks.
