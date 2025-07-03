@@ -37,12 +37,10 @@ defmodule WebappPhoenixWeb.QueryIps do
       |> Stream.map(fn {:item, xml} ->
         xml |> xpath(
           ~x"/item",
-          begin: ~x"./begin/text()"s,
-          end: ~x"./end/text()"s,
-          reportscount: ~x"./reportscount/text()"i,
-          sum: ~x"./proportionalrowcountsum/text()"i,
-          spf: ~x"./spf/text()"s,
-          dkim: ~x"./dkim/text()"s
+          ip: ~x"./source_ip/text()"s,
+          dmarc: ~x"./dmarc/text()"s,
+          count: ~x"./count/text()"i,
+          reports: [~x"./reports/report"l, id: ~x"./id/text()"s, email: ~x"./email/text()"]
         )
       end)
       |> Enum.to_list()

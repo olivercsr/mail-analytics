@@ -20,21 +20,25 @@ IPSSSSSSSSSSSSSSSSS
       <table class="table table-xs table-zebra">
         <thead>
           <tr>
-            <th></th>
+            <th>IP</th>
+            <th>Dmarc</th>
+            <th>Count</th>
             <th>Reports</th>
-            <th>Sum</th>
-            <th>Spf</th>
-            <th>Dkim</th>
           </tr>
         </thead>
         <tbody>
           <%= for item <- @results do %>
           <tr>
-          <th><%= item[:begin] %> - <%= item[:end] %></th>
-          <td><%= item[:reportscount] %></td>
-          <td><%= item[:sum] %></td>
-          <td><%= item[:spf] %></td>
-          <td><%= item[:dkim] %></td>
+          <td><%= item[:ip] %></td>
+          <td><%= item[:dmarc] %></td>
+          <td><%= item[:count] %></td>
+          <td>
+          <ul>
+          <%= for report <- item[:reports] do %>
+              <li><span><%= report[:id] %></span> - <span><%= report[:email] %></span></li>
+          <% end %>
+          </ul>
+          </td>
           </tr>
           <% end %>
         </tbody>
