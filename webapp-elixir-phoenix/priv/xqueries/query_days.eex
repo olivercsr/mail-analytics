@@ -39,7 +39,7 @@ for $record in collection('/dmarc/' || $tenant)/feedback/record
                 <timestamp>{$dateTimeOffset}</timestamp>
                 <count>{sum($proportionCount)}</count>
                 <reportcount>{count($reportId)}</reportcount>
-                <ipcount>{count($ip)}</ipcount>
+                <ipcount>{count(distinct-values($ip))}</ipcount>
                 <reports>
                     {for $id at $pos in $reportId return
                         <report>
