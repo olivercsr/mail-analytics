@@ -46,16 +46,15 @@ defmodule WebappPhoenixWeb.QueryIps do
       |> Enum.to_list()
   end
 
-  defp param_to_date(param) when is_binary(param) do
-    with {i, _} <- Integer.parse(param),
-      {:ok, d} <- DateTime.from_unix(i) do
+  defp param_to_date(param) when is_integer(param) do
+    with {:ok, d} <- DateTime.from_unix(param) do
       {:ok, DateTime.to_date(d)}
     end
   end
 
-  defp param_to_date(param) when is_integer(param) do
-    with {:ok, d} <- DateTime.from_unix(param) do
-      {:ok, DateTime.to_date(d)}
+  defp param_to_date(param) when is_binary(param) do
+    with {i, _} <- Integer.parse(param),
+      param_to_date(i)
     end
   end
 
@@ -67,8 +66,6 @@ defmodule WebappPhoenixWeb.QueryIps do
     Logger.debug([module: __MODULE__, message: "MOUNT"])
     # IO.inspect(params)
     # IO.inspect(session)
-
-    # TODO: add ui controls to adjust start & end, which will then in turn trigger re-query
 
     tenant = Map.fetch!(session, "authuser")
     startdate = case param_to_date(params["start"]) do
