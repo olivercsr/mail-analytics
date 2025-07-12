@@ -11,11 +11,11 @@ let $wantedEndD := xs:date($wantedEndDT)
 
 for $record in collection('/dmarc/' || $tenant)/feedback/record
     let $metadata := $record/ancestor::feedback/report_metadata
+    let $reportBegin := $metadata/date_range/begin/text()
+    let $reportEnd := $metadata/date_range/end/text()
     let $reportId := $metadata/report_id/text()
     let $reportOrg := $metadata/org_name/text()
     let $reportEmail := $metadata/email/text()
-    let $reportBegin := $metadata/date_range/begin/text()
-    let $reportEnd := $metadata/date_range/end/text()
     where $reportBegin <= $wantedEnd and $reportEnd >= $wantedBegin (: i.e. inclusive/lax :)
     (:  where $reportBegin >= $wantedBegin and $reportEnd <= $wantedEnd :) (: i.e. exclusive/strict :)
     let $reportDurationDays := ($reportEnd - $reportBegin) div 60 div 60 div 24
@@ -36,16 +36,15 @@ for $record in collection('/dmarc/' || $tenant)/feedback/record
             <item>
                 <dmarc>{if ($dmarc) then "pass" else "fail"}</dmarc>
                 <date>{$proportionD}</date>
-                <timestamp>{$dateTimeOffset}</timestamp>
                 <count>{sum($proportionCount)}</count>
-                <reportcount>{count($reportId)}</reportcount>
+                <reportcount>{count(distinct-values($reportId))}</reportcount>
                 <ipcount>{count(distinct-values($ip))}</ipcount>
                 <reports>
-                    {for $id at $pos in $reportId return
+                    {for $id at $pos in distinct-values($reportId) return
                         <report>
                             <id>{$id}</id>
-                            <org>{$reportOrg[$pos]}</org>
-                            <email>{$reportEmail[$pos]}</email>
+                            <org>{distinct-values($reportOrg)[$pos]}</org>
+                            <email>{distinct-values($reportEmail)[$pos]}</email>
                         </report>
                     }
                 </reports>

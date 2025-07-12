@@ -1,4 +1,4 @@
-defmodule WebappPhoenixWeb.QueryIps do
+defmodule WebappPhoenixWeb.QueryDays do
   @moduledoc """
   This module contains pages rendered by PageController.
 
@@ -29,7 +29,7 @@ defmodule WebappPhoenixWeb.QueryIps do
 
     {:ok, result_stream} = Db.ExistDb.query(Db.ExistDb,
       tenant,
-      "query_ips",
+      "query_days",
       %{wantedBegin: startts, wantedEnd: endts}
     )
 
@@ -37,9 +37,11 @@ defmodule WebappPhoenixWeb.QueryIps do
       |> Stream.map(fn {:item, xml} ->
         xml |> xpath(
           ~x"/item",
-          ip: ~x"./source_ip/text()"s,
           dmarc: ~x"./dmarc/text()"s,
-          count: ~x"./count/text()"i,
+          date: ~x"./date/text()"s,
+          count: ~x"./count/text()"f,
+          reportcount: ~x"./reportcount/text()"i,
+          ipcount: ~x"./ipcount/text()"i,
           reports: [~x"./reports/report"l, id: ~x"./id/text()"s, email: ~x"./email/text()"]
         )
       end)
