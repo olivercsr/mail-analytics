@@ -23,20 +23,23 @@ for $record in collection('/dmarc/' || $tenant)/feedback/record
     let $ip := $row/source_ip/text()
     let $spf := $row/policy_evaluated/spf/text()
     let $dkim := $row/policy_evaluated/dkim/text()
-    let $dmarc := $spf = "pass" or $dkim = "pass"
     let $count := $row/count/text()
     let $proportionCount := $count div max([$reportDurationDays, 1e0])
+    let $dmarcPassed := if ($spf = "pass" or $dkim = "pass") then $proportionCount else 0
+    let $dmarcFailed := if ($spf = "fail" and $dkim = "fail") then $proportionCount else 0
+    let $dmarcUnknown := $proportionCount - $dmarcPassed - $dmarcFailed
     for $dayOffset in 0 to xs:integer(floor($reportDurationDays))
         let $dateTimeOffset := xs:integer($reportBegin + ($dayOffset * 24 * 60 * 60))
         let $proportionDT := xs:dateTime('1970-01-01T00:00:00Z') + xs:dayTimeDuration('PT' || $dateTimeOffset || 'S')
         let $proportionD := xs:date($proportionDT)
-        group by $dmarc, $proportionD
-        order by $dmarc, $proportionD
+        group by $proportionD
+        order by $proportionD
         return
             <item>
-                <dmarc>{if ($dmarc) then "pass" else "fail"}</dmarc>
                 <date>{$proportionD}</date>
-                <count>{sum($proportionCount)}</count>
+                <dmarcpassed>{sum($dmarcPassed)}</dmarcpassed>
+                <dmarcfailed>{sum($dmarcFailed)}</dmarcfailed>
+                <dmarcunknown>{sum($dmarcUnknown)}</dmarcunknown>
                 <reportcount>{count(distinct-values($reportId))}</reportcount>
                 <ipcount>{count(distinct-values($ip))}</ipcount>
                 <reports>
