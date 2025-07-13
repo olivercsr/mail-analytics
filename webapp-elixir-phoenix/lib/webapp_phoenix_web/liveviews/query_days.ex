@@ -37,9 +37,10 @@ defmodule WebappPhoenixWeb.QueryDays do
       |> Stream.map(fn {:item, xml} ->
         xml |> xpath(
           ~x"/item",
-          dmarc: ~x"./dmarc/text()"s,
           date: ~x"./date/text()"s,
-          count: ~x"./count/text()"f,
+          dmarctotal: ~x"./dmarctotal/text()"f,
+          dmarcpassed: ~x"./dmarcpassed/text()"f,
+          dmarcfailed: ~x"./dmarcfailed/text()"f,
           reportcount: ~x"./reportcount/text()"i,
           ipcount: ~x"./ipcount/text()"i,
           reports: [~x"./reports/report"l, id: ~x"./id/text()"s, email: ~x"./email/text()"]
@@ -81,6 +82,7 @@ defmodule WebappPhoenixWeb.QueryDays do
       _ -> DateTime.now!("Etc/UTC")
         |> DateTime.to_date()
     end
+
     # results = query(tenant, ~D[2024-06-01], ~D[2025-03-31])
     results = query(tenant, startdate, enddate)
 
@@ -90,6 +92,7 @@ defmodule WebappPhoenixWeb.QueryDays do
       startdate: startdate,
       enddate: enddate,
       results: results,
+      dmarc_max: Float.max_finite(),
       query_tref: nil
     )}
   end
@@ -126,8 +129,11 @@ defmodule WebappPhoenixWeb.QueryDays do
     enddate = socket.assigns[:enddate]
     tenant = socket.assigns[:tenant]
     results = query(tenant, startdate, enddate)
+    dmarc_max = results
+      |> Enum.map(fn item -> item[:dmarctotal] end)
+      |> Enum.max(&>=/2, fn -> Float.max_finite() end)
 
-    {:noreply, assign(socket, results: results, query_tref: nil)}
+    {:noreply, assign(socket, results: results, dmarc_max: dmarc_max * 1.05, query_tref: nil)}
   end
 end
 
