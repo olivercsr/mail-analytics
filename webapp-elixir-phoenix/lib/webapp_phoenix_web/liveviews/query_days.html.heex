@@ -11,7 +11,7 @@ DAYSSSSSSSSSSSSSSSSSSSSSSSSS
     </.form>
   </div>
   <div class="data-item bgx-red-950 min-h-[20px] col-span-3">
-    <table class="charts-css bar columnx multiple stacked show-labels show-heading show-primary-axis show-5-secondary-axes data-spacing-5">
+    <table class="days-chart charts-css bar columnx multiple stacked show-labels show-heading show-primary-axis show-5-secondary-axes data-spacing-5">
       <caption>Dmarc by days</caption>
       <thead>
         <tr>
@@ -26,7 +26,7 @@ DAYSSSSSSSSSSSSSSSSSSSSSSSSS
       <tbody>
         <%= for item <- @results do %>
         <tr>
-          <th scope="row"><%= item[:date] %></th>
+          <th class="text-xs" scope="row"><%= item[:date] %></th>
           <td style={"--size: calc(#{item[:dmarcpassed]} / #{@dmarc_max})"}> <%= if item[:dmarcpassed] > 0.0 do Float.round(item[:dmarcpassed], 2) else "" end %> </td>
           <td style={"--size: calc(#{item[:dmarcfailed]} / #{@dmarc_max})"}> <%= if item[:dmarcfailed] > 0.0 do Float.round(item[:dmarcfailed], 2) else "" end %> </td>
           <td style={"--size: calc(#{item[:dmarctotal] - item[:dmarcpassed] - item[:dmarcfailed]} / #{@dmarc_max})"}> <%= #Float.round(item[:dmarcunknown], 2) %> </td>
