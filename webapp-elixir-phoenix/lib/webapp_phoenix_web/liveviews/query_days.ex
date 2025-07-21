@@ -131,7 +131,7 @@ defmodule WebappPhoenixWeb.QueryDays do
     results = query(tenant, startdate, enddate)
     dmarc_max = results
       |> Enum.map(fn item -> item[:dmarctotal] end)
-      |> Enum.max(&>=/2, fn -> Float.max_finite() end)
+      |> Enum.max(&>=/2, fn -> 100.0 end)
 
     {:noreply, assign(socket, results: results, dmarc_max: dmarc_max * 1.05, query_tref: nil)}
   end

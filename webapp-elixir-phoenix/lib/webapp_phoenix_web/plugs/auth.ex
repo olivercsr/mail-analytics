@@ -28,6 +28,9 @@ defmodule WebappPhoenixWeb.Plugs.Auth do
   end
 
   def call(conn, authuser_header) do
+    # IO.puts("========================================= conn")
+    # IO.inspect(conn)
+
     authuser = case get_authuser(conn, authuser_header) do
       authuser when is_binary(authuser) and authuser != "" -> authuser
     end
