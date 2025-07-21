@@ -31,7 +31,7 @@
 ##
 ## Server Configuration
 ##
-# server:
+server:
   ## The address for the Main server to listen on in the address common syntax.
   ## Formats:
   ##  - [<scheme>://]<hostname>[:<port>][/<path>]
@@ -94,7 +94,7 @@
 
   ## Server Endpoints configuration.
   ## This section is considered advanced and it SHOULD NOT be configured unless you've read the relevant documentation.
-  # endpoints:
+  endpoints:
     ## Enables the pprof endpoint.
     # enable_pprof: false
 
@@ -102,9 +102,9 @@
     # enable_expvars: false
 
     ## Configure the authz endpoints.
-    # authz:
-      # forward-auth:
-        # implementation: 'ForwardAuth'
+    authz:
+      forward-auth:
+        implementation: 'ForwardAuth'
         # authn_strategies: []
       # ext-authz:
         # implementation: 'ExtAuthz'
@@ -119,9 +119,9 @@
 ##
 ## Log Configuration
 ##
-# log:
+log:
   ## Level of verbosity for logs: info, debug, trace.
-  # level: 'debug'
+  level: 'debug'
 
   ## Format the logs are written as: json, text.
   # format: 'json'
@@ -614,9 +614,9 @@ authentication_backend:
       #algorithm: 'bcrypt'
       argon2:
         variant: 'argon2id'
-        iterations: 3
-        memory: 65536
-        parallelism: 4
+        iterations: 2
+        memory: 4096
+        parallelism: 2
         key_length: 32
         salt_length: 16
       # scrypt:
@@ -842,6 +842,7 @@ session:
       ##      - Match the host portion of this URI.
       ##      - Match the suffix of the host portion when prefixed with '.'.
       # default_redirection_url: 'https://www.example.com'
+      default_redirection_url: 'http://localhost:4000'
 
       ## Sets the Cookie SameSite value. Possible options are none, lax, or strict.
       ## Please read https://www.authelia.com/c/session#same_site
@@ -1020,7 +1021,7 @@ storage:
   ##
   local:
     ## Path to the SQLite3 Database.
-    path: '/config/db.sqlite3'
+    path: '/data/db.sqlite3'
 
   ##
   ## MySQL / MariaDB (Storage Provider)
@@ -1668,4 +1669,4 @@ notifier:
               # -----BEGIN CERTIFICATE-----
               # ...
               # -----END CERTIFICATE-----
-...
+
