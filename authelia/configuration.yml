@@ -721,7 +721,7 @@ access_control:
   default_policy: 'deny'
 
   rules:
-    - domain: '127.0.0.1'
+    - domain: 'dmarc.localhost'
       policy: one_factor
     ## Rules applied to everyone
     # - domain: 'public.example.com'
@@ -818,7 +818,7 @@ session:
       ## The domain to protect.
       ## Note: the Authelia portal must also be in that domain.
       # domain: 'example.com'
-      domain: '127.0.0.1'
+      domain: 'dmarc.localhost'
 
       ## Required. The fully qualified URI of the portal to redirect users to on proxies that support redirections.
       ## Rules:
@@ -827,7 +827,7 @@ session:
       ##      - Match the host portion of this URI.
       ##      - Match the suffix of the host portion when prefixed with '.'.
       # authelia_url: 'https://auth.example.com'
-      authelia_url: 'https://127.0.0.1'
+      authelia_url: 'https://auth.dmarc.localhost:8443'
 
       ## Optional. The fully qualified URI used as the redirection location if the portal is accessed directly. Not
       ## configuring this option disables the automatic redirection behaviour.
@@ -842,7 +842,7 @@ session:
       ##      - Match the host portion of this URI.
       ##      - Match the suffix of the host portion when prefixed with '.'.
       # default_redirection_url: 'https://www.example.com'
-      default_redirection_url: 'http://localhost:4000'
+      default_redirection_url: 'https://dmarc.localhost:8443'
 
       ## Sets the Cookie SameSite value. Possible options are none, lax, or strict.
       ## Please read https://www.authelia.com/c/session#same_site
@@ -1021,7 +1021,7 @@ storage:
   ##
   local:
     ## Path to the SQLite3 Database.
-    path: '/data/db.sqlite3'
+    path: '/config/db.sqlite3'
 
   ##
   ## MySQL / MariaDB (Storage Provider)
