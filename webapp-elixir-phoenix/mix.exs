@@ -60,7 +60,8 @@ defmodule WebappPhoenix.MixProject do
       {:mime, "~> 2.0"},
       {:mail, "~> 0.4"},
       {:stream_gzip, "~>0.4"},
-      {:zstream, "~> 0.6"}
+      {:zstream, "~> 0.6"},
+      {:exldap, "~> 0.6"}
     ]
   end
 
