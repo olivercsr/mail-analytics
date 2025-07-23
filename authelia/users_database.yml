@@ -7,4 +7,12 @@ users:
     groups:
       - 'admins'
       - 'dev'
+  dmarc@csr-informatik.de:
+    disabled: false
+    displayname: 'dmarc@csr-informatik.de'
+    password: '$argon2id$v=19$m=4096,t=3,p=1$bXlzYWx0MTIz$f4o/dKqdscO3x427VUhtj/getiqWU2onPFZjSTSzSuw'
+    email: 'oliver@localhost.local'
+    groups:
+      - 'admins'
+      - 'dev'
 
