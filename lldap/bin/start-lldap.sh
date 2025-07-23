@@ -8,5 +8,5 @@ podman run -it --rm \
   -e TZ=Europe/Berlin \
   -p17170:17170 -p3890:3890 \
   -v lldap_data:/data:Z \
-  docker.io/lldap/lldap
+  docker.io/lldap/lldap:latest
 
