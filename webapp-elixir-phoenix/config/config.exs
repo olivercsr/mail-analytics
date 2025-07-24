@@ -41,9 +41,12 @@ config :webapp_phoenix, WebappPhoenix.Mailer, adapter: Swoosh.Adapters.Local
 #  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
 #  redirect_uri: System.get_env("GITHUB_REDIRECT_URI")
 config :webapp_phoenix, KanIdm,
-  client_id: System.get_env("KANIDM_CLIENT_ID"),
-  client_secret: System.get_env("KANIDM_CLIENT_SECRET"),
-  redirect_uri: System.get_env("KANIDM_REDIRECT_URI")
+  # client_id: System.get_env("KANIDM_CLIENT_ID"),
+  # client_secret: System.get_env("KANIDM_CLIENT_SECRET"),
+  # redirect_uri: System.get_env("KANIDM_REDIRECT_URI")
+  client_id: "dmarc-client",
+  client_secret: "secret",
+  redirect_uri: "https://dmarc.localhost:8443/oauth/kanidm/callback"
 
 # Configure esbuild (the version is required)
 config :esbuild,

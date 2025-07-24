@@ -7,9 +7,9 @@ defmodule Auth.KanIdmOAuth do
   defp config do
     [
       strategy: __MODULE__,
-      site: "https://idm.localhost",
-      authorize_url: "https://idm.localhost/oauth/authorize",
-      token_url: "https://idm.localhost/oauth/token"
+      site: "http://dmarc.localhost:4000",
+      authorize_url: "https://idm.localhost:8443/ui/oauth2",
+      token_url: "https://idm.localhost:8443/oauth2/token"
     ]
   end
 
@@ -25,7 +25,15 @@ defmodule Auth.KanIdmOAuth do
   end
 
   def get_token!(params \\ [], headers \\ [], opts \\ []) do
-    OAuth2.Client.get_token!(client(), params, headers, opts)
+    allOpts = Keyword.merge([ssl: [verify: :verify_none]], opts)
+    OAuth2.Client.get_token!(client(), params, headers, allOpts)
+  end
+
+  def get_user!(client) do
+    IO.puts("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu")
+    r = OAuth2.Client.get(client, "http://idm.localhost:8443/oauth2/token/introspect")
+    IO.inspect(r)
+    OAuth2.Client.get(client, "https://idm.localhost:8443/oauth2/openid/dmarc-client/userinfo")
   end
 
   # Strategy callbacks

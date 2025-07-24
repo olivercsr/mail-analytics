@@ -18,6 +18,13 @@ defmodule WebappPhoenixWeb.Router do
     plug WebappPhoenixWeb.Plugs.Auth, "remote-user"
   end
 
+  scope "/oauth/:provider", WebappPhoenixWeb do
+    pipe_through [:browser]
+
+    get "/", AuthController, :index
+    get "/callback", AuthController, :callback
+  end
+
   scope "/", WebappPhoenixWeb do
     pipe_through [:browser, :authenticated]
 
