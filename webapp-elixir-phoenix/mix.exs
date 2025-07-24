@@ -61,7 +61,8 @@ defmodule WebappPhoenix.MixProject do
       {:mail, "~> 0.4"},
       {:stream_gzip, "~>0.4"},
       {:zstream, "~> 0.6"},
-      {:exldap, "~> 0.6"}
+      {:exldap, "~> 0.6"},
+      {:oauth2, "~> 2.1"}
     ]
   end
 
