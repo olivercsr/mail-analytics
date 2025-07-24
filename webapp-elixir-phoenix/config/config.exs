@@ -30,6 +30,17 @@ config :webapp_phoenix, WebappPhoenixWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :webapp_phoenix, WebappPhoenix.Mailer, adapter: Swoosh.Adapters.Local
 
+# OAuth providers
+#config :webapp_phoenix, Google,
+#  client_id: System.get_env("GOOGLE_CLIENT_ID"),
+#  client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
+#  redirect_uri: System.get_env("GOOGLE_REDIRECT_URI")
+#
+#config :webapp_phoenix, GitHub,
+#  client_id: System.get_env("GITHUB_CLIENT_ID"),
+#  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
+#  redirect_uri: System.get_env("GITHUB_REDIRECT_URI")
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
