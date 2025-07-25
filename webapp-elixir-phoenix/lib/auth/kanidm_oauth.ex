@@ -7,7 +7,7 @@ defmodule Auth.KanIdmOAuth do
   defp config do
     [
       strategy: __MODULE__,
-      site: "http://dmarc.localhost:4000",
+      site: "https://idm.localhost:8443",
       authorize_url: "https://idm.localhost:8443/ui/oauth2",
       token_url: "https://idm.localhost:8443/oauth2/token"
     ]
