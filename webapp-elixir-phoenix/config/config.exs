@@ -46,6 +46,10 @@ config :webapp_phoenix, KanIdm,
   client_secret: System.get_env("KANIDM_CLIENT_SECRET"),
   redirect_uri: System.get_env("KANIDM_REDIRECT_URI")
 
+config :joken, :default_signer,
+  signer_alg: "HS512",
+  key_octet: System.get_env("JWT_SIGNKEY")
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",

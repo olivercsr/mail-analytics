@@ -60,9 +60,24 @@ defmodule WebappPhoenixWeb.AuthController do
     #   - set JWT as cookie
     #   - on each request, check JWT
     #   - if appropriate, redirect to login
-    # token = generate_and_sign_jwt!()
+
+    token = Auth.Jwt.generate_and_sign()
+    IO.puts("========================= our token =======================")
+    IO.inspect(token)
 
     redirect(conn, to: "/")
+  end
+
+  def testtoken(conn, _params) do
+    {:ok, token, claims} = Auth.Jwt.generate_and_sign(%{"sub" => "abcdef"})
+    verificationResult = Auth.Jwt.verify_and_validate(token)
+    IO.puts("========================= our token =======================")
+    IO.inspect(token)
+    IO.inspect(claims)
+    IO.puts("========================= token verification result =======================")
+    IO.inspect(verificationResult)
+
+    resp(conn, 200, "all ok")
   end
 end
 

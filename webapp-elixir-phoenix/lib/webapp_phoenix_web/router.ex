@@ -23,6 +23,7 @@ defmodule WebappPhoenixWeb.Router do
 
     get "/", AuthController, :index
     get "/callback", AuthController, :callback
+    get "/testtoken", AuthController, :testtoken
   end
 
   scope "/", WebappPhoenixWeb do
