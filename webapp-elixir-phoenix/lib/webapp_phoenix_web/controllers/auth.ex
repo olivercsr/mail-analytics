@@ -1,4 +1,6 @@
 defmodule WebappPhoenixWeb.AuthController do
+  require Logger
+
   use WebappPhoenixWeb, :controller
 
   defp authorize_url!("kanidm") do
@@ -6,7 +8,7 @@ defmodule WebappPhoenixWeb.AuthController do
   end
 
   defp authorize_url!("google") do
-    Auth.GoogleOAuth.authorize_url!(scope: "https://www.googleapis.com/auth/userinfo.email")
+    Auth.GoogleOAuth.authorize_url!(scope: "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile")
   end
 
   defp authorize_url!(provider) do
@@ -34,10 +36,16 @@ defmodule WebappPhoenixWeb.AuthController do
   end
 
   def index(conn, %{"provider" => provider}) do
-    redirect(conn, external: authorize_url!(provider))
+    url = authorize_url!(provider)
+
+    Logger.debug([module: __MODULE__, message: "index", provider: provider, authorizationUrl: url])
+
+    redirect(conn, external: url)
   end
 
   def callback(conn, %{"provider" => provider, "code" => code}) do
+    Logger.debug([module: __MODULE__, message: "callback", provider: provider, code: "...#{String.slice(code, -3..-1//1)}"])
+
     client = get_token!(provider, code)
     user = get_user!(provider, client)
 
@@ -45,6 +53,13 @@ defmodule WebappPhoenixWeb.AuthController do
     IO.inspect(client)
     IO.inspect(user)
 
+    # TODO: implement:
+    #   (see README.md for detailed steps)
+    #   - verify (id) token
+    #   - create & sign JWT with relevant information
+    #   - set JWT as cookie
+    #   - on each request, check JWT
+    #   - if appropriate, redirect to login
     # token = generate_and_sign_jwt!()
 
     redirect(conn, to: "/")
