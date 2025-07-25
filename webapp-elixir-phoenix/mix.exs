@@ -52,7 +52,7 @@ defmodule WebappPhoenix.MixProject do
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.26"},
-      {:jason, "~> 1.2"},
+      {:jason, "~> 1.4"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:req, "~> 0.5.0"},
@@ -62,7 +62,8 @@ defmodule WebappPhoenix.MixProject do
       {:stream_gzip, "~>0.4"},
       {:zstream, "~> 0.6"},
       {:exldap, "~> 0.6"},
-      {:oauth2, "~> 2.1"}
+      {:oauth2, "~> 2.1"},
+      {:joken, "~> 2.6"}
     ]
   end
 
