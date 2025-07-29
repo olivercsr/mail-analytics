@@ -24,9 +24,9 @@ defmodule Auth.GoogleOAuth do
     OAuth2.Client.authorize_url!(client(), params)
   end
 
-  def get_token!(params \\ [], headers \\ [], opts \\ []) do
+  def get_tokenx(params \\ [], headers \\ [], opts \\ []) do
     # allOpts = Keyword.merge([ssl: [verify: :verify_none]], opts)
-    OAuth2.Client.get_token!(client(), params, headers, opts)
+    OAuth2.Client.get_token(client(), params, headers, opts)
   end
 
   def get_user!(client) do

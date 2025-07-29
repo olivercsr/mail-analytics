@@ -15,16 +15,16 @@ defmodule WebappPhoenixWeb.AuthController do
     raise("No matching OAuth provider found for #{provider}")
   end
 
-  defp get_token!("kanidm", code) do
-    Auth.KanIdmOAuth.get_token!(state: "abc", code: code)
+  defp get_token("kanidm", code) do
+    Auth.KanIdmOAuth.get_tokenx(state: "abc", code: code)
   end
 
-  defp get_token!("google", code) do
-    Auth.GoogleOAuth.get_token!(code: code)
+  defp get_token("google", code) do
+    Auth.GoogleOAuth.get_tokenx(code: code)
   end
 
-  defp get_token!(provider, _) do
-    raise("No matching OAuth provider found for #{provider}")
+  defp get_token(provider, _) do
+    {:error, "No matching OAuth provider found for #{provider}"}
   end
 
   defp get_user!("kanidm", client) do
@@ -46,7 +46,10 @@ defmodule WebappPhoenixWeb.AuthController do
   def callback(conn, %{"provider" => provider, "code" => code}) do
     Logger.debug([module: __MODULE__, message: "callback", provider: provider, code: "...#{String.slice(code, -3..-1//1)}"])
 
-    client = get_token!(provider, code)
+    client = case get_token(provider, code) do
+      {:ok, client} -> client
+      {:error, reason} -> raise("Could not get token: #{inspect reason}")
+    end
     user = get_user!(provider, client)
 
     IO.puts("====================================================== got token")
@@ -61,7 +64,7 @@ defmodule WebappPhoenixWeb.AuthController do
     #   - on each request, check JWT
     #   - if appropriate, redirect to login
 
-    token = Auth.Jwt.generate_and_sign()
+    token = Auth.Jwt.generate_and_sign(%{"sub" => "xyz123"})
     IO.puts("========================= our token =======================")
     IO.inspect(token)
 
@@ -77,6 +80,7 @@ defmodule WebappPhoenixWeb.AuthController do
     IO.puts("========================= token verification result =======================")
     IO.inspect(verificationResult)
 
+    put_resp_cookie(conn, "x-dmarc-session", token)
     resp(conn, 200, "all ok")
   end
 end
