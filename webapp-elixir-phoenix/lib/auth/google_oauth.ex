@@ -32,12 +32,7 @@ defmodule Auth.GoogleOAuth do
   def get_user!(client) do
     %{body: user} = OAuth2.Client.get!(client, "https://www.googleapis.com/oauth2/v3/userinfo")
 
-    %{
-      email: user["email"],
-      avatar: user["picture"],
-      email_verified: user["email_verified"],
-      sub: user["sub"]
-    }
+    user
   end
 
   # Strategy callbacks

@@ -64,7 +64,8 @@ defmodule WebappPhoenixWeb.AuthController do
     #   - on each request, check JWT
     #   - if appropriate, redirect to login
 
-    token = Auth.Jwt.generate_and_sign(%{"sub" => "xyz123"})
+    # token = Auth.Jwt.generate_and_sign(Map.merge(user, %{"provider" => provider})) # NOTE: token might become too large
+    token = Auth.Jwt.generate_and_sign(%{"provider" => provider, "sub" => user["sub"], "email" => user["email"]})
     IO.puts("========================= our token =======================")
     IO.inspect(token)
 
