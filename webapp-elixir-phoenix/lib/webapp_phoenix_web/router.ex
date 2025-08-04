@@ -18,6 +18,10 @@ defmodule WebappPhoenixWeb.Router do
     plug WebappPhoenixWeb.Plugs.Auth, "remote-user"
   end
 
+  pipeline :authenticated_jwt do
+    plug WebappPhoenixWeb.Plugs.AuthJwt
+  end
+
   scope "/oauth/:provider", WebappPhoenixWeb do
     pipe_through [:browser]
 
@@ -27,7 +31,7 @@ defmodule WebappPhoenixWeb.Router do
   end
 
   scope "/", WebappPhoenixWeb do
-    pipe_through [:browser, :authenticated]
+    pipe_through [:browser, :authenticated_jwt]
 
     get "/", PageController, :home
     # get "/query/count/from/:start/until/:end", QueryController, :count
