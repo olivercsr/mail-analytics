@@ -9,6 +9,7 @@ defmodule Auth.Jwt do
   def token_config do
     default_claims()
       |> add_claim("sub", nil, fn sub -> String.length(sub) > 5 end)
+    # TODO: add claims for email & provider
   end
 end
 
