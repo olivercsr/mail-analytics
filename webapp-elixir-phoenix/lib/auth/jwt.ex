@@ -9,6 +9,10 @@ defmodule Auth.Jwt do
     end
   end
 
+  # TODO: implement:
+  #  - expiry (copy value from 3rd party token?)
+  #  - ...
+
   @impl true
   def token_config do
     default_claims()
