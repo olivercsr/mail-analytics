@@ -69,6 +69,9 @@ defmodule WebappPhoenixWeb.AuthController do
     #   (see README.md for detailed steps)
     #   - verify (id) token
 
+    ptoken = Phoenix.Token.encrypt(WebappPhoenixWeb.Endpoint, "thesecret", %{:foo => "dingens"})
+    IO.inspect(ptoken)
+
     case Auth.Jwt.generate_and_sign(%{
       "exp" => client.token.expires_at,
       "provider" => provider,
