@@ -84,6 +84,9 @@ config :mime, :suffixes, %{
   "gzip" => ["gz"]
 }
 
+config :webapp_phoenix,
+  auth_cookie: (System.get_env("AUTH_COOKIE") || "x-dmarc-session") |> String.trim()
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

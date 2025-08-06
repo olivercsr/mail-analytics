@@ -2,10 +2,11 @@ defmodule Auth.Jwt do
   use Joken.Config
 
   defp is_email_address(str) do
-    re = ~r"^([^@\s]+)@.+$"
-    [_all, email] = Regex.run(re, str)
-    case email |> String.trim() do
-      email when is_binary(email) and email != "" and email != nil -> email
+    re = ~r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+    [email] = Regex.run(re, str)
+    case email do
+      email when email != nil -> true
+      _ -> false
     end
   end
 

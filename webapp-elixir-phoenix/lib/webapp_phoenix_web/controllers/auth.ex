@@ -44,7 +44,15 @@ defmodule WebappPhoenixWeb.AuthController do
   end
 
   def callback(conn, %{"provider" => provider, "code" => code}) do
-    Logger.debug([module: __MODULE__, message: "callback", provider: provider, code: "...#{String.slice(code, -3..-1//1)}"])
+    jwtcookie = Application.get_env(:webapp_phoenix, :auth_cookie)
+
+    Logger.debug([
+      module: __MODULE__,
+      message: "callback",
+      jwt_cookie: jwtcookie,
+      provider: provider,
+      code: "...#{String.slice(code, -3..-1//1)}"
+    ])
 
     client = case get_token(provider, code) do
       {:ok, client} -> client
@@ -73,21 +81,8 @@ defmodule WebappPhoenixWeb.AuthController do
     IO.puts("========================= token verification result =======================")
     IO.inspect(verificationResult)
 
-    conn = put_resp_cookie(conn, "x-dmarc-session", token, http_only: true, secure: true, same_site: "lax")
+    conn = put_resp_cookie(conn, jwtcookie, token, http_only: true, secure: true, same_site: "lax")
     redirect(conn, to: "/")
-  end
-
-  def testtoken(conn, _params) do
-    {:ok, token, claims} = Auth.Jwt.generate_and_sign(%{"sub" => "abcdef"})
-    verificationResult = Auth.Jwt.verify_and_validate(token)
-    IO.puts("========================= our token =======================")
-    IO.inspect(token)
-    IO.inspect(claims)
-    IO.puts("========================= token verification result =======================")
-    IO.inspect(verificationResult)
-
-    put_resp_cookie(conn, "x-dmarc-session", token)
-    resp(conn, 200, "all ok")
   end
 end
 
