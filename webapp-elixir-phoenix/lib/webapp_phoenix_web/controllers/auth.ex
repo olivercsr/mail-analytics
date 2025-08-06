@@ -62,16 +62,30 @@ defmodule WebappPhoenixWeb.AuthController do
 
     IO.puts("====================================================== got token")
     IO.inspect(client)
+    IO.inspect(client.token.expires_at)
     IO.inspect(user)
 
     # TODO: implement:
     #   (see README.md for detailed steps)
     #   - verify (id) token
 
-    case Auth.Jwt.generate_and_sign(%{"provider" => provider, "sub" => user["sub"], "email" => user["email"]}) do
-      {:ok, token, _claims} -> conn
+    case Auth.Jwt.generate_and_sign(%{
+      "exp" => client.token.expires_at,
+      "provider" => provider,
+      "sub" => user["sub"],
+      "email" => user["email"],
+    }) do
+      {:ok, token, claims} -> (
+        Logger.info([
+          module: __MODULE__,
+          message: "generated JWT",
+          jwt: token,
+          claims: claims,
+        ])
+        conn
         |> put_resp_cookie(jwtcookie, token, http_only: true, secure: true, same_site: "lax")
         |> redirect(to: "/")
+      )
       _ -> conn
         |> assign(:failed_logins, (conn.assigns[:failed_logins] || 0) + 1)
         |> redirect(to: "/login")

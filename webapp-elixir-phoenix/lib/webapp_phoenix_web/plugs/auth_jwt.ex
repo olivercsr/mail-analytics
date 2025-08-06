@@ -75,11 +75,13 @@ defmodule WebappPhoenixWeb.Plugs.AuthJwt do
 
     case get_authuser(conn, jwtcookie) do
       {:ok, authuser} -> (
-        assign(conn, :authuser, authuser)
         Logger.info([module: __MODULE__, message: "jwt", authuser: authuser])
         conn
+        |> assign(:authuser, authuser)
       )
-      _ -> resp(conn, 401, "unauthenticated") |> halt()
+      _ -> conn
+        |> Phoenix.Controller.redirect(to: "/login")
+        # resp(conn, 401, "unauthenticated") |> halt()
     end
   end
 end
