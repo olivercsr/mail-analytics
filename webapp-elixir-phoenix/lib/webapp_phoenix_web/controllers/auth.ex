@@ -67,10 +67,6 @@ defmodule WebappPhoenixWeb.AuthController do
     # TODO: implement:
     #   (see README.md for detailed steps)
     #   - verify (id) token
-    #   - create & sign JWT with relevant information
-    #   - set JWT as cookie
-    #   - on each request, check JWT
-    #   - if appropriate, redirect to login
 
     case Auth.Jwt.generate_and_sign(%{"provider" => provider, "sub" => user["sub"], "email" => user["email"]}) do
       {:ok, token, _claims} -> conn
