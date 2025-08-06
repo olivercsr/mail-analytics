@@ -77,7 +77,8 @@ defmodule WebappPhoenixWeb.Plugs.AuthJwt do
       {:ok, authuser} -> (
         Logger.info([module: __MODULE__, message: "jwt", authuser: authuser])
         conn
-        |> assign(:authuser, authuser)
+        # |> assign(:authuser, authuser)
+        |> put_session("authuser", authuser)
       )
       _ -> conn
         |> Phoenix.Controller.redirect(to: "/login")
