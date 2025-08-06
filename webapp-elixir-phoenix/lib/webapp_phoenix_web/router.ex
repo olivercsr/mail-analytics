@@ -22,11 +22,12 @@ defmodule WebappPhoenixWeb.Router do
     plug WebappPhoenixWeb.Plugs.AuthJwt
   end
 
-  scope "/oauth/:provider", WebappPhoenixWeb do
+  scope "/login", WebappPhoenixWeb do
     pipe_through [:browser]
 
-    get "/", AuthController, :index
-    get "/callback", AuthController, :callback
+    get "/", LoginController, :index
+    get "/:provider", AuthController, :index
+    get "/:provider/callback", AuthController, :callback
   end
 
   scope "/", WebappPhoenixWeb do

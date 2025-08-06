@@ -72,17 +72,14 @@ defmodule WebappPhoenixWeb.AuthController do
     #   - on each request, check JWT
     #   - if appropriate, redirect to login
 
-    # {:ok, token, claims} = Auth.Jwt.generate_and_sign(Map.merge(user, %{"provider" => provider})) # NOTE: token might become too large
-    {:ok, token, claims} = Auth.Jwt.generate_and_sign(%{"provider" => provider, "sub" => user["sub"], "email" => user["email"]})
-    IO.puts("========================= our token =======================")
-    IO.inspect(token)
-
-    {:ok, verificationResult} = Auth.Jwt.verify_and_validate(token)
-    IO.puts("========================= token verification result =======================")
-    IO.inspect(verificationResult)
-
-    conn = put_resp_cookie(conn, jwtcookie, token, http_only: true, secure: true, same_site: "lax")
-    redirect(conn, to: "/")
+    case Auth.Jwt.generate_and_sign(%{"provider" => provider, "sub" => user["sub"], "email" => user["email"]}) do
+      {:ok, token, _claims} -> conn
+        |> put_resp_cookie(jwtcookie, token, http_only: true, secure: true, same_site: "lax")
+        |> redirect(to: "/")
+      _ -> conn
+        |> assign(:failed_logins, (conn.assigns[:failed_logins] || 0) + 1)
+        |> redirect(to: "/login")
+    end
   end
 end
 
