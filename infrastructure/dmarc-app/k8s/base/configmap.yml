@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dmarc-app-config
+  labels:
+    app: dmarc-app
+data:
+  MIX_ENV: "prod"
+  GOOGLE_REDIRECT_URI: https://app.oliver.local/login/google/callback
+  EXISTDB_URL: http://existdb:8080/exist/rest/dmarc
+

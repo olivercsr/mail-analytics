@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp
+  name: dmarc-app
   labels:
-    app: webapp
+    app: dmarc-app
 spec:
   #type: LoadBalancer
   type: ClusterIP
   #clusterIP: None  # headless service for statefulset
   selector:
-    app: webapp
+    app: dmarc-app
   ports:
-  - name: webapp
-    port: 8081
-    targetPort: web
+  - name: http
+    port: 80
+    targetPort: http
 

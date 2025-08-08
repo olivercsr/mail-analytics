@@ -1,0 +1,57 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+
+namespace: dmarc-dev
+
+##labels:
+##- pairs:
+##    app: haraka
+##  #includeSelectors: true
+##  #includeTemplates: true
+#
+##namePrefix: haraka-
+#
+#generatorOptions:
+#  disableNameSuffixHash: true
+
+configMapGenerator:
+- name: haraka-config
+  behavior: merge
+  files:
+  - files/host_list
+  - files/me
+  #- files/file-provider.yml
+
+patches:
+# replace file:
+#- path: ingress.yml
+
+# strategic merge patching:
+#- patch: |-
+#    apiVersion: networking.k8s.io/v1
+#    kind: Ingress
+#    metadata:
+#      name: nginx-to-traefik
+#    spec:
+#      rules:
+#      - host: 'auth.mydmarc.csr-informatik.de'
+#      - host: 'mydmarc.csr-informatik.de'
+
+# json 6902 patching:
+- target:
+    kind: StatefulSet
+    name: haraka
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: europe-west3-docker.pkg.dev/csrinternal/mail-analytics/haraka:latest
+    - op: replace
+      path: /spec/template/spec/containers/0/imagePullPolicy
+      value: Always
+    - op: replace
+      path: /spec/volumeClaimTemplates/0/spec/resources/requests/storage
+      value: 1Gi
+
