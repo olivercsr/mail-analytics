@@ -1,0 +1,23 @@
+FROM elixir:1.18 as build
+
+USER appuser
+WORKDIR /app
+
+COPY --chown=appuser mix.* /app/
+RUN deps.get --only prod
+ENV MIX_ENV=prod
+RUN mix compile && mix assets.deploy && mix phx.gen.release
+
+
+
+FROM elixir:1.18 as run
+
+USER appuser
+WORKDIR /app
+
+COPY --chown=appuser --from=build /app/_build /app
+
+EXPOSE 4000
+
+ENTRYPOINT ["/app/_build/prod/rel/webapp_phoenix/bin/webapp_phoenix"]
+
