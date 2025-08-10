@@ -19,7 +19,9 @@ defmodule WebappPhoenix.MixProject do
   def application do
     [
       mod: {WebappPhoenix.Application, []},
-      extra_applications: [:logger, :runtime_tools, :os_mon, :observer, :wx, :runtime_tools]
+      # enable for observer debugging:
+      # extra_applications: [:logger, :runtime_tools, :os_mon, :observer, :wx, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :os_mon]
     ]
   end
 
