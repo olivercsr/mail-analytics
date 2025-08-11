@@ -16,6 +16,8 @@ spec:
       labels:
         app: dmarc-app
     spec:
+      securityContext:
+        fsGroup: 65534
       terminationGracePeriodSeconds: 20
       containers:
       - name: dmarc-app
@@ -52,19 +54,25 @@ spec:
 #            secretKeyRef:
 #              name: existdb-secrets
 #              key: POSTGRES_PASSWORD
-#        volumeMounts:
+        volumeMounts:
 #        - name: config-files
 #          mountPath: '/etc/traefik/'
 #          readOnly: true
+        - name: dmarc-app-filestorage
+          mountPath: '/mails'
+          readOnly: false
         resources:
           requests:
             memory: 16Mi
           limits:
             memory: 384Mi
-#      volumes:
+      volumes:
 #      - name: config-files
 #        configMap:
 #          name: traefik-config
+      - name: dmarc-app-filestorage
+        persistentVolumeClaim:
+          claimName: dmarc-app-filestorage
 
 #  volumeClaimTemplates:
 #  - metadata:
