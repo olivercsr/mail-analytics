@@ -1,3 +1,5 @@
+# NOTE: we're not using ceph atm
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
