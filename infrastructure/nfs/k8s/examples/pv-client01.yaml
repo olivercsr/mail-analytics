@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-client01-pv
+spec:
+  capacity:
+    storage: 128Mi
+  accessModes:
+    - ReadWriteMany
+  #storageClassName: taiga-nfs-static-sc
+  persistentVolumeReclaimPolicy: Delete
+  nfs:
+    server: nfs.nfs.svc.cluster.local
+    # path: "/exports/static"
+    path: '/client01'
+  mountOptions:
+  - hard
+  - nfsvers=4.2
+  - timeo=300
+  - retrans=3
+  - proto=tcp
+  - rsize=4096
+  - wsize=4096
+  - noacl
+  - nocto
+  - noatime
+  - nodiratime
+

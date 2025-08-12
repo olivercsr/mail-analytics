@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nfs
+  labels:
+    app: nfs
+spec:
+  selector:
+    matchLabels:
+      run: nfs
+  replicas: 1
+  revisionHistoryLimit: 2
+  #strategy:
+  #  type: Recreate
+  template:
+    metadata:
+      labels:
+        run: nfs
+    spec:
+      terminationGracePeriodSeconds: 20
+      initContainers:
+      - name: init-nfs
+        image: busybox:latest
+        # create needed folders here:
+        # command: [ 'sh', '-c', 'mkdir -p /exports/client01 ; chown -R 999:999 /exports/client01' ]
+        command: [ 'sh', '-c', 'mkdir -p /exports/client01' ]
+        volumeMounts:
+        - name: nfs-backing-storage
+          mountPath: '/exports'
+          readOnly: false
+      containers:
+      - name: nfs
+        # image: itsthenetwork/nfs-server-alpine:12
+        # image: gcr.io/google_containers/volume-nfs:0.8
+        # image: erichough/nfs-server:2.2.1
+        image: nfs-server  # build this from the local Dockerfile
+        #imagePullPolicy: IfNotPresent
+        #env:
+        #- name: NFS_EXPORT_0
+        #  value: '/nfs-share/client01 *(rw,insecure,no_subtree_check,no_root_squash)'
+        #- name: POSTGRES_DB
+        #  valueFrom:
+        #    configMapKeyRef:
+        #      name: taiga-db-config
+        #      key: POSTGRES_DB
+        #- name: PGDATA
+        #  valueFrom:
+        #    configMapKeyRef:
+        #      name: taiga-db-config
+        #      key: PGDATA
+        #- name: POSTGRES_PASSWORD
+        #  valueFrom:
+        #    secretKeyRef:
+        #      name: taiga-db-secrets
+        #      key: POSTGRES_PASSWORD
+        #- name: POSTGRES_USER
+        #  valueFrom:
+        #    secretKeyRef:
+        #      name: taiga-db-secrets
+        #      key: POSTGRES_USER
+        #ports:
+        #- name: nfs
+        #  containerPort: 2049
+        #- name: mountd
+        #  containerPort: 20048
+        #- name: rpcbind
+        #  containerPort: 111
+        securityContext:
+          # privileged: true
+          capabilities:
+            add: ["SYS_ADMIN"]
+        volumeMounts:
+#        - name: nfs-config
+#          mountPath: '/etc/exports'
+#          subPath: 'exports'
+#          readOnly: true
+        - name: nfs-backing-storage
+          mountPath: '/exports'
+          readOnly: false
+        resources:
+          requests:
+            memory: 8Mi
+          limits:
+            memory: 256Mi
+      volumes:
+      - name: nfs-config
+        configMap:
+          name: nfs-config
+          items:
+          - key: 'exports'
+            path: 'exports'
+      #- name: nfs-backing-storage
+      #  persistentVolumeClaim:
+      #    claimName: nfs-backing-storage
+  volumeClaimTemplates:
+  - metadata:
+      name: nfs-backing-storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 128Mi
+

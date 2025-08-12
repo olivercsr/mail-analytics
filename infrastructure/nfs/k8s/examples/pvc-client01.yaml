@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-client01-pvc
+spec:
+  volumeName: nfs-client01-pv
+  #storageClassName: nfs-data-sc
+  storageClassName: ""
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 128Mi
+
