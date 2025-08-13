@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+# - configmap.yml
+- statefulset.yml
+- service.yml
+- pv-mails.yml
+- pvc-mails.yml
+
+namespace: dmarc-dev
+
+labels:
+- pairs:
+    app: nfs-server
+
+#namePrefix: haraka-
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+- name: nfs-server-config
+  files:
+  - files/exports
+#  - files/host_list
+#  - files/internalcmd_key
+#  - files/log.ini
+#  - files/loglevel
+#  - files/me
+#  - files/plugins
+#  - files/quarantine.ini
+#  - files/rabbitmq.ini
+#  - files/smtp.ini
+#  - files/smtpgreeting
+#  - files/ehlo_hello_message
+#  - files/connection_close_message
+

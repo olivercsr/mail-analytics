@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: haraka
 spec:
@@ -49,7 +49,7 @@ spec:
         - name: config-files
           mountPath: '/app/test01/config/'
           readOnly: true
-        - name: haraka-mails
+        - name: nfs-mails
           mountPath: '/var/spool/haraka/quarantine'
           readOnly: false
         resources:
@@ -57,19 +57,22 @@ spec:
             memory: 16Mi
           limits:
             memory: 256Mi
-      securityContext:
-        fsGroup: 1000
+      # securityContext:
+      #   fsGroup: 1000
       volumes:
       - name: config-files
         configMap:
           name: haraka-config
-  volumeClaimTemplates:
-  - metadata:
-      name: haraka-mails
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 128Mi
+      - name: nfs-mails
+        persistentVolumeClaim:
+          claimName: nfs-mails
+#  volumeClaimTemplates:
+#  - metadata:
+#      name: haraka-mail-storage
+#    spec:
+#      accessModes:
+#      - ReadWriteOnce
+#      resources:
+#        requests:
+#          storage: 128Mi
 

@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+
+namespace: dmarc-dev
+
+##labels:
+##- pairs:
+##    app: haraka
+##  #includeSelectors: true
+##  #includeTemplates: true
+#
+##namePrefix: haraka-
+#
+#generatorOptions:
+#  disableNameSuffixHash: true
+
+#configMapGenerator:
+#- name: haraka-config
+#  behavior: merge
+#  files:
+#  - files/traefik.yml
+#  #- files/file-provider.yml
+
+#patches:
+#- path: 

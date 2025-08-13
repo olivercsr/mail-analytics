@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: nfs
+  name: nfs-server
   labels:
-    app: nfs
+    app: nfs-server
 spec:
   selector:
     matchLabels:
-      run: nfs
+      run: nfs-server
   replicas: 1
   revisionHistoryLimit: 2
   #strategy:
@@ -15,26 +15,27 @@ spec:
   template:
     metadata:
       labels:
-        run: nfs
+        run: nfs-server
     spec:
       terminationGracePeriodSeconds: 20
       initContainers:
-      - name: init-nfs
+      - name: init-nfs-server
         image: busybox:latest
         # create needed folders here:
         # command: [ 'sh', '-c', 'mkdir -p /exports/client01 ; chown -R 999:999 /exports/client01' ]
-        command: [ 'sh', '-c', 'mkdir -p /exports/client01' ]
+        command: [ 'sh', '-c', 'mkdir -p /exports/mails' ]
         volumeMounts:
         - name: nfs-backing-storage
           mountPath: '/exports'
           readOnly: false
       containers:
-      - name: nfs
+      - name: nfs-server
         # image: itsthenetwork/nfs-server-alpine:12
         # image: gcr.io/google_containers/volume-nfs:0.8
         # image: erichough/nfs-server:2.2.1
-        image: nfs-server  # build this from the local Dockerfile
-        #imagePullPolicy: IfNotPresent
+        image: nfs-server:latest  # build this from the local Dockerfile
+        # need to enable this for minikube, if image is just present in minikube registry, but not remotely:
+        imagePullPolicy: IfNotPresent
         #env:
         #- name: NFS_EXPORT_0
         #  value: '/nfs-share/client01 *(rw,insecure,no_subtree_check,no_root_squash)'
@@ -58,9 +59,13 @@ spec:
         #    secretKeyRef:
         #      name: taiga-db-secrets
         #      key: POSTGRES_USER
-        #ports:
-        #- name: nfs
-        #  containerPort: 2049
+        ports:
+        - name: rpcbind
+          containerPort: 111
+        - name: nfs
+          containerPort: 2049
+        - name: mountd
+          containerPort: 20048
         #- name: mountd
         #  containerPort: 20048
         #- name: rpcbind
@@ -70,10 +75,10 @@ spec:
           capabilities:
             add: ["SYS_ADMIN"]
         volumeMounts:
-#        - name: nfs-config
-#          mountPath: '/etc/exports'
-#          subPath: 'exports'
-#          readOnly: true
+        - name: nfs-server-config
+          mountPath: '/etc/exports'
+          subPath: 'exports'
+          readOnly: true
         - name: nfs-backing-storage
           mountPath: '/exports'
           readOnly: false
@@ -83,9 +88,9 @@ spec:
           limits:
             memory: 256Mi
       volumes:
-      - name: nfs-config
+      - name: nfs-server-config
         configMap:
-          name: nfs-config
+          name: nfs-server-config
           items:
           - key: 'exports'
             path: 'exports'

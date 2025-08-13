@@ -1,7 +1,7 @@
 FROM docker.io/alpine:3
 
 VOLUME /exports
-EXPOSE 2049 32767
+EXPOSE 111 2049 20048
 
 RUN apk update && apk add nfs-utils
 
