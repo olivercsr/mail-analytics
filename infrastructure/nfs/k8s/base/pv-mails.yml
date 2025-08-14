@@ -12,7 +12,9 @@ spec:
   persistentVolumeReclaimPolicy: Delete
   nfs:
     # server: nfs.nfs.svc.cluster.local
-    server: nfs.dmarc-dev.svc.cluster.local
+    # server: nfs.dmarc-dev.svc.cluster.local
+    # server: nfs
+    server: 10.100.5.250
     # server: 10.244.2.70
     # path: "/exports/static"
     path: '/mails'

@@ -14,6 +14,9 @@ spec:
       labels:
         app: haraka
     spec:
+      securityContext:
+        # for being able to mount NFS shares:
+        supplementalGroups: [2000]
       terminationGracePeriodSeconds: 20
       containers:
       - name: haraka
@@ -57,8 +60,6 @@ spec:
             memory: 16Mi
           limits:
             memory: 256Mi
-      # securityContext:
-      #   fsGroup: 1000
       volumes:
       - name: config-files
         configMap:

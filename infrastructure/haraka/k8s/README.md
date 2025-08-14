@@ -13,3 +13,7 @@ can resolve k8s' services' names
 For this to work, run the script `fix-resolved.sh` in the
 `infrastructure/minikube/bin` folder.
 
+Update: As gke obviously also does not support DNS lookups
+from the nodes to the K8s services, we should instead define
+the NFS service with a static IP address from the cluster IP
+pool and refer to that IP address from NFS clients/PVs.

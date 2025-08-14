@@ -23,7 +23,10 @@ spec:
         image: busybox:latest
         # create needed folders here:
         # command: [ 'sh', '-c', 'mkdir -p /exports/client01 ; chown -R 999:999 /exports/client01' ]
-        command: [ 'sh', '-c', 'mkdir -p /exports/mails' ]
+        command:
+        - 'sh'
+        - '-c'
+        - '(mkdir -p /exports/mails; chown 2000:2000 /exports/mails; chmod 775 /exports/mails)'
         volumeMounts:
         - name: nfs-backing-storage
           mountPath: '/exports'
@@ -71,9 +74,9 @@ spec:
         #- name: rpcbind
         #  containerPort: 111
         securityContext:
-          # privileged: true
-          capabilities:
-            add: ["SYS_ADMIN"]
+          privileged: true
+          # capabilities:
+          #   add: ["SYS_ADMIN"]
         volumeMounts:
         - name: nfs-server-config
           mountPath: '/etc/exports'

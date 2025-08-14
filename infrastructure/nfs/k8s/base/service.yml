@@ -6,8 +6,13 @@ metadata:
     app: nfs-server
 spec:
   # type: LoadBalancer
-  # NOTE: for NFS, a headless service is recommended:
-  clusterIP: None
+  # NOTE: as it seems, DNS is not working from the nodes' points of view,
+  #   which prevents mounting an NFS PV by its service name, as that is
+  #   being done by the node. And if it cannot resolve the service's
+  #   DNS name, it cannot mount the NFS PV as a result.
+  #   So we assign a static IP address to the service and use that one
+  #   in all NFS PVs as server address instead of the DNS name:
+  clusterIP: 10.100.5.250
   selector:
     run: nfs-server
     # app: nfs-server
