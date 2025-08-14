@@ -70,4 +70,4 @@ rcpt_to.in_host_list
 # Queue mail via smtp - see config/smtp_forward.ini for where your mail goes
 queue/quarantine
 #queue/smtp_forward
-queue/rabbitmq
+#queue/rabbitmq
