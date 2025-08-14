@@ -1,3 +1,7 @@
-/exports 10.0.0.0/8(fsid=root,rw,sync,insecure,nohide,no_subtree_check,all_squash,anonuid=2000,anongid=2000)
-/exports/mails 10.0.0.0/8(fsid=1,rw,sync,insecure,nohide,no_subtree_check,all_squash,anonuid=2000,anongid=2000)
+/exports 10.0.0.0/8(fsid=root,rw,async,insecure,nohide,no_subtree_check,all_squash,anonuid=2000,anongid=2000)
+/exports 172.16.0.0/12(fsid=root,rw,async,insecure,nohide,no_subtree_check,all_squash,anonuid=2000,anongid=2000)
+/exports 192.168.0.0/16(fsid=root,rw,async,insecure,nohide,no_subtree_check,all_squash,anonuid=2000,anongid=2000)
+/exports/mails 10.0.0.0/8(fsid=1,rw,async,insecure,nohide,no_subtree_check,all_squash,anonuid=2000,anongid=2000)
+/exports/mails 172.16.0.0/12(fsid=1,rw,async,insecure,nohide,no_subtree_check,all_squash,anonuid=2000,anongid=2000)
+/exports/mails 192.168.0.0/16(fsid=1,rw,async,insecure,nohide,no_subtree_check,all_squash,anonuid=2000,anongid=2000)
 
