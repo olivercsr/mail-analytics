@@ -1,3 +1,18 @@
+# %{
+#   "/mails/mails/new/20250815/DFD44375-ABA3-4B65-9FB9-E29374103191.1" => {:ok,
+#    nil}
+# }
+# 11:39:08.691 [error] GenServer MailDecoder terminating
+# ** (FunctionClauseError) no function clause matching in Mail.Parsers.RFC2822.extract_headers/2
+#     (mail 0.5.1) lib/mail/parsers/rfc_2822.ex:66: Mail.Parsers.RFC2822.extract_headers([], ["Received: from foo.com (ip6-localhost [127.0.0.1])\n\tby haraka (Haraka/3.0.5) with ESMTP id DFD44375-ABA3-4B65-9FB9-E29374103191.1\n\tenvelope-from <oliver.wegner@csr-informatik.de>;\n\tFri, 15 Aug 2025 11:32:09 +0000\nSubject: wfpeiwogihew\n\nqworihwoetih"])
+#     (mail 0.5.1) lib/mail/parsers/rfc_2822.ex:53: Mail.Parsers.RFC2822.parse/2
+#     (webapp_phoenix 0.1.0) lib/ingress/mail_decoder.ex:116: Ingress.MailDecoder.handle_cast/2
+#     (stdlib 6.2.2) gen_server.erl:2371: :gen_server.try_handle_cast/3
+#     (stdlib 6.2.2) gen_server.erl:2433: :gen_server.handle_msg/6
+#     (stdlib 6.2.2) proc_lib.erl:329: :proc_lib.init_p_do_apply/3
+# Last message: {:"$gen_cast", {:decode, "/mails/mails/pending/20250815/DFD44375-ABA3-4B65-9FB9-E29374103191.1", "/mails/mails/done/20250815/DFD44375-ABA3-4B65-9FB9-E29374103191.1", "20250815"}}
+
+
 defmodule Ingress.MailDecoder do
   use GenServer
 
