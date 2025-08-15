@@ -55,10 +55,13 @@ spec:
 #            secretKeyRef:
 #              name: existdb-secrets
 #              key: POSTGRES_PASSWORD
-#        volumeMounts:
+        volumeMounts:
 #        - name: config-files
 #          mountPath: '/etc/traefik/'
 #          readOnly: true
+        - name: nfs-mails
+          mountPath: '/mails'
+          readOnly: false
 #        - name: dmarc-app-filestorage
 #          mountPath: '/mails'
 #          readOnly: false
@@ -67,10 +70,13 @@ spec:
             memory: 16Mi
           limits:
             memory: 384Mi
-#      volumes:
+      volumes:
 #      - name: config-files
 #        configMap:
 #          name: traefik-config
+      - name: nfs-mails
+        persistentVolumeClaim:
+          claimName: nfs-mails
 #      - name: dmarc-app-filestorage
 #        persistentVolumeClaim:
 #          claimName: dmarc-app-filestorage
