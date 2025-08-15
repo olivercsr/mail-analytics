@@ -18,7 +18,7 @@ namespace: dmarc-dev
 #  disableNameSuffixHash: true
 
 configMapGenerator:
-- name: haraka-config
+- name: haraka-file-config
   behavior: merge
   files:
   - files/host_list

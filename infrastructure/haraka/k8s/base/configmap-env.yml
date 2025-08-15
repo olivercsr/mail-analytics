@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haraka-env-config
+  labels:
+    app: haraka
+data:
+  QUARANTINE_SUBFOLDERS: 'mails/new'
+

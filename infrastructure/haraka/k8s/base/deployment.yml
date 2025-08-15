@@ -27,6 +27,9 @@ spec:
           containerPort: 2500
         # need to enable this for minikube, if image is just present in minikube registry, but not remotely:
         imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: haraka-env-config
 #        env:
 #        - name: POSTGRES_DB
 #          valueFrom:
@@ -63,7 +66,7 @@ spec:
       volumes:
       - name: config-files
         configMap:
-          name: haraka-config
+          name: haraka-file-config
       - name: nfs-mails
         persistentVolumeClaim:
           claimName: nfs-mails
