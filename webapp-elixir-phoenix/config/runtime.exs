@@ -136,8 +136,8 @@ config :joken, :default_signer,
   key_octet: System.get_env("JWT_SIGNKEY")
 
 config :webapp_phoenix, DmarcFileCollector, %Ingress.FileCollector.Config{
-  interval_seconds: 31,
-  # interval_seconds: 11,
+  interval_seconds: 41,
+  # interval_seconds: 21,
   minfileage: 1,
   basepath: mail_folder,
   newpath: "dmarc/new",
@@ -145,8 +145,8 @@ config :webapp_phoenix, DmarcFileCollector, %Ingress.FileCollector.Config{
   donepath: "dmarc/done",
 }
 config :webapp_phoenix, DmarcFilePendingChecker, %Ingress.FileCollector.Config{
-  interval_seconds: 53,
-  minfileage: 5,
+  interval_seconds: 61,
+  minfileage: 30,
   basepath: mail_folder,
   newpath: "dmarc/pending",
   pendingpath: "dmarc/new",
@@ -164,7 +164,7 @@ config :webapp_phoenix, AttachmentFileCollector, %Ingress.FileCollector.Config{
 }
 config :webapp_phoenix, AttachmentFilePendingChecker, %Ingress.FileCollector.Config{
   interval_seconds: 59,
-  minfileage: 5,
+  minfileage: 30,
   basepath: mail_folder,
   newpath: "attachments/pending",
   pendingpath: "attachments/new",
@@ -172,8 +172,8 @@ config :webapp_phoenix, AttachmentFilePendingChecker, %Ingress.FileCollector.Con
 }
 
 config :webapp_phoenix, MailFileCollector, %Ingress.FileCollector.Config{
-  interval_seconds: 41,
-  # interval_seconds: 21,
+  interval_seconds: 31,
+  # interval_seconds: 11,
   minfileage: 1,
   basepath: mail_folder,
   newpath: "mails/new",
@@ -181,8 +181,8 @@ config :webapp_phoenix, MailFileCollector, %Ingress.FileCollector.Config{
   donepath: "mails/done",
 }
 config :webapp_phoenix, MailFilePendingChecker, %Ingress.FileCollector.Config{
-  interval_seconds: 61,
-  minfileage: 5,
+  interval_seconds: 53,
+  minfileage: 30,
   basepath: mail_folder,
   newpath: "mails/pending",
   pendingpath: "mails/new",
