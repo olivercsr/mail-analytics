@@ -103,9 +103,89 @@ end
 
 config :webapp_phoenix, :env, config_env()
 
+mail_folder = System.get_env("MAIL_FOLDER") || "./mails"
+
+config :webapp_phoenix,
+  auth_cookie: (System.get_env("AUTH_COOKIE") || "x-dmarc-session") |> String.trim(),
+  mail_folder: mail_folder
+
 config :webapp_phoenix, Db.ExistDb.Config, %Db.ExistDb.Config{
   base_url: System.get_env("EXISTDB_URL"),
   user: System.get_env("EXISTDB_USER"),
   password: System.get_env("EXISTDB_PASSWORD")
+}
+
+# OAuth providers
+config :webapp_phoenix, Google,
+ client_id: System.get_env("GOOGLE_CLIENT_ID"),
+ client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
+ redirect_uri: System.get_env("GOOGLE_REDIRECT_URI")
+
+#config :webapp_phoenix, GitHub,
+#  client_id: System.get_env("GITHUB_CLIENT_ID"),
+#  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
+#  redirect_uri: System.get_env("GITHUB_REDIRECT_URI")
+
+config :webapp_phoenix, KanIdm,
+  client_id: System.get_env("KANIDM_CLIENT_ID"),
+  client_secret: System.get_env("KANIDM_CLIENT_SECRET"),
+  redirect_uri: System.get_env("KANIDM_REDIRECT_URI")
+
+config :joken, :default_signer,
+  signer_alg: "HS512",
+  key_octet: System.get_env("JWT_SIGNKEY")
+
+config :webapp_phoenix, DmarcFileCollector, %Ingress.FileCollector.Config{
+  interval_seconds: 31,
+  # interval_seconds: 11,
+  minfileage: 1,
+  basepath: mail_folder,
+  newpath: "dmarc/new",
+  pendingpath: "dmarc/pending",
+  donepath: "dmarc/done",
+}
+config :webapp_phoenix, DmarcFilePendingChecker, %Ingress.FileCollector.Config{
+  interval_seconds: 53,
+  minfileage: 5,
+  basepath: mail_folder,
+  newpath: "dmarc/pending",
+  pendingpath: "dmarc/new",
+  donepath: "dmarc/new",
+}
+
+config :webapp_phoenix, AttachmentFileCollector, %Ingress.FileCollector.Config{
+  interval_seconds: 37,
+  # interval_seconds: 17,
+  minfileage: 1,
+  basepath: mail_folder,
+  newpath: "attachments/new",
+  pendingpath: "attachments/pending",
+  donepath: "attachments/done",
+}
+config :webapp_phoenix, AttachmentFilePendingChecker, %Ingress.FileCollector.Config{
+  interval_seconds: 59,
+  minfileage: 5,
+  basepath: mail_folder,
+  newpath: "attachments/pending",
+  pendingpath: "attachments/new",
+  donepath: "attachments/new",
+}
+
+config :webapp_phoenix, MailFileCollector, %Ingress.FileCollector.Config{
+  interval_seconds: 41,
+  # interval_seconds: 21,
+  minfileage: 1,
+  basepath: mail_folder,
+  newpath: "mails/new",
+  pendingpath: "mails/pending",
+  donepath: "mails/done",
+}
+config :webapp_phoenix, MailFilePendingChecker, %Ingress.FileCollector.Config{
+  interval_seconds: 61,
+  minfileage: 5,
+  basepath: mail_folder,
+  newpath: "mails/pending",
+  pendingpath: "mails/new",
+  donepath: "mails/new",
 }
 

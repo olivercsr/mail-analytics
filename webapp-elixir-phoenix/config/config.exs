@@ -30,26 +30,6 @@ config :webapp_phoenix, WebappPhoenixWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :webapp_phoenix, WebappPhoenix.Mailer, adapter: Swoosh.Adapters.Local
 
-# OAuth providers
-config :webapp_phoenix, Google,
- client_id: System.get_env("GOOGLE_CLIENT_ID"),
- client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
- redirect_uri: System.get_env("GOOGLE_REDIRECT_URI")
-
-#config :webapp_phoenix, GitHub,
-#  client_id: System.get_env("GITHUB_CLIENT_ID"),
-#  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
-#  redirect_uri: System.get_env("GITHUB_REDIRECT_URI")
-
-config :webapp_phoenix, KanIdm,
-  client_id: System.get_env("KANIDM_CLIENT_ID"),
-  client_secret: System.get_env("KANIDM_CLIENT_SECRET"),
-  redirect_uri: System.get_env("KANIDM_REDIRECT_URI")
-
-config :joken, :default_signer,
-  signer_alg: "HS512",
-  key_octet: System.get_env("JWT_SIGNKEY")
-
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
@@ -83,9 +63,6 @@ config :phoenix, :json_library, Jason
 config :mime, :suffixes, %{
   "gzip" => ["gz"]
 }
-
-config :webapp_phoenix,
-  auth_cookie: (System.get_env("AUTH_COOKIE") || "x-dmarc-session") |> String.trim()
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

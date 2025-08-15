@@ -8,15 +8,27 @@ defmodule Ingress.FileCollector do
   def default_interval, do: 10
   def default_minfileage, do: 1
 
+  defmodule Config do
+    defstruct [:interval_seconds, :minfileage, :basepath, :newpath, :pendingpath, :donepath]
+  end
+
   def start_link(opts) do
+    # Logger.info([module: __MODULE__, message: "FileCollector start_link", opts: opts])
+
     GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
   @impl true
   def init(opts) do
-    schedule_work(opts[:interval_seconds])
+    name = opts[:name]
+    config = opts[:config]
+    action = opts[:action]
 
-    {:ok, %{opts: opts}}
+    Logger.info([module: __MODULE__, message: "FileCollector init", name: name, config: config])
+
+    schedule_work(config.interval_seconds)
+
+    {:ok, %{name: name, config: config, action: action}}
   end
 
   @impl true
@@ -65,16 +77,16 @@ defmodule Ingress.FileCollector do
   @impl true
   def handle_info(:work, state) do
     # wd = File.cwd!()
-    interval = state.opts[:interval_seconds] || default_interval()
-    minfileage = state.opts[:minfileage] || default_minfileage()
-    basepath = Path.absname(state.opts[:basepath])
-    newpath = Path.absname("#{basepath}/#{state.opts[:newpath]}")
+    interval = state.config.interval_seconds || default_interval()
+    minfileage = state.config.minfileage || default_minfileage()
+    basepath = Path.absname(state.config.basepath)
+    newpath = Path.absname("#{basepath}/#{state.config.newpath}")
     newpathlen = String.length(newpath)
-    pendingpath = Path.absname("#{basepath}/#{state.opts[:pendingpath]}")
-    donepath = Path.absname("#{basepath}/#{state.opts[:donepath]}")
-    file_action = state.opts[:action]
+    pendingpath = Path.absname("#{basepath}/#{state.config.pendingpath}")
+    donepath = Path.absname("#{basepath}/#{state.config.donepath}")
+    file_action = state.action
 
-    Logger.debug([module: __MODULE__, message: "running file collector", name: state.opts[:name], state: state])
+    Logger.debug([module: __MODULE__, message: "running file collector", name: state.name, state: state])
 
     action_results = Path.wildcard("#{newpath}/**/*")
       |> Enum.map(fn file ->
