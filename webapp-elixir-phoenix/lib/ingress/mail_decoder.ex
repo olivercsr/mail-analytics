@@ -15,6 +15,10 @@ defmodule Ingress.MailDecoder do
   require File
   require Mail
 
+  defmodule Config do
+    defstruct [:basepath, :attachmentsdir]
+  end
+
   # Client
 
   def start_link(opts) do
@@ -24,6 +28,10 @@ defmodule Ingress.MailDecoder do
 
   def decode(pid, filepath, donefilepath, filesubdir) do
     GenServer.cast(pid, {:decode, filepath, donefilepath, filesubdir})
+  end
+
+  def decode_task(config, filepath, donefilepath, filesubdir) do
+    action(config, filepath, donefilepath, filesubdir)
   end
 
   # Server
@@ -151,6 +159,10 @@ defmodule Ingress.MailDecoder do
     end
 
     {:noreply, state}
+  end
+
+  defp action(config, filepath, donefilepath, filesubdir) do
+    handle_cast({:decode, filepath, donefilepath, filesubdir}, %{state: config})
   end
 end
 
