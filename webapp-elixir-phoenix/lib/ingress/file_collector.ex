@@ -53,6 +53,7 @@ defmodule Ingress.FileCollector do
     Logger.debug([module: __MODULE__, message: "process_file start", filedir: filedir, file: filepath, pendingfilepath: pendingfilepath])
     case file_processable?(filestat, minfileage) do
       {:ok, true} ->
+        :ok = File.touch(filepath)
         :ok = File.mkdir_p(pendingfiledir)
         :ok = File.mkdir_p(donefiledir)
         :ok = File.rename(filepath, pendingfilepath)
