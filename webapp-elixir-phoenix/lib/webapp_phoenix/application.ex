@@ -34,7 +34,7 @@ defmodule WebappPhoenix.Application do
       Supervisor.child_spec({Ingress.FileCollector,
         name: DmarcFilePendingChecker,
         config: Application.get_env(:webapp_phoenix, DmarcFilePendingChecker),
-        action: fn _ -> :ok end  # TODO: implement
+        action: fn _, _, _ -> :ok end
       }, id: :dmarc_file_pending_checker),
 
       {Ingress.AttachmentDecoder,
@@ -50,7 +50,7 @@ defmodule WebappPhoenix.Application do
       Supervisor.child_spec({Ingress.FileCollector,
         name: AttachmentFilePendingChecker,
         config: Application.get_env(:webapp_phoenix, AttachmentFilePendingChecker),
-        action: fn _ -> :ok end
+        action: fn _, _, _ -> :ok end
       }, id: :attachment_file_pending_checker),
 
       {Ingress.MailDecoder,
@@ -66,7 +66,7 @@ defmodule WebappPhoenix.Application do
       Supervisor.child_spec({Ingress.FileCollector,
         name: MailFilePendingChecker,
         config: Application.get_env(:webapp_phoenix, MailFilePendingChecker),
-        action: fn _ -> :ok end
+        action: fn _, _, _ -> :ok end
       }, id: :mail_file_pending_checker),
     ]
 
