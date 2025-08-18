@@ -1,17 +1,12 @@
-# %{
-#   "/mails/mails/new/20250815/DFD44375-ABA3-4B65-9FB9-E29374103191.1" => {:ok,
-#    nil}
-# }
-# 11:39:08.691 [error] GenServer MailDecoder terminating
-# ** (FunctionClauseError) no function clause matching in Mail.Parsers.RFC2822.extract_headers/2
-#     (mail 0.5.1) lib/mail/parsers/rfc_2822.ex:66: Mail.Parsers.RFC2822.extract_headers([], ["Received: from foo.com (ip6-localhost [127.0.0.1])\n\tby haraka (Haraka/3.0.5) with ESMTP id DFD44375-ABA3-4B65-9FB9-E29374103191.1\n\tenvelope-from <oliver.wegner@csr-informatik.de>;\n\tFri, 15 Aug 2025 11:32:09 +0000\nSubject: wfpeiwogihew\n\nqworihwoetih"])
-#     (mail 0.5.1) lib/mail/parsers/rfc_2822.ex:53: Mail.Parsers.RFC2822.parse/2
-#     (webapp_phoenix 0.1.0) lib/ingress/mail_decoder.ex:116: Ingress.MailDecoder.handle_cast/2
-#     (stdlib 6.2.2) gen_server.erl:2371: :gen_server.try_handle_cast/3
-#     (stdlib 6.2.2) gen_server.erl:2433: :gen_server.handle_msg/6
-#     (stdlib 6.2.2) proc_lib.erl:329: :proc_lib.init_p_do_apply/3
-# Last message: {:"$gen_cast", {:decode, "/mails/mails/pending/20250815/DFD44375-ABA3-4B65-9FB9-E29374103191.1", "/mails/mails/done/20250815/DFD44375-ABA3-4B65-9FB9-E29374103191.1", "20250815"}}
-
+# TODO: make this a Task instead of a Genserver,
+#   as otherwise a crash for a call of a client will
+#   clear this Genserver's mailbox, potentially losing
+#   the pending requests of other clients.
+#   Although this can be mitigated by using call()
+#   instead of cast(), using call() will serialize
+#   all clients' calls, which is not what we intend.
+#   A more appropriate handling would be to run the
+#   decoding logic via a Task.
 
 defmodule Ingress.MailDecoder do
   use GenServer
@@ -23,6 +18,7 @@ defmodule Ingress.MailDecoder do
   # Client
 
   def start_link(opts) do
+    # IO.puts("==================================== MailDecoder start_link")
     GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
@@ -114,6 +110,7 @@ defmodule Ingress.MailDecoder do
 
   @impl true
   def init(opts) do
+    # IO.puts("==================================== MailDecoder init")
     {:ok, %{
       # recipient_regex: ~r"^([^@\s]+)@.+$",
       opts: opts
@@ -127,11 +124,13 @@ defmodule Ingress.MailDecoder do
     basepath = Path.absname(state.opts[:basepath])
     attachmentsdir = Path.absname("#{basepath}/#{state.opts[:attachmentsdir]}")
 
+    # IO.puts("======================== read #{mailfilepath}...")
     with {:ok, file_contents} <- File.read(mailfilepath),
       mail_msg <- Mail.parse(file_contents) do
       [tenant] = Mail.get_to(mail_msg) # TODO: allow for multiple recipients and then search for the one that belongs to us
         # |> Enum.at(0)
         # |> get_tenant_from_recipient(state)
+      # IO.puts("======================== get_attachments #{mailfilepath}...")
       results = Mail.get_attachments(mail_msg, :attachment)
         |> Enum.map(fn {attachmentfilename, attachmentdata} ->
           try do
@@ -145,6 +144,7 @@ defmodule Ingress.MailDecoder do
           end
         end)
 
+      # IO.puts("======================== rename #{mailfilepath} #{maildonefilepath}...")
       :ok = File.rename(mailfilepath, maildonefilepath)
 
       Logger.debug([module: __MODULE__, message: "MailDecoder.decode done", results: results])

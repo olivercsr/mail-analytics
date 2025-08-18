@@ -1,3 +1,13 @@
+# TODO: make this a Task instead of a Genserver,
+#   as otherwise a crash for a call of a client will
+#   clear this Genserver's mailbox, potentially losing
+#   the pending requests of other clients.
+#   Although this can be mitigated by using call()
+#   instead of cast(), using call() will serialize
+#   all clients' calls, which is not what we intend.
+#   A more appropriate handling would be to run the
+#   decoding logic via a Task.
+
 defmodule Ingress.DmarcImporter do
   use GenServer
 
