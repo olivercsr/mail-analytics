@@ -147,6 +147,7 @@ config :webapp_phoenix, DmarcFileCollector, %Ingress.FileCollector.Config{
 config :webapp_phoenix, DmarcFilePendingChecker, %Ingress.FileCollector.Config{
   interval_seconds: 61,
   minfileage: 30,
+  # minfileage: 2,
   basepath: mail_folder,
   newpath: "dmarc/pending",
   pendingpath: "dmarc/new",
@@ -165,6 +166,7 @@ config :webapp_phoenix, AttachmentFileCollector, %Ingress.FileCollector.Config{
 config :webapp_phoenix, AttachmentFilePendingChecker, %Ingress.FileCollector.Config{
   interval_seconds: 59,
   minfileage: 30,
+  # minfileage: 2,
   basepath: mail_folder,
   newpath: "attachments/pending",
   pendingpath: "attachments/new",
@@ -183,9 +185,15 @@ config :webapp_phoenix, MailFileCollector, %Ingress.FileCollector.Config{
 config :webapp_phoenix, MailFilePendingChecker, %Ingress.FileCollector.Config{
   interval_seconds: 53,
   minfileage: 30,
+  # minfileage: 2,
   basepath: mail_folder,
   newpath: "mails/pending",
   pendingpath: "mails/new",
   donepath: "mails/new",
+}
+
+config :webapp_phoenix, MailDecoder, %Ingress.MailDecoder.Config{
+  basepath: mail_folder,
+  attachmentsdir: "attachments/new",
 }
 

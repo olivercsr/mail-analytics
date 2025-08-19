@@ -53,15 +53,13 @@ defmodule WebappPhoenix.Application do
         action: fn _, _, _ -> :ok end
       }, id: :attachment_file_pending_checker),
 
-      {Ingress.MailDecoder,
-        name: MailDecoder,
-        basepath: Application.get_env(:webapp_phoenix, :mail_folder),
-        attachmentsdir: "attachments/new",
-      },
       Supervisor.child_spec({Ingress.FileCollector,
         name: MailFileCollector,
         config: Application.get_env(:webapp_phoenix, MailFileCollector),
-        action: &Ingress.MailDecoder.decode(MailDecoder, &1, &2, &3)
+        action: &Ingress.MailDecoder.decode_async(
+          Application.get_env(:webapp_phoenix, MailDecoder),
+          &1, &2, &3
+        )
       }, id: :mail_file_collector),
       Supervisor.child_spec({Ingress.FileCollector,
         name: MailFilePendingChecker,
