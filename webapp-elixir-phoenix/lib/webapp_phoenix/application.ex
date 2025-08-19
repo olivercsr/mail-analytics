@@ -18,6 +18,10 @@ defmodule WebappPhoenix.Application do
       # Start to serve requests, typically the last entry
       WebappPhoenixWeb.Endpoint,
 
+      {Task.Supervisor,
+        name: TaskSupervisor
+      },
+
       {Db.ExistDb,
         name: Db.ExistDb,
         config: Application.get_env(:webapp_phoenix, Db.ExistDb.Config)
@@ -37,15 +41,13 @@ defmodule WebappPhoenix.Application do
         action: fn _, _, _ -> :ok end
       }, id: :dmarc_file_pending_checker),
 
-      {Ingress.AttachmentDecoder,
-        name: AttachmentDecoder,
-        basepath: Application.get_env(:webapp_phoenix, :mail_folder),
-        dmarcreportsdir: "dmarc/new",
-      },
       Supervisor.child_spec({Ingress.FileCollector,
         name: AttachmentFileCollector,
         config: Application.get_env(:webapp_phoenix, AttachmentFileCollector),
-        action: &Ingress.AttachmentDecoder.decode(AttachmentDecoder, &1, &2, &3)
+        action: &Ingress.AttachmentDecoder.decode_async(
+          Application.get_env(:webapp_phoenix, AttachmentDecoder),
+          &1, &2, &3
+        )
       }, id: :attachment_file_collector),
       Supervisor.child_spec({Ingress.FileCollector,
         name: AttachmentFilePendingChecker,

@@ -1,32 +1,12 @@
-# TODO: make this a Task instead of a Genserver,
-#   as otherwise a crash for a call of a client will
-#   clear this Genserver's mailbox, potentially losing
-#   the pending requests of other clients.
-#   Although this can be mitigated by using call()
-#   instead of cast(), using call() will serialize
-#   all clients' calls, which is not what we intend.
-#   A more appropriate handling would be to run the
-#   decoding logic via a Task.
-
 defmodule Ingress.AttachmentDecoder do
-  use GenServer
-
   require Logger
   require MIME
   require StreamGzip
   require Zstream
 
-  # Client
-
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: opts[:name])
+  defmodule Config do
+    defstruct [:basepath, :dmarcreportsdir]
   end
-
-  def decode(pid, filepath, donefilepath, filesubdir) do
-    GenServer.cast(pid, {:decode, filepath, donefilepath, filesubdir})
-  end
-
-  # Server
 
   defp decode_attachment(filepath, reportsdir, :"application/gzip") do
     donefilename = Path.basename(filepath, Path.extname(filepath))
@@ -61,17 +41,11 @@ defmodule Ingress.AttachmentDecoder do
     :ok
   end
 
-  @impl true
-  def init(opts) do
-    {:ok, %{opts: opts}}
-  end
-
-  @impl true
-  def handle_cast({:decode, filepath, donefilepath, filesubdir}, state) do
+  def decode(config, filepath, donefilepath, filesubdir) do
     Logger.debug([module: __MODULE__, message: "AttachmentsDecoder.decode start", filepath: filepath, donefilepath: donefilepath, filesubdir: filesubdir])
 
-    basepath = Path.absname(state.opts[:basepath])
-    reportsdir = Path.absname("#{basepath}/#{state.opts[:dmarcreportsdir]}/#{filesubdir}")
+    basepath = Path.absname(config.basepath)
+    reportsdir = Path.absname("#{basepath}/#{config.dmarcreportsdir}/#{filesubdir}")
 
     mime_type = MIME.from_path(filepath)
       |> String.to_atom()
@@ -83,7 +57,12 @@ defmodule Ingress.AttachmentDecoder do
 
     Logger.debug([module: __MODULE__, message: "AttachmentsDecoder.decode done"])
 
-    {:noreply, state}
+    :ok
+  end
+
+  def decode_async(config, filepath, donefilepath, filesubdir) do
+    fn -> decode(config, filepath, donefilepath, filesubdir) end
+      |> Task.async
   end
 end
 
