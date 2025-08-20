@@ -27,13 +27,15 @@ defmodule WebappPhoenix.Application do
         config: Application.get_env(:webapp_phoenix, Db.ExistDb.Config)
       },
 
-      {Ingress.DmarcImporter,
-        name: DmarcImporter,
-      },
       Supervisor.child_spec({Ingress.FileCollector,
         name: DmarcFileCollector,
         config: Application.get_env(:webapp_phoenix, DmarcFileCollector),
-        action: &Ingress.DmarcImporter.import_file(DmarcImporter, &1, &2, &3)
+        action: &Task.Supervisor.start_child(
+          TaskSupervisor,
+          fn -> Ingress.DmarcImporter.import_file(
+            &1, &2, &3
+          ) end
+        )
       }, id: :dmarc_file_collector),
       Supervisor.child_spec({Ingress.FileCollector,
         name: DmarcFilePendingChecker,
@@ -44,9 +46,12 @@ defmodule WebappPhoenix.Application do
       Supervisor.child_spec({Ingress.FileCollector,
         name: AttachmentFileCollector,
         config: Application.get_env(:webapp_phoenix, AttachmentFileCollector),
-        action: &Ingress.AttachmentDecoder.decode_async(
-          Application.get_env(:webapp_phoenix, AttachmentDecoder),
-          &1, &2, &3
+        action: &Task.Supervisor.start_child(
+          TaskSupervisor,
+          fn -> Ingress.AttachmentDecoder.decode(
+            Application.get_env(:webapp_phoenix, AttachmentDecoder),
+            &1, &2, &3
+          ) end
         )
       }, id: :attachment_file_collector),
       Supervisor.child_spec({Ingress.FileCollector,
@@ -58,9 +63,12 @@ defmodule WebappPhoenix.Application do
       Supervisor.child_spec({Ingress.FileCollector,
         name: MailFileCollector,
         config: Application.get_env(:webapp_phoenix, MailFileCollector),
-        action: &Ingress.MailDecoder.decode_async(
-          Application.get_env(:webapp_phoenix, MailDecoder),
-          &1, &2, &3
+        action: &Task.Supervisor.start_child(
+          TaskSupervisor,
+          fn -> Ingress.MailDecoder.decode(
+            Application.get_env(:webapp_phoenix, MailDecoder),
+            &1, &2, &3
+          ) end
         )
       }, id: :mail_file_collector),
       Supervisor.child_spec({Ingress.FileCollector,

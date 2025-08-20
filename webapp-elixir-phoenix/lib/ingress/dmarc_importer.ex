@@ -1,37 +1,11 @@
-# TODO: make this a Task instead of a Genserver,
-#   as otherwise a crash for a call of a client will
-#   clear this Genserver's mailbox, potentially losing
-#   the pending requests of other clients.
-#   Although this can be mitigated by using call()
-#   instead of cast(), using call() will serialize
-#   all clients' calls, which is not what we intend.
-#   A more appropriate handling would be to run the
-#   decoding logic via a Task.
-
 defmodule Ingress.DmarcImporter do
-  use GenServer
-
   require Logger
 
-  # Client
+  # defmodule Config do
+  #   defstruct [:basepath, :attachmentsdir]
+  # end
 
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: opts[:name])
-  end
-
-  def import_file(pid, filepath, donefilepath, filesubdir) do
-    GenServer.cast(pid, {:import, filepath, donefilepath, filesubdir})
-  end
-
-  # Server
-
-  @impl true
-  def init(opts) do
-    {:ok, %{opts: opts}}
-  end
-
-  @impl true
-  def handle_cast({:import, filepath, donefilepath, filesubdir}, state) do
+  def import_file(filepath, donefilepath, filesubdir) do
     Logger.debug([module: __MODULE__, message: "DmarcImporter.import start", filepath: filepath, donefilepath: donefilepath])
 
     filename = Path.basename(filepath)
@@ -42,7 +16,7 @@ defmodule Ingress.DmarcImporter do
 
     Logger.debug([module: __MODULE__, message: "DmarcImporter.import done"])
 
-    {:noreply, state}
+    :ok
   end
 end
 

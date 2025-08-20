@@ -13,7 +13,6 @@ defmodule Ingress.MailDecoder do
     basepath = Path.absname(config.basepath)
     attachmentsdir = Path.absname("#{basepath}/#{config.attachmentsdir}")
 
-    try do
     with {:ok, file_contents} <- File.read(mailfilepath),
       mail_msg <- Mail.parse(file_contents) do
       IO.puts("------------------------------- get recipients #{mailfilepath}")
@@ -39,26 +38,8 @@ defmodule Ingress.MailDecoder do
 
       Logger.debug([module: __MODULE__, message: "MailDecoder.decode done", results: results])
     end
-    rescue
-      e -> IO.puts("wooooooooooooooooooooooops #{mailfilepath} #{inspect e}")
-        raise e
-    end
 
     :ok
-  end
-
-  def decode_async(config, filepath, donefilepath, filesubdir) do
-    IO.puts("=========================== mail decode_async start: #{filepath}")
-    # fn -> decode(config, filepath, donefilepath, filesubdir) end
-    #   |> Task.async
-    task = Task.Supervisor.start_child(
-    # task = Task.Supervisor.async(
-      TaskSupervisor,
-      fn -> decode(config, filepath, donefilepath, filesubdir) end
-    )
-    IO.puts("=========================== mail decode_async end: #{filepath} #{task}")
-    # Task.await(task)
-    task
   end
 end
 

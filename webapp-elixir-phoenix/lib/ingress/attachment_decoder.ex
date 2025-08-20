@@ -59,10 +59,5 @@ defmodule Ingress.AttachmentDecoder do
 
     :ok
   end
-
-  def decode_async(config, filepath, donefilepath, filesubdir) do
-    fn -> decode(config, filepath, donefilepath, filesubdir) end
-      |> Task.async
-  end
 end
 
