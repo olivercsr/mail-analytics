@@ -15,7 +15,6 @@ defmodule Ingress.MailDecoder do
 
     with {:ok, file_contents} <- File.read(mailfilepath),
       mail_msg <- Mail.parse(file_contents) do
-      IO.puts("------------------------------- get recipients #{mailfilepath}")
       # TODO: allow for multiple recipients and then search for the one that belongs to us
       # TODO: process only our own domains, not 3rd party ones:
       [tenant] = Mail.get_to(mail_msg)
