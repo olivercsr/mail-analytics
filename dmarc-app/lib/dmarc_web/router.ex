@@ -14,10 +14,31 @@ defmodule DmarcWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated do
+    plug DmarcWeb.Plugs.Auth, "remote-user"
+  end
+
+  pipeline :authenticated_jwt do
+    plug DmarcWeb.Plugs.AuthJwt
+  end
+
+  scope "/login", DmarcWeb do
+    pipe_through [:browser]
+
+    get "/", LoginController, :index
+    get "/:provider", AuthController, :index
+    get "/:provider/callback", AuthController, :callback
+  end
+
   scope "/", DmarcWeb do
-    pipe_through :browser
+    pipe_through [:browser, :authenticated_jwt]
 
     get "/", PageController, :home
+    # get "/query/count/from/:start/until/:end", QueryController, :count
+    live "/query/count/from/:start/until/:end", QueryLive
+    live "/query/count", QueryLive
+    live "/query/ips", QueryIps
+    live "/query/days", QueryDays
   end
 
   # Other scopes may use custom stacks.

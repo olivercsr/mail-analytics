@@ -8,12 +8,10 @@
       {assigns[:page_title]}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
-    <%!-- <link href={~p"/assets/styles.css"} rel="stylesheet"> --%>
-    <%!-- <link href={~p"/assets/charts.min.css"} rel="stylesheet"> --%>
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body id="application" phx-hook="BrowserStorage">
+  <body class="bg-white" id="home" phx-hook="BrowserStorage">
     {@inner_content}
   </body>
 </html>

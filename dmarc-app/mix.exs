@@ -19,7 +19,9 @@ defmodule Dmarc.MixProject do
   def application do
     [
       mod: {Dmarc.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      # enable for observer debugging:
+      # extra_applications: [:logger, :runtime_tools, :os_mon, :observer, :wx, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :os_mon]
     ]
   end
 
@@ -57,7 +59,16 @@ defmodule Dmarc.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:req, "~> 0.5.0"},
+      {:sweet_xml, "~> 0.7.5"},
+      {:mime, "~> 2.0"},
+      {:mail, "~> 0.5.1"},
+      {:stream_gzip, "~>0.4"},
+      {:zstream, "~> 0.6"},
+      {:exldap, "~> 0.6"},
+      {:oauth2, "~> 2.1"},
+      {:joken, "~> 2.6"}
     ]
   end
 

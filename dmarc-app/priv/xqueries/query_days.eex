@@ -1,0 +1,54 @@
+xquery version "3.1";
+
+declare variable $tenant external;
+declare variable $wantedBegin external;
+declare variable $wantedEnd external;
+
+let $wantedBeginDT := xs:dateTime('1970-01-01T00:00:00Z') + xs:dayTimeDuration('PT' || $wantedBegin || 'S')
+let $wantedBeginD := xs:date($wantedBeginDT)
+let $wantedEndDT := xs:dateTime('1970-01-01T00:00:00Z') + xs:dayTimeDuration('PT' || $wantedEnd || 'S')
+let $wantedEndD := xs:date($wantedEndDT)
+
+for $record in collection('/dmarc/' || $tenant)/feedback/record
+    let $metadata := $record/ancestor::feedback/report_metadata
+    let $reportBegin := $metadata/date_range/begin/text()
+    let $reportEnd := $metadata/date_range/end/text()
+    let $reportId := $metadata/report_id/text()
+    let $reportOrg := $metadata/org_name/text()
+    let $reportEmail := $metadata/email/text()
+    where $reportBegin <= $wantedEnd and $reportEnd >= $wantedBegin (: i.e. inclusive/lax :)
+    (:  where $reportBegin >= $wantedBegin and $reportEnd <= $wantedEnd :) (: i.e. exclusive/strict :)
+    let $reportDurationDays := ($reportEnd - $reportBegin) div 60 div 60 div 24
+    let $row := $record/row
+    let $ip := $row/source_ip/text()
+    let $spf := $row/policy_evaluated/spf/text()
+    let $dkim := $row/policy_evaluated/dkim/text()
+    let $count := $row/count/text()
+    let $proportionCount := $count div max([$reportDurationDays, 1e0])
+    let $dmarcPassed := if ($spf = "pass" or $dkim = "pass") then $proportionCount else 0e0
+    let $dmarcFailed := if ($spf = "fail" and $dkim = "fail") then $proportionCount else 0e0
+    for $dayOffset in 0 to xs:integer(floor($reportDurationDays))
+        let $dateTimeOffset := xs:integer($reportBegin + ($dayOffset * 24 * 60 * 60))
+        let $proportionDT := xs:dateTime('1970-01-01T00:00:00Z') + xs:dayTimeDuration('PT' || $dateTimeOffset || 'S')
+        let $proportionD := xs:date($proportionDT)
+        group by $proportionD
+        order by $proportionD
+        return
+            <item>
+                <date>{$proportionD}</date>
+                <dmarctotal>{sum($proportionCount)}</dmarctotal>
+                <dmarcpassed>{sum($dmarcPassed)}</dmarcpassed>
+                <dmarcfailed>{sum($dmarcFailed)}</dmarcfailed>
+                <reportcount>{count(distinct-values($reportId))}</reportcount>
+                <ipcount>{count(distinct-values($ip))}</ipcount>
+                <reports>
+                    {for $id at $pos in distinct-values($reportId) return
+                        <report>
+                            <id>{$id}</id>
+                            <org>{distinct-values($reportOrg)[$pos]}</org>
+                            <email>{distinct-values($reportEmail)[$pos]}</email>
+                        </report>
+                    }
+                </reports>
+            </item>
+

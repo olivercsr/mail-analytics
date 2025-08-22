@@ -1,5 +1,14 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+/* @plugin "daisyui" { */
+/*   themes: light --default, dark --prefersdark, garden; */
+/* } */
 
 /* This file is for your main application CSS */
+
+@import "./charts.min.css";
+/* @import "./styles.css"; */
+
+@import "./custom.css";
+
