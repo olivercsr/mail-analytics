@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  selector:
+    matchLabels:
+      run: postgres
+  serviceName: postgres  # name of headless service
+  replicas: 1
+  revisionHistoryLimit: 2
+  minReadySeconds: 15
+  template:
+    metadata:
+      labels:
+        run: postgres
+    spec:
+      terminationGracePeriodSeconds: 15
+      containers:
+      - name: postgres
+        image: postgres:17-alpine
+        #imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: postgres-config
+        - secretRef:
+            name: postgres-secrets
+        volumeMounts:
+        - name: postgres-data
+          mountPath: '/var/lib/postgresql/data'
+          readOnly: false
+        resources:
+          requests:
+            memory: 32Mi
+          limits:
+            memory: 512Mi
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 256Mi
+
