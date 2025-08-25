@@ -15,13 +15,13 @@ ARG ELIXIR_VERSION=1.18.3
 ARG OTP_VERSION=27.3.3
 ARG DEBIAN_VERSION=bullseye-20250428-slim
 
-ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
-ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
+ARG BUILDER_IMAGE="docker.io/hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
+ARG RUNNER_IMAGE="docker.io/debian:${DEBIAN_VERSION}"
 
 FROM ${BUILDER_IMAGE} as builder
 
 # install build dependencies
-RUN apt-get update -y && apt-get install -y build-essential git \
+RUN apt-get update -y && apt-get install -y build-essential git npm \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # prepare build dir
@@ -50,6 +50,9 @@ COPY priv priv
 COPY lib lib
 
 COPY assets assets
+
+# install npm/node deps
+RUN cd assets && npm ci
 
 # compile assets
 RUN mix assets.deploy
