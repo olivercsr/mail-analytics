@@ -10,12 +10,12 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
 
 ## Project Setup TODOs
-- initialize database
-- integrate daisy.ui ((p)npm)
-- generate docker release files
-- adjust Dockerfile
-- generate release files
-- generate auth models
+- (x) initialize database
+- (x) integrate daisy.ui ((p)npm)
+- (x) generate docker release files
+- (x) adjust Dockerfile
+- (x) generate release files
+- (x) generate auth models
 
 ## Local Development
 
