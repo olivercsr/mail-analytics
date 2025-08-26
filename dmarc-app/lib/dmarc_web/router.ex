@@ -21,6 +21,10 @@ defmodule DmarcWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/query/count/from/:start/until/:end", Queries.QueryLive
+    live "/query/count", Queries.QueryLive
+    live "/query/ips", Queries.QueryIps
+    live "/query/days", Queries.QueryDays
   end
 
   # Other scopes may use custom stacks.
