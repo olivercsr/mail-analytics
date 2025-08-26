@@ -62,12 +62,14 @@ defmodule DmarcWeb.Queries.QueryIps do
     :error
   end
 
-  def mount(params, session, socket) do
-    Logger.debug([module: __MODULE__, message: "MOUNT"])
+  def mount(params, _session, socket) do
+    Logger.debug([module: __MODULE__, message: "MOUNT", customer_email: socket.assigns.current_scope.customer.email])
     # IO.inspect(params)
     # IO.inspect(session)
 
-    tenant = Map.fetch!(session, "authuser")
+    # tenant = Map.fetch!(session, "authuser")
+    tenant = socket.assigns.current_scope.customer.email
+
     startdate = case param_to_date(params["start"]) do
       {:ok, date} -> date
       _ -> DateTime.now!("Etc/UTC")
