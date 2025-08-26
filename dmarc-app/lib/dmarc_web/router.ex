@@ -17,16 +17,6 @@ defmodule DmarcWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", DmarcWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-    live "/query/count/from/:start/until/:end", Queries.QueryLive
-    live "/query/count", Queries.QueryLive
-    live "/query/ips", Queries.QueryIps
-    live "/query/days", Queries.QueryDays
-  end
-
   # Other scopes may use custom stacks.
   # scope "/api", DmarcWeb do
   #   pipe_through :api
@@ -58,9 +48,15 @@ defmodule DmarcWeb.Router do
       on_mount: [{DmarcWeb.CustomerAuth, :require_authenticated}] do
       live "/customers/settings", CustomerLive.Settings, :edit
       live "/customers/settings/confirm-email/:token", CustomerLive.Settings, :confirm_email
+
+      live "/query/count/from/:start/until/:end", Queries.QueryLive
+      live "/query/count", Queries.QueryLive
+      live "/query/ips", Queries.QueryIps
+      live "/query/days", Queries.QueryDays
     end
 
     post "/customers/update-password", CustomerSessionController, :update_password
+    get "/", PageController, :home
   end
 
   scope "/", DmarcWeb do
