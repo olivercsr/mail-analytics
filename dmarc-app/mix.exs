@@ -69,7 +69,8 @@ defmodule Dmarc.MixProject do
       {:zstream, "~> 0.6"},
       {:exldap, "~> 0.6"},
       {:oauth2, "~> 2.1"},
-      {:joken, "~> 2.6"}
+      {:joken, "~> 2.6"},
+      {:lazy_html, "~> 0.1.0", only: :test}
     ]
   end
 

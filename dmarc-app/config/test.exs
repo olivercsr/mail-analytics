@@ -9,10 +9,11 @@ config :bcrypt_elixir, :log_rounds, 1
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :dmarc, Dmarc.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "dmarc_test#{System.get_env("MIX_TEST_PARTITION")}",
+  url: System.get_env("DATABASE_URL") || "ecto://dmarc:dmarc@localhost/dmarc",
+  #username: "postgres",
+  #password: "postgres",
+  #hostname: "localhost",
+  #database: "dmarc_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
