@@ -49,16 +49,6 @@ defmodule DmarcWeb.Router do
       live "/customers/settings", CustomerLive.Settings, :edit
       live "/customers/settings/confirm-email/:token", CustomerLive.Settings, :confirm_email
 
-      live "/tenants", TenantLive.Index, :index
-      live "/tenants/new", TenantLive.Form, :new
-      live "/tenants/:id", TenantLive.Show, :show
-      live "/tenants/:id/edit", TenantLive.Form, :edit
-
-      live "/recipients", RecipientLive.Index, :index
-      live "/recipients/new", RecipientLive.Form, :new
-      live "/recipients/:id", RecipientLive.Show, :show
-      live "/recipients/:id/edit", RecipientLive.Form, :edit
-
       live "/query/count/from/:start/until/:end", Queries.QueryLive
       live "/query/count", Queries.QueryLive
       live "/query/ips", Queries.QueryIps
