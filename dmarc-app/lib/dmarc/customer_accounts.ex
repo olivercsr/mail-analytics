@@ -75,7 +75,12 @@ defmodule Dmarc.CustomerAccounts do
 
   """
   def register_customer(attrs) do
-    %Customer{}
+    {:ok, tenant} = %Dmarc.Tenant{}
+      |> Dmarc.Tenant.changeset(%{name: attrs["email"], dmarc_email: attrs["email"]}, %{})
+      |> Repo.insert()
+    # IO.inspect(tenant)
+
+    %Customer{tenant_id: tenant.id}
     |> Customer.email_changeset(attrs)
     |> Repo.insert()
   end

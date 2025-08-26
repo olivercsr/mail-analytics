@@ -4,6 +4,7 @@ defmodule Dmarc.CustomerAccounts.Customer do
 
   schema "customers" do
     field :email, :string
+    field :tenant_id, :id
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
