@@ -2,10 +2,11 @@ import Config
 
 # Configure your database
 config :dmarc, Dmarc.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "dmarc_dev",
+  url: System.get_env("DATABASE_URL") || "ecto://dmarc:dmarc@localhost/dmarc",
+  #username: "postgres",
+  #password: "postgres",
+  #hostname: "localhost",
+  #database: "dmarc_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
