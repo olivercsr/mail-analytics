@@ -121,34 +121,34 @@ end
 mail_folder = System.get_env("MAIL_FOLDER") || "./mails"
 
 config :dmarc,
-  auth_cookie: (System.get_env("AUTH_COOKIE") || "x-dmarc-session") |> String.trim(),
+  # auth_cookie: (System.get_env("AUTH_COOKIE") || "x-dmarc-session") |> String.trim(),
   mail_folder: mail_folder
 
-config :dmarc, Db.ExistDb.Config, %Db.ExistDb.Config{
-  base_url: System.get_env("EXISTDB_URL"),
-  user: System.get_env("EXISTDB_USER"),
-  password: System.get_env("EXISTDB_PASSWORD")
-}
+# config :dmarc, Db.ExistDb.Config, %Db.ExistDb.Config{
+#   base_url: System.get_env("EXISTDB_URL"),
+#   user: System.get_env("EXISTDB_USER"),
+#   password: System.get_env("EXISTDB_PASSWORD")
+# }
 
 # OAuth providers
-config :dmarc, Google,
- client_id: System.get_env("GOOGLE_CLIENT_ID"),
- client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
- redirect_uri: System.get_env("GOOGLE_REDIRECT_URI")
+# config :dmarc, Google,
+#  client_id: System.get_env("GOOGLE_CLIENT_ID"),
+#  client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
+#  redirect_uri: System.get_env("GOOGLE_REDIRECT_URI")
 
 #config :dmarc, GitHub,
 #  client_id: System.get_env("GITHUB_CLIENT_ID"),
 #  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
 #  redirect_uri: System.get_env("GITHUB_REDIRECT_URI")
 
-config :dmarc, KanIdm,
-  client_id: System.get_env("KANIDM_CLIENT_ID"),
-  client_secret: System.get_env("KANIDM_CLIENT_SECRET"),
-  redirect_uri: System.get_env("KANIDM_REDIRECT_URI")
+# config :dmarc, KanIdm,
+#   client_id: System.get_env("KANIDM_CLIENT_ID"),
+#   client_secret: System.get_env("KANIDM_CLIENT_SECRET"),
+#   redirect_uri: System.get_env("KANIDM_REDIRECT_URI")
 
-config :joken, :default_signer,
-  signer_alg: "HS512",
-  key_octet: System.get_env("JWT_SIGNKEY")
+# config :joken, :default_signer,
+#   signer_alg: "HS512",
+#   key_octet: System.get_env("JWT_SIGNKEY")
 
 config :dmarc, DmarcFileCollector, %Ingress.FileCollector.Config{
   interval_seconds: 41,
