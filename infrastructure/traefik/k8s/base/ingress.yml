@@ -32,17 +32,17 @@ spec:
   #  - ${INGRESS_HOST}
   #  secretName: ${INGRESS_HOST}-tls
   rules:
-  - host: 'auth.oliver.local'
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: traefik-ingress
-            port:
-              number: 443
-  - host: 'app.oliver.local'
+  # - host: 'auth.oliver.local'
+  #   http:
+  #     paths:
+  #     - path: /
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: traefik-ingress
+  #           port:
+  #             number: 443
+  - host: 'dmarc.localhost'
     http:
       paths:
       - path: /

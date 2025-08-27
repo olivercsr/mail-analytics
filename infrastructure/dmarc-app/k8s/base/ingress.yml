@@ -13,7 +13,7 @@ metadata:
 spec:
   #ingressClassName: traefik
   rules:
-  - host: 'app.oliver.local'
+  - host: 'dmarc.localhost'
     http:
       paths:
       - path: /
