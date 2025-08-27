@@ -71,7 +71,7 @@ defmodule DmarcWeb.Queries.QueryDays do
     # IO.inspect(session)
 
     # tenant = Map.fetch!(session, "authuser")
-    tenant = socket.assigns.current_scope.customer.email
+    tenant = socket.assigns.current_scope.customer.tenant.dmarc_email
 
     startdate = case param_to_date(params["start"]) do
       {:ok, date} -> date
@@ -89,7 +89,7 @@ defmodule DmarcWeb.Queries.QueryDays do
     results = query(tenant, startdate, enddate)
 
     {:ok, assign(socket,
-      tenant: tenant,
+      # tenant: tenant,
       form: to_form(%{"start" => startdate, "end" => enddate}),
       startdate: startdate,
       enddate: enddate,
@@ -129,7 +129,9 @@ defmodule DmarcWeb.Queries.QueryDays do
 
     startdate = socket.assigns[:startdate]
     enddate = socket.assigns[:enddate]
-    tenant = socket.assigns[:tenant]
+    # tenant = socket.assigns[:tenant]
+    tenant = socket.assigns.current_scope.customer.tenant.dmarc_email
+    Logger.debug([module: __MODULE__, message: "query params", tenant: tenant, startdate: startdate, enddate: enddate])
     results = query(tenant, startdate, enddate)
     dmarc_max = results
       |> Enum.map(fn item -> item[:dmarctotal] end)

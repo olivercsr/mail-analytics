@@ -125,11 +125,11 @@ config :dmarc,
   mail_folder: mail_folder,
   mail_domain: System.get_env("MAIL_DOMAIN") || "csr-informatik.de"
 
-# config :dmarc, Db.ExistDb.Config, %Db.ExistDb.Config{
-#   base_url: System.get_env("EXISTDB_URL"),
-#   user: System.get_env("EXISTDB_USER"),
-#   password: System.get_env("EXISTDB_PASSWORD")
-# }
+config :dmarc, Db.ExistDb.Config, %Db.ExistDb.Config{
+  base_url: System.get_env("EXISTDB_URL"),
+  user: System.get_env("EXISTDB_USER"),
+  password: System.get_env("EXISTDB_PASSWORD")
+}
 
 # OAuth providers
 # config :dmarc, Google,
