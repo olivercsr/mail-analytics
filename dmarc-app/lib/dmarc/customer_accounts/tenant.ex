@@ -1,4 +1,4 @@
-defmodule Dmarc.Tenant do
+defmodule Dmarc.CustomerAccounts.Tenant do
   use Ecto.Schema
   import Ecto.Changeset
 

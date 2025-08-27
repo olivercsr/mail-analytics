@@ -66,7 +66,7 @@ defmodule DmarcWeb.Queries.QueryDays do
   end
 
   def mount(params, _session, socket) do
-    Logger.debug([module: __MODULE__, message: "MOUNT", customer_email: socket.assigns.current_scope.customer.email])
+    Logger.debug([module: __MODULE__, message: "MOUNT", current_scope: socket.assigns.current_scope])
     # IO.inspect(params)
     # IO.inspect(session)
 

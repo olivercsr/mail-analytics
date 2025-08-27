@@ -16,6 +16,7 @@ defmodule Dmarc.CustomerAccounts.Scope do
   growing application requirements.
   """
 
+  alias Dmarc.Repo
   alias Dmarc.CustomerAccounts.Customer
 
   defstruct customer: nil
@@ -26,7 +27,7 @@ defmodule Dmarc.CustomerAccounts.Scope do
   Returns nil if no customer is given.
   """
   def for_customer(%Customer{} = customer) do
-    %__MODULE__{customer: customer}
+    %__MODULE__{customer: customer |> Repo.preload(:tenant)}
   end
 
   def for_customer(nil), do: nil

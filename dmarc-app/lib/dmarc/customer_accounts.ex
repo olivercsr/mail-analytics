@@ -6,7 +6,7 @@ defmodule Dmarc.CustomerAccounts do
   import Ecto.Query, warn: false
   alias Dmarc.Repo
 
-  alias Dmarc.CustomerAccounts.{Customer, CustomerToken, CustomerNotifier}
+  alias Dmarc.CustomerAccounts.{Customer, CustomerToken, CustomerNotifier, Tenant}
 
   ## Database getters
 
@@ -75,12 +75,12 @@ defmodule Dmarc.CustomerAccounts do
 
   """
   def register_customer(attrs) do
-    {:ok, tenant} = %Dmarc.Tenant{}
-      |> Dmarc.Tenant.changeset(%{name: attrs["email"], dmarc_email: attrs["email"]}, %{})
+    {:ok, tenant} = %Tenant{}
+      |> Tenant.changeset(%{name: attrs["email"], dmarc_email: attrs["email"]}, %{})
       |> Repo.insert()
     # IO.inspect(tenant)
 
-    %Customer{tenant_id: tenant.id}
+    %Customer{tenant: tenant}
     |> Customer.email_changeset(attrs)
     |> Repo.insert()
   end
