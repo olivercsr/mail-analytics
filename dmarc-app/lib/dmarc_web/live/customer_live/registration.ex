@@ -31,6 +31,14 @@ defmodule DmarcWeb.CustomerLive.Registration do
             required
             phx-mounted={JS.focus()}
           />
+          <.input
+            field={@form[:tenant_name]}
+            type="text"
+            label="Tenant"
+            autocomplete="tenant"
+            required
+            phx-mounted={JS.focus()}
+          />
 
           <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
             Create an account
@@ -54,7 +62,8 @@ defmodule DmarcWeb.CustomerLive.Registration do
   end
 
   @impl true
-  def handle_event("save", %{"customer" => customer_params}, socket) do
+  def handle_event("save", %{"customer" => customer_params} = _opts, socket) do
+    # IO.puts("=========================== save #{inspect opts}")
     case CustomerAccounts.register_customer(customer_params) do
       {:ok, customer} ->
         {:ok, _} =
