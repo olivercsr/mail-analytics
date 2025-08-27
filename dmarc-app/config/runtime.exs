@@ -122,7 +122,8 @@ mail_folder = System.get_env("MAIL_FOLDER") || "./mails"
 
 config :dmarc,
   # auth_cookie: (System.get_env("AUTH_COOKIE") || "x-dmarc-session") |> String.trim(),
-  mail_folder: mail_folder
+  mail_folder: mail_folder,
+  mail_domain: System.get_env("MAIL_DOMAIN") || "csr-informatik.de"
 
 # config :dmarc, Db.ExistDb.Config, %Db.ExistDb.Config{
 #   base_url: System.get_env("EXISTDB_URL"),

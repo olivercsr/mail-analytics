@@ -75,9 +75,14 @@ defmodule Dmarc.CustomerAccounts do
 
   """
   def register_customer(%{"email" => _email, "tenant_name" => tenant_name} = attrs) do
+    dmarc_email = Dmarc.Dmarc.generate_mail_address(
+      Application.get_env(:dmarc, :mail_domain),
+      24
+    )
+
     {:ok, tenant} = %Tenant{}
       # TODO: generate dmarc email
-      |> Tenant.changeset(%{name: tenant_name, dmarc_email: attrs["email"]}, %{})
+      |> Tenant.changeset(%{name: tenant_name, dmarc_email: dmarc_email}, %{})
       |> Repo.insert()
     # IO.inspect(tenant)
 
