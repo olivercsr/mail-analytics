@@ -11,4 +11,5 @@ data:
   EXISTDB_URL: http://existdb:8080/exist/rest/dmarc
   MAIL_FOLDER: /mails
   MAIL_DOMAIN: csr-informatik.de
+  MAIL_SENDER: dmarc@csr-informatik.de
 
