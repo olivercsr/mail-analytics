@@ -116,6 +116,11 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Req
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+
+  config :dmarc, Dmarc.Mailer,
+    adapter: Swoosh.Adapters.Smtp2Go,
+    api_key: System.get_env("SMTP2GO_APIKEY")
+
 end
 
 mail_folder = System.get_env("MAIL_FOLDER") || "./mails"
