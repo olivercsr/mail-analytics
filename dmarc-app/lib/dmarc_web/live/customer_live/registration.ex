@@ -37,7 +37,6 @@ defmodule DmarcWeb.CustomerLive.Registration do
             label="Tenant"
             autocomplete="tenant"
             required
-            phx-mounted={JS.focus()}
           />
 
           <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">

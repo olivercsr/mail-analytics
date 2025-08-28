@@ -9,7 +9,7 @@ defmodule Dmarc.CustomerAccounts.CustomerNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Dmarc", "contact@example.com"})
+      |> from({"Dmarc", Application.get_env(:dmarc, :mail_sender)})
       |> subject(subject)
       |> text_body(body)
 

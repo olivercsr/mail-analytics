@@ -118,7 +118,7 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 
   config :dmarc, Dmarc.Mailer,
-    adapter: Swoosh.Adapters.Smtp2Go,
+    adapter: Swoosh.Adapters.SMTP2GO,
     api_key: System.get_env("SMTP2GO_APIKEY")
 
 end
@@ -128,7 +128,8 @@ mail_folder = System.get_env("MAIL_FOLDER") || "./mails"
 config :dmarc,
   # auth_cookie: (System.get_env("AUTH_COOKIE") || "x-dmarc-session") |> String.trim(),
   mail_folder: mail_folder,
-  mail_domain: System.get_env("MAIL_DOMAIN") || "csr-informatik.de"
+  mail_domain: System.get_env("MAIL_DOMAIN") || "csr-informatik.de",
+  mail_sender: System.get_env("MAIL_SENDER") || "dmarc@csr-informatik.de"
 
 config :dmarc, Db.ExistDb.Config, %Db.ExistDb.Config{
   base_url: System.get_env("EXISTDB_URL"),
