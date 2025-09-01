@@ -51,4 +51,23 @@ patches:
     - op: replace
       path: /spec/template/spec/containers/0/imagePullPolicy
       value: Always
+- target:
+    kind: Ingress
+    name: dmarc-app
+  patch: |-
+    - op: remove
+      path: /spec/rules/0
+    - op: add
+      path: /spec/rules/0
+      value:
+        host: 'dev.mydmarc.csr-informatik.de'
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dmarc-app
+                port:
+                  name: http
 
