@@ -53,12 +53,9 @@ patches:
       value: letsencrypt-prod
     - op: replace
       path: /spec/rules/0/host
-      value: auth.mydmarc.csr-informatik.de
-    - op: replace
-      path: /spec/rules/1/host
       value: mydmarc.csr-informatik.de
     - op: add
-      path: /spec/rules/2
+      path: /spec/rules/1
       value:
         host: 'dev.mydmarc.csr-informatik.de'
         http:
