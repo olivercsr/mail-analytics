@@ -7,6 +7,16 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 
+defmodule Env do
+  def get_boolean_envvar(key, default) do
+    case System.fetch_env(key) do
+      {:ok, "true"} -> true
+      {:ok, "false"} -> false
+      _ -> default
+    end
+  end
+end
+
 # ## Using releases
 #
 # If you use `mix release`, you need to explicitly enable the server
@@ -126,6 +136,7 @@ end
 mail_folder = System.get_env("MAIL_FOLDER") || "./mails"
 
 config :dmarc,
+  registration_disabled: Env.get_boolean_envvar("REGISTRATION_DISABLED", false),
   # auth_cookie: (System.get_env("AUTH_COOKIE") || "x-dmarc-session") |> String.trim(),
   mail_folder: mail_folder,
   mail_domain: System.get_env("MAIL_DOMAIN") || "csr-informatik.de",

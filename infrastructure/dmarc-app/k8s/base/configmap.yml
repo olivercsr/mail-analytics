@@ -12,4 +12,5 @@ data:
   MAIL_FOLDER: /mails
   MAIL_DOMAIN: csr-informatik.de
   MAIL_SENDER: dmarc@csr-informatik.de
+  REGISTRATION_DISABLED: 'false'
 

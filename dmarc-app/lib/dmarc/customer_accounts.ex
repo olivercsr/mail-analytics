@@ -75,6 +75,10 @@ defmodule Dmarc.CustomerAccounts do
 
   """
   def register_customer(%{"email" => _email, "tenant_name" => tenant_name} = attrs) do
+    if Application.get_env(:dmarc, :registration_disabled) do
+      raise "registration is disabled" 
+    end
+
     dmarc_email = Dmarc.Dmarc.generate_mail_address(
       Application.get_env(:dmarc, :mail_domain),
       24
