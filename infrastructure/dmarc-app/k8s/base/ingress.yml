@@ -2,16 +2,21 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: dmarc-app
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+  # annotations:
+    # kubernetes.io/ingress.class: traefik
+    # traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     #traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-rewrite-path@kubernetescrd,dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
     #traefik.ingress.kubernetes.io/router.middlewares: 'dmarc-dev-forwardauth-authelia@kubernetescrd' # name of your middleware, as defined in your middleware.yml
-    traefik.ingress.kubernetes.io/router.tls: 'true'
-  labels:
-    router: traefik
+    # traefik.ingress.kubernetes.io/router.tls: 'true'
+    # cert-manager.io/issuer: "letsencrypt-staging"   # replace this with letsencrypt-prod when sure that everything is working fine
+  # labels:
+  #   router: traefik
 spec:
-  ingressClassName: traefik
+  ingressClassName: nginx
+  # tls:
+  # - hosts:
+  #   - 'dmarc.localhost'
+  #   secretName: dmarc.localhost-tls
   rules:
   - host: 'dmarc.localhost'
     http:
