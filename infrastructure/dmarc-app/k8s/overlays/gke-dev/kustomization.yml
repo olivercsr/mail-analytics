@@ -52,22 +52,43 @@ patches:
       path: /spec/template/spec/containers/0/imagePullPolicy
       value: Always
 - target:
+    kind: ConfigMap
+    name: dmarc-app-config
+  patch: |-
+    - op: replace
+      path: /data/PHX_HOST
+      value: dev.mydmarc.csr-informatik.de
+- target:
     kind: Ingress
     name: dmarc-app
   patch: |-
-    - op: remove
-      path: /spec/rules/0
     - op: add
-      path: /spec/rules/0
+      path: /metadata/annotations
       value:
-        host: 'dev.mydmarc.csr-informatik.de'
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: dmarc-app
-                port:
-                  name: http
+        cert-manager.io/issuer: "letsencrypt-staging"
+    - op: add
+      path: /spec/tls
+      value:
+      - hosts:
+        - dev.mydmarc.csr-informatik.de
+        - mydmarc.csr-informatik.de
+        secretName: mydmarc.csr-informatik.de-tls
+    - op: replace
+      path: /spec/rules/0/host
+      value: dev.mydmarc.csr-informatik.de
+#    - op: remove
+#      path: /spec/rules/0
+#    - op: add
+#      path: /spec/rules/0
+#      value:
+#        host: 'dev.mydmarc.csr-informatik.de'
+#        http:
+#          paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: dmarc-app
+#                port:
+#                  name: http
 
