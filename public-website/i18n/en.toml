@@ -1,0 +1,23 @@
+[get_started]
+other = "Start now!"
+
+[feature_collect_title]
+other = "Collect DMARC reports"
+[feature_collect_description]
+other = "Store all your incoming DMARC reports in a centralized place. Let us manage storage, backups etc."
+
+[feature_visualize_title]
+other = "Visualize DMARC reports"
+[feature_visualize_description]
+other = "Look at your DMARC in an easily digestibla way instead of trying to decrypt XML format."
+
+[feature_analyze_title]
+other = "Analyze DMARC reports"
+[feature_analyze_description]
+other = "Look at metrics telling you trends over time and which 3rd party mail senders are malicious."
+
+[feature_alerting_title]
+other = "Be informed in real-time"
+[feature_alerting_description]
+other = "Configure alerts on certain events, so you can react in real time."
+
