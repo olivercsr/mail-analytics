@@ -4,6 +4,7 @@ import "core:fmt"
 import "core:log"
 import "core:net"
 import "core:time"
+import rl "vendor:raylib"
 
 import http "odin-http"
 
@@ -39,6 +40,20 @@ main :: proc() {
 
   err := http.listen_and_serve(&s, routed, net.Endpoint{address = net.IP4_Loopback, port = 6969})
   fmt.assertf(err == nil, "server stopped with error: %v", err)
+
+  my_raylib()
+}
+
+my_raylib :: proc() {
+  rl.InitWindow(1024, 800, "my_raylib")
+
+  for !rl.WindowShouldClose() {
+    rl.BeginDrawing()
+    rl.ClearBackground(rl.BLUE)
+    rl.EndDrawing()
+  }
+
+  rl.CloseWindow()
 }
 
 cookies :: proc(req: ^http.Request, res: ^http.Response) {
